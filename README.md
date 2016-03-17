@@ -3,8 +3,9 @@ TP 1942
 
 # GRUPO
 
-- Perrotta Agustin
-- Israel Pablo
-- Mintrone Luciano
 - Caldora Facundo
 - Gimenez Gustavo
+- Israel Pablo
+- Mintrone Luciano
+- Perrotta Agustin
+
