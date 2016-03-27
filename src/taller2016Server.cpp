@@ -12,11 +12,14 @@
 #define MAXHOSTNAME 256
 using namespace std;
 
+
 struct clientMsj {
 	int id;
 	char type[20];
 	char value[20];
 };
+
+list<clientMsj> msjs;
 
 int readBlock(int fd, void* buffer, int len) {
 	int ret = 0;
@@ -33,7 +36,6 @@ int readBlock(int fd, void* buffer, int len) {
 
 void* readMsjs(void *param) {
 	clientMsj msj = { };
-	list<clientMsj> msjs = *((list<clientMsj> *) param);
 	while (1) {
 		if (!msjs.empty()) {
 			msj = msjs.front();
@@ -48,7 +50,6 @@ void* readMsjs(void *param) {
 
 int main() {
 
-	list<clientMsj> msjs;
 	struct sockaddr_in socketInfo;
 	char sysHost[MAXHOSTNAME + 1]; // Hostname of this computer we are running on
 	struct hostent *hPtr;
@@ -93,15 +94,13 @@ int main() {
 
 	//arranco el thread que va a ir desencolando los mensajes que recibe el server
 	pthread_t messageReaderThread;
-	pthread_create(&messageReaderThread, NULL, readMsjs, &msjs);
+	pthread_create(&messageReaderThread, NULL, readMsjs, NULL);
 
 	while (1) {
 		clientMsj msj = { };
 		int socketConnection = accept(socketHandle, NULL, NULL);
 		int rc = readBlock(socketConnection, &msj, 44);
-		cout << msj.id << endl;
 		msjs.push_back(msj);
-		cout << msjs.size() << endl;
 
 	}
 	pthread_join(messageReaderThread, NULL);
