@@ -9,9 +9,11 @@
 #include <string.h>
 #include <list>
 #include <pthread.h>
+#include "ClientAttendant.h"
+#include "ClientMessage.h"
+
 #define MAXHOSTNAME 256
 using namespace std;
-
 
 struct clientMsj {
 	int id;
@@ -19,7 +21,8 @@ struct clientMsj {
 	char value[20];
 };
 
-list<clientMsj> msjs;
+list<clientMsj> messagesList;
+list<ClientMessage> clientMessageList;
 
 int readBlock(int fd, void* buffer, int len) {
 	int ret = 0;
@@ -35,14 +38,14 @@ int readBlock(int fd, void* buffer, int len) {
 }
 
 void* readMsjs(void *param) {
-	clientMsj msj = { };
+	clientMsj clientMessage = { };
 	while (1) {
-		if (!msjs.empty()) {
-			msj = msjs.front();
-			cout << msj.id << endl;
-			cout << msj.value << endl;
-			cout << msj.type << endl;
-			msjs.pop_front();
+		if (!messagesList.empty()) {
+			clientMessage = messagesList.front();
+			cout << clientMessage.id << endl;
+			cout << clientMessage.value << endl;
+			cout << clientMessage.type << endl;
+			messagesList.pop_front();
 		}
 	}
 	return 0;
@@ -81,10 +84,21 @@ int main() {
 
 	// Bind the socket to a local socket address
 
+	cout << "BIND";
+
+	int clientID = 1;
+	int clientSocket = 1;
+	ClientAttendant *clientAttendant = new ClientAttendant(clientID,clientSocket, &clientMessageList);//, messagges);
+
+	//clientAttendant->startListeningToClient();
+
+	delete clientAttendant;
+
 	if (bind(socketHandle, (struct sockaddr *) &socketInfo, sizeof(socketInfo))
 			< 0) {
 		close(socketHandle);
 		perror("bind");
+		cout << "exit ";
 		exit(EXIT_FAILURE);
 	}
 
@@ -100,9 +114,9 @@ int main() {
 		clientMsj msj = { };
 		int socketConnection = accept(socketHandle, NULL, NULL);
 		int rc = readBlock(socketConnection, &msj, 44);
-		msjs.push_back(msj);
-
+		messagesList.push_back(msj);
 	}
 	pthread_join(messageReaderThread, NULL);
 	close(socketHandle);
+	cout << "Close ";
 }
