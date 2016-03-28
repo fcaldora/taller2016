@@ -11,15 +11,11 @@
 #include <pthread.h>
 #include "ClientAttendant.h"
 #include "ClientMessage.h"
+#include "XmlParser.h"
+#include "CargadorXML.h"
 
 #define MAXHOSTNAME 256
 using namespace std;
-
-struct clientMsj {
-	int id;
-	char type[20];
-	char value[20];
-};
 
 list<clientMsj> messagesList;
 list<ClientMessage> clientMessageList;
@@ -51,13 +47,21 @@ void* readMsjs(void *param) {
 	return 0;
 }
 
-int main() {
-
+int main(int argc, char* argv[]) {
+	if(argc != 2){
+	cout<<"Falta escribir el nombre del archivo!"<<endl;
+	return -1;	
+	}
+	
+	CargadorXML cargador;
+	cargador.cargarServidor(argv[1]);
+	XmlParser parser(cargador.getDocumento());
 	struct sockaddr_in socketInfo;
 	char sysHost[MAXHOSTNAME + 1]; // Hostname of this computer we are running on
 	struct hostent *hPtr;
 	int socketHandle;
 	int portNumber = 8080;
+	parser.obtenerPuertoSv(portNumber);
 
 	bzero(&socketInfo, sizeof(sockaddr_in));  // Clear structure memory
 
@@ -113,7 +117,7 @@ int main() {
 	while (1) {
 		clientMsj msj = { };
 		int socketConnection = accept(socketHandle, NULL, NULL);
-		int rc = readBlock(socketConnection, &msj, 44);
+		int rc = readBlock(socketConnection, &msj, 60);
 		messagesList.push_back(msj);
 	}
 	pthread_join(messageReaderThread, NULL);
