@@ -67,6 +67,9 @@ int main(int argc, char* argv[]) {
 	int socketHandle;
 	int portNumber = 8080;
 	parser.obtenerPuertoSv(portNumber);
+	int maxNumberOfClients;
+	int numberOfCurrentAcceptedClients = 0;
+	parser.obtenerMaxClientes(maxNumberOfClients);
 
 	bzero(&socketInfo, sizeof(sockaddr_in));  // Clear structure memory
 
@@ -99,8 +102,6 @@ int main(int argc, char* argv[]) {
 		cout << "exit ";
 		exit(EXIT_FAILURE);
 	}
-	cout << "Thread created ";
-
 	if (listen(socketHandle, 5) == -1) {
 		return -1;
 	}
@@ -112,12 +113,17 @@ int main(int argc, char* argv[]) {
 			printf("\ncan't create thread :[%s]", strerror(err));
 
 	while (1) {
-		clientMsj msj = { };
-		int socketConnection = accept(socketHandle, NULL, NULL);
-		int rc = readBlock(socketConnection, &msj, 60);
-		messagesList.push_back(msj);
+		if (numberOfCurrentAcceptedClients < maxNumberOfClients) {
+			int socketConnection = accept(socketHandle, NULL, NULL);
+			clientMsj msj = { };
+			int rc = readBlock(socketConnection, &msj, 60);
+			messagesList.push_back(msj);
+			numberOfCurrentAcceptedClients++;
+		}
 	}
 	pthread_join(messageReaderThread, NULL);
 	close(socketHandle);
 	cout << "Close ";
+
+	return EXIT_SUCCESS;
 }
