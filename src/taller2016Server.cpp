@@ -17,6 +17,8 @@
 #define MAXHOSTNAME 256
 using namespace std;
 
+pthread_t threadID[2];
+
 list<clientMsj> messagesList;
 list<ClientMessage> clientMessageList;
 
@@ -50,11 +52,14 @@ void* readMsjs(void *param) {
 int main(int argc, char* argv[]) {
 	if(argc != 2){
 	cout<<"Falta escribir el nombre del archivo!"<<endl;
-	return -1;	
+	return -1;
 	}
 	
 	CargadorXML cargador;
+
 	cargador.cargarServidor(argv[1]);
+	//cargador.cargarServidor("serverTest.txt");
+
 	XmlParser parser(cargador.getDocumento());
 	struct sockaddr_in socketInfo;
 	char sysHost[MAXHOSTNAME + 1]; // Hostname of this computer we are running on
@@ -87,17 +92,6 @@ int main(int argc, char* argv[]) {
 	socketInfo.sin_port = htons(portNumber);  // Set port number
 
 	// Bind the socket to a local socket address
-
-	cout << "BIND";
-
-	int clientID = 1;
-	int clientSocket = 1;
-	ClientAttendant *clientAttendant = new ClientAttendant(clientID,clientSocket, &clientMessageList);//, messagges);
-
-	//clientAttendant->startListeningToClient();
-
-	delete clientAttendant;
-
 	if (bind(socketHandle, (struct sockaddr *) &socketInfo, sizeof(socketInfo))
 			< 0) {
 		close(socketHandle);
@@ -105,6 +99,7 @@ int main(int argc, char* argv[]) {
 		cout << "exit ";
 		exit(EXIT_FAILURE);
 	}
+	cout << "Thread created ";
 
 	if (listen(socketHandle, 5) == -1) {
 		return -1;
@@ -112,7 +107,9 @@ int main(int argc, char* argv[]) {
 
 	//arranco el thread que va a ir desencolando los mensajes que recibe el server
 	pthread_t messageReaderThread;
-	pthread_create(&messageReaderThread, NULL, readMsjs, NULL);
+	int err = pthread_create(&(threadID[2]), NULL, &readMsjs, NULL);
+	if (err != 0)
+			printf("\ncan't create thread :[%s]", strerror(err));
 
 	while (1) {
 		clientMsj msj = { };
