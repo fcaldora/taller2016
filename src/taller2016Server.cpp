@@ -47,10 +47,16 @@ void readMsjs() {
 }
 
 void* clientReader(int socketConnection){
-	while(1){
+	bool clientConnected = true;
+	while(clientConnected){
 		clientMsj msj;
-		readBlock(socketConnection, &msj, 60);
+		readBlock(socketConnection, &msj, sizeof(msj));
 		cout << "socket connection: " << socketConnection << ", msj:" << msj.value << endl;
+		if(strcmp (msj.value,"Disconnection") == 0){
+			write(socketConnection, &msj, sizeof(msj));
+			close(socketConnection);
+			clientConnected = false;
+		}
 		write(socketConnection,&msj,sizeof(msj));
 	}
 }
