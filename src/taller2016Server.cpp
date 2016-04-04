@@ -8,7 +8,7 @@
 #include <sys/unistd.h>
 #include <string.h>
 #include <list>
-#include <pthread.h>
+#include <thread>
 #include "ClientAttendant.h"
 #include "ClientMessage.h"
 #include "XmlParser.h"
@@ -16,8 +16,6 @@
 
 #define MAXHOSTNAME 256
 using namespace std;
-
-pthread_t threadID[2];
 
 list<clientMsj> messagesList;
 list<ClientMessage> clientMessageList;
@@ -35,7 +33,7 @@ int readBlock(int fd, void* buffer, int len) {
 	return count;
 }
 
-void* readMsjs(void *param) {
+void readMsjs() {
 	clientMsj clientMessage = { };
 	while (1) {
 		if (!messagesList.empty()) {
@@ -46,7 +44,15 @@ void* readMsjs(void *param) {
 			messagesList.pop_front();
 		}
 	}
-	return 0;
+}
+
+void* clientReader(int socketConnection){
+	while(1){
+		clientMsj msj;
+		readBlock(socketConnection, &msj, 60);
+		cout << "socket connection: " << socketConnection << ", msj:" << msj.value << endl;
+		write(socketConnection,&msj,sizeof(msj));
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -55,6 +61,8 @@ int main(int argc, char* argv[]) {
 	return -1;
 	}
 	
+	std::thread clientThreads[5];
+
 	CargadorXML cargador;
 
 	cargador.cargarServidor(argv[1]);
@@ -68,7 +76,7 @@ int main(int argc, char* argv[]) {
 	int portNumber = 8080;
 	parser.obtenerPuertoSv(portNumber);
 	int maxNumberOfClients;
-	int numberOfCurrentAcceptedClients = 0;
+	int numberOfCurrentAcceptedClients = 1;
 	parser.obtenerMaxClientes(maxNumberOfClients);
 
 	bzero(&socketInfo, sizeof(sockaddr_in));  // Clear structure memory
@@ -105,23 +113,27 @@ int main(int argc, char* argv[]) {
 	if (listen(socketHandle, 5) == -1) {
 		return -1;
 	}
+	//Creo una lista donde voy a guardar los threads
 
 	//arranco el thread que va a ir desencolando los mensajes que recibe el server
-	pthread_t messageReaderThread;
-	int err = pthread_create(&(threadID[2]), NULL, &readMsjs, NULL);
-	if (err != 0)
-			printf("\ncan't create thread :[%s]", strerror(err));
+
+	//std::thread messageReaderThread(readMsjs);
 
 	while (1) {
 		if (numberOfCurrentAcceptedClients < maxNumberOfClients) {
+			cout << "Waiting for a client connection" << endl;
 			int socketConnection = accept(socketHandle, NULL, NULL);
-			clientMsj msj = { };
-			int rc = readBlock(socketConnection, &msj, 60);
-			messagesList.push_back(msj);
+			cout << "connection received" << endl;
+			//int rc = readBlock(socketConnection, &msj, 60);
+			clientThreads[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection);
 			numberOfCurrentAcceptedClients++;
 		}
 	}
-	pthread_join(messageReaderThread, NULL);
+
+	//messageReaderThread.join();
+	for(int i=1; i< maxNumberOfClients; i++){
+		clientThreads[i].join();
+	}
 	close(socketHandle);
 	cout << "Close ";
 
