@@ -1,11 +1,14 @@
 #include "XmlParser.h"
 
-XmlParser::XmlParser(TiXmlDocument* doc) {
-	this->doc = doc;
+XmlParser::XmlParser(const char* fileName) {
+	TiXmlDocument xmlFile(fileName);
+	if (xmlFile.LoadFile()) {
+		this->doc = xmlFile;
+	}
 }
 
 void XmlParser::obtenerMensaje(clientMsj &mensaje, int nroMensaje){
-	TiXmlHandle docHandle(this->doc);
+	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* msj = docHandle.FirstChild("Cliente").FirstChild("Mensajes").Child("Mensaje", nroMensaje).ToElement();
 	if (msj){
 		string id(msj->FirstChild("Id")->ToElement()->GetText());
@@ -21,18 +24,20 @@ void XmlParser::obtenerMensaje(clientMsj &mensaje, int nroMensaje){
 		cout<<"Error al obtener el mensaje";
 }
 
-void XmlParser::obtenerPuertoSv(int &puerto){
-	TiXmlHandle docHandle(this->doc);
+int XmlParser::getServerPort(){
+	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* puertoElem = docHandle.FirstChild("Servidor").FirstChild("Puerto").ToElement();
 
 	if(puertoElem)
-		puerto = atoi(puertoElem->GetText());
-	else
+		return atoi(puertoElem->GetText());
+	else {
 		cout<<"Error al obtener el puerto";
+		return 8080;
+	}
 }
 
 void XmlParser::obtenerPuertoCl(int &puerto){
-	TiXmlHandle docHandle(this->doc);
+	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* puertoElem = docHandle.FirstChild("Cliente").FirstChild("Conexion").FirstChild("Puerto").ToElement();
 
 	if(puertoElem)
@@ -43,7 +48,7 @@ void XmlParser::obtenerPuertoCl(int &puerto){
 }
 
 void XmlParser::obtenerIp(string &ip){
-	TiXmlHandle docHandle(this->doc);
+	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* ipElem = docHandle.FirstChild("Cliente").FirstChild("Conexion").FirstChild("Ip").ToElement();
 
 	if(ipElem)
@@ -53,7 +58,7 @@ void XmlParser::obtenerIp(string &ip){
 }
 
 void XmlParser::obtenerMaxClientes(int &maxClientes){
-	TiXmlHandle docHandle(this->doc);
+	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* maxElem = docHandle.FirstChild("Servidor").FirstChild("CantidadMaximaClientes").ToElement();
 
 	if (maxElem)

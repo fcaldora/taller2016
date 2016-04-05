@@ -17,15 +17,15 @@ using namespace std;
 
 class XmlParser {
 public:
-	XmlParser(TiXmlDocument* doc);
+	XmlParser(const char* fileName);
 	virtual ~XmlParser();
 	void obtenerMensaje(clientMsj &mensaje, int nroMensaje);
-	void obtenerPuertoSv(int &puerto);
+	int getServerPort();
 	void obtenerPuertoCl(int &puerto);
 	void obtenerIp(string &ip);
 	void obtenerMaxClientes(int &maxClientes);
 private:
-	TiXmlDocument* doc;
+	TiXmlDocument doc;
 };
 
 #endif /* XMLPARSER_H_ */

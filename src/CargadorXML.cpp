@@ -1,12 +1,16 @@
 #include "CargadorXML.h"
+#include <iostream>
+#include <sstream>
 
 //Constantes para crear el archivo en caso de que no exista.
 #define MAXCLIENTES "7"
 #define IP "127.0.0.1"
 #define PUERTO "8080"
+#define kMaxNumberOfClients 10
+#define kMaxNumberOfValidPort 65535
 
 CargadorXML::CargadorXML() {
-	this->archivoErrores.open("ErroresArchivoXML", ios_base::app);
+	this->archivoErrores.open("xmlErrorsLog.txt", ios_base::app);
 }
 
 void CargadorXML::cargarServidor(string nombreArchivo){
@@ -30,6 +34,92 @@ void CargadorXML::cargarServidor(string nombreArchivo){
 		archivoNuevo.SaveFile(nombreArchivo.c_str());
 		this->archivo.LoadFile(nombreArchivo.c_str());
 	}
+}
+
+bool CargadorXML::serverXMLHasValidElements(TiXmlDocument xmlFile) {
+	TiXmlElement *server = xmlFile.FirstChildElement("Servidor");
+	if (server == NULL){
+		writeNotFoundElementInXML("Servidor");
+		return false;
+	}
+
+	TiXmlElement *maxNumberOfClients = server->FirstChildElement("CantidadMaximaClientes");
+	if (maxNumberOfClients == NULL) {
+		writeNotFoundElementInXML("CantidadMaximaClientes");
+		return false;
+	}
+
+	TiXmlElement *port = maxNumberOfClients->NextSiblingElement("Puerto");
+	if (port == NULL) {
+		writeNotFoundElementInXML("Puerto");
+		return false;
+	}
+
+	return true;
+}
+
+bool CargadorXML::serverXMLHasValidValues(TiXmlDocument xmlFile){
+	const char* maxNumberOfClients = xmlFile.FirstChildElement("Servidor")->FirstChildElement("CantidadMaximaClientes")->GetText();
+	std::stringstream strValue;
+	strValue << maxNumberOfClients;
+	unsigned int intValue;
+	strValue >> intValue;
+
+	if (intValue <= 0 || intValue >= kMaxNumberOfClients) {
+		writeValueErrorForElementInXML("CantidadMaximaClientes");
+		return false;
+	}
+
+	const char* port = xmlFile.FirstChildElement("Servidor")->FirstChildElement("CantidadMaximaClientes")->NextSiblingElement("Puerto")->GetText();
+	std::stringstream portStrValue;
+	portStrValue << port;
+	unsigned int portIntValue;
+	portStrValue >> portIntValue;
+
+	if (portIntValue <= 0 || portIntValue > kMaxNumberOfValidPort) {
+		writeValueErrorForElementInXML("Puerto");
+		return false;
+	}
+
+	return true;
+}
+
+bool CargadorXML::serverXMLIsValid(const char* fileName) {
+	TiXmlDocument xmlFile(fileName);
+
+	if(!xmlFile.LoadFile()) {
+		writeNotFoundFileForNameError(fileName);
+		xmlFile.Clear();
+		return false;
+	}
+
+	if (!serverXMLHasValidElements(xmlFile) || !serverXMLHasValidValues(xmlFile)) {
+		xmlFile.Clear();
+		return false;
+	}
+
+	xmlFile.Clear();
+	return true;
+}
+
+void CargadorXML::writeValueErrorForElementInXML(string element){
+	string error = "El valor del elemento '" + element + "' es invalido. Se usara un XML por defecto";
+	writeErrorInFile(error);
+}
+
+void CargadorXML::writeNotFoundElementInXML(string element) {
+	string error = "El elemento '" + element + "' no existe. Se usara un XML por defecto";
+	writeErrorInFile(error);
+}
+
+void CargadorXML::writeNotFoundFileForNameError(string fileName) {
+	string error = "El archivo '" + fileName + "' no existe o es invalido. Se usara archivo pot defecto\n";
+	writeErrorInFile(error);
+}
+
+void CargadorXML::writeErrorInFile(string error) {
+	cout << error << endl;
+	this->archivoErrores <<error;
 }
 
 void CargadorXML::cargarCliente(string nombreArchivo){

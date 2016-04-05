@@ -15,6 +15,8 @@
 #include "CargadorXML.h"
 
 #define MAXHOSTNAME 256
+#define kServerTestFile "serverTest.txt"
+
 using namespace std;
 
 list<clientMsj> messagesList;
@@ -63,29 +65,27 @@ void* clientReader(int socketConnection){
 }
 
 int main(int argc, char* argv[]) {
-	string fileName;
+	const char* fileName;
+	CargadorXML xmlLoader;
 
 	if(argc != 2){
-		fileName = "serverTest.txt";
+		fileName = kServerTestFile;
 		cout<<"Falta escribir el nombre del archivo, se usara uno por defecto"<<endl;
 	} else {
 		fileName = argv[1];
+		if (!xmlLoader.serverXMLIsValid(fileName)){
+			fileName = kServerTestFile;
+		}
 	}
 	
 	std::thread clientThreads[5];
 
-	CargadorXML cargador;
-
-	cargador.cargarServidor(fileName);
-	//cargador.cargarServidor("serverTest.txt");
-
-	XmlParser parser(cargador.getDocumento());
+	XmlParser parser(fileName);
 	struct sockaddr_in socketInfo;
 	char sysHost[MAXHOSTNAME + 1]; // Hostname of this computer we are running on
 	struct hostent *hPtr;
 	int socketHandle;
-	int portNumber = 8080;
-	parser.obtenerPuertoSv(portNumber);
+	int portNumber = parser.getServerPort();
 	int maxNumberOfClients;
 	int numberOfCurrentAcceptedClients = 1;
 	parser.obtenerMaxClientes(maxNumberOfClients);
@@ -118,11 +118,12 @@ int main(int argc, char* argv[]) {
 			< 0) {
 		close(socketHandle);
 		perror("bind");
-		cout << "exit ";
+		cout << "bind exit ";
 		exit(EXIT_FAILURE);
 	}
 	if (listen(socketHandle, 5) == -1) {
-		return -1;
+		cout << "listen exit ";
+		return EXIT_FAILURE;
 	}
 	//Creo una lista donde voy a guardar los threads
 
