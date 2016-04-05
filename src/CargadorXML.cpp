@@ -8,35 +8,13 @@
 #define PUERTO "8080"
 #define kMaxNumberOfClients 10
 #define kMaxNumberOfValidPort 65535
+#define kErrorsLogName "xmlErrorsLog.txt"
 
-CargadorXML::CargadorXML() {
-	this->archivoErrores.open("xmlErrorsLog.txt", ios_base::app);
+XMLLoader::XMLLoader() {
+	this->errorLogFile.open(kErrorsLogName);
 }
 
-void CargadorXML::cargarServidor(string nombreArchivo){
-	if(!this->archivo.LoadFile(nombreArchivo.c_str()))
-	{
-		//Escribo en el file de errores.
-		this->archivoErrores <<"El archivo '"<<nombreArchivo<< "' no existe. Se creó un archivo con ese nombre.\n";
-		//abro un archivo nuevo con valores estander.
-		TiXmlDocument archivoNuevo;
-		TiXmlElement* servidor = new TiXmlElement("Servidor");
-		archivoNuevo.LinkEndChild(servidor);
-		TiXmlElement* maxClientes = new TiXmlElement("CantidadMaximaClientes");
-		servidor->LinkEndChild(maxClientes);
-		TiXmlText* cantidadClientes = new TiXmlText(MAXCLIENTES);
-		maxClientes->LinkEndChild(cantidadClientes);
-		TiXmlElement* puerto = new TiXmlElement("Puerto");
-		TiXmlText* numeroPuerto = new TiXmlText(PUERTO);
-		puerto->LinkEndChild(numeroPuerto);
-		servidor->LinkEndChild(puerto);
-
-		archivoNuevo.SaveFile(nombreArchivo.c_str());
-		this->archivo.LoadFile(nombreArchivo.c_str());
-	}
-}
-
-bool CargadorXML::serverXMLHasValidElements(TiXmlDocument xmlFile) {
+bool XMLLoader::serverXMLHasValidElements(TiXmlDocument xmlFile) {
 	TiXmlElement *server = xmlFile.FirstChildElement("Servidor");
 	if (server == NULL){
 		writeNotFoundElementInXML("Servidor");
@@ -58,7 +36,7 @@ bool CargadorXML::serverXMLHasValidElements(TiXmlDocument xmlFile) {
 	return true;
 }
 
-bool CargadorXML::serverXMLHasValidValues(TiXmlDocument xmlFile){
+bool XMLLoader::serverXMLHasValidValues(TiXmlDocument xmlFile){
 	const char* maxNumberOfClients = xmlFile.FirstChildElement("Servidor")->FirstChildElement("CantidadMaximaClientes")->GetText();
 	std::stringstream strValue;
 	strValue << maxNumberOfClients;
@@ -84,7 +62,7 @@ bool CargadorXML::serverXMLHasValidValues(TiXmlDocument xmlFile){
 	return true;
 }
 
-bool CargadorXML::serverXMLIsValid(const char* fileName) {
+bool XMLLoader::serverXMLIsValid(const char* fileName) {
 	TiXmlDocument xmlFile(fileName);
 
 	if(!xmlFile.LoadFile()) {
@@ -102,31 +80,31 @@ bool CargadorXML::serverXMLIsValid(const char* fileName) {
 	return true;
 }
 
-void CargadorXML::writeValueErrorForElementInXML(string element){
-	string error = "El valor del elemento '" + element + "' es invalido. Se usara un XML por defecto";
+void XMLLoader::writeValueErrorForElementInXML(string element){
+	string error = "El valor del elemento '" + element + "' es invalido. Se usara un XML por defecto.";
 	writeErrorInFile(error);
 }
 
-void CargadorXML::writeNotFoundElementInXML(string element) {
-	string error = "El elemento '" + element + "' no existe. Se usara un XML por defecto";
+void XMLLoader::writeNotFoundElementInXML(string element) {
+	string error = "El elemento '" + element + "' no existe. Se usara un XML por defecto.";
 	writeErrorInFile(error);
 }
 
-void CargadorXML::writeNotFoundFileForNameError(string fileName) {
-	string error = "El archivo '" + fileName + "' no existe o es invalido. Se usara archivo pot defecto\n";
+void XMLLoader::writeNotFoundFileForNameError(string fileName) {
+	string error = "El archivo '" + fileName + "' no existe o es invalido. Se usara archivo pot defecto.";
 	writeErrorInFile(error);
 }
 
-void CargadorXML::writeErrorInFile(string error) {
+void XMLLoader::writeErrorInFile(string error) {
 	cout << error << endl;
-	this->archivoErrores <<error;
+	this->errorLogFile << error << endl;
 }
 
-void CargadorXML::cargarCliente(string nombreArchivo){
-	if(!this->archivo.LoadFile(nombreArchivo.c_str()))
+void XMLLoader::cargarCliente(string nombreArchivo){
+	if(!this->xmlDocument.LoadFile(nombreArchivo.c_str()))
 		{
 			//Escribo en el file de errores.
-			this->archivoErrores <<"El archivo '"<<nombreArchivo<< "' no existe. Se creó un archivo con ese nombre.\n";
+			this->errorLogFile <<"El archivo '"<<nombreArchivo<< "' no existe. Se creó un archivo con ese nombre.\n";
 			//abro un archivo nuevo con valores estander.
 			TiXmlDocument archivoNuevo;
 			TiXmlElement* cliente = new TiXmlElement("Cliente");
@@ -159,17 +137,13 @@ void CargadorXML::cargarCliente(string nombreArchivo){
 			mensajes->LinkEndChild(mensajeUno);
 			cliente->LinkEndChild(mensajes);
 			archivoNuevo.SaveFile(nombreArchivo.c_str());
-			this->archivo.LoadFile(nombreArchivo.c_str());
+			this->xmlDocument.LoadFile(nombreArchivo.c_str());
 		}else{
 			cout<<"carga exitosa\n";
 	}
 }
 
-TiXmlDocument* CargadorXML::getDocumento(){
-	return (&this->archivo);
-}
-
-CargadorXML::~CargadorXML() {
-	this->archivo.Clear();
-	this->archivoErrores.close();
+XMLLoader::~XMLLoader() {
+	this->xmlDocument.Clear();
+	this->errorLogFile.close();
 }

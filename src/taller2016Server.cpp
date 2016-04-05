@@ -64,31 +64,38 @@ void* clientReader(int socketConnection){
 	pthread_exit(NULL);
 }
 
+void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser ,string exitMessage){
+	cout << exitMessage << endl;
+	delete xmlLoader;
+	delete xmlParser;
+}
+
 int main(int argc, char* argv[]) {
 	const char* fileName;
-	CargadorXML xmlLoader;
+	XMLLoader *xmlLoader = new XMLLoader();
 
 	if(argc != 2){
 		fileName = kServerTestFile;
 		cout<<"Falta escribir el nombre del archivo, se usara uno por defecto"<<endl;
 	} else {
 		fileName = argv[1];
-		if (!xmlLoader.serverXMLIsValid(fileName)){
+		if (!xmlLoader->serverXMLIsValid(fileName)){
 			fileName = kServerTestFile;
 		}
 	}
 	
+	xmlLoader->serverXMLIsValid(fileName);
+
 	std::thread clientThreads[5];
 
-	XmlParser parser(fileName);
+	XmlParser *parser = new XmlParser(fileName);
 	struct sockaddr_in socketInfo;
 	char sysHost[MAXHOSTNAME + 1]; // Hostname of this computer we are running on
 	struct hostent *hPtr;
 	int socketHandle;
-	int portNumber = parser.getServerPort();
-	int maxNumberOfClients;
+	int portNumber = parser->getServerPort();
+	int maxNumberOfClients = parser->getMaxNumberOfClients();
 	int numberOfCurrentAcceptedClients = 1;
-	parser.obtenerMaxClientes(maxNumberOfClients);
 
 	bzero(&socketInfo, sizeof(sockaddr_in));  // Clear structure memory
 
@@ -97,6 +104,7 @@ int main(int argc, char* argv[]) {
 	gethostname(sysHost, MAXHOSTNAME); // Get the name of this computer we are running on
 	if ((hPtr = gethostbyname(sysHost)) == NULL) {
 		cerr << "System hostname misconfigured." << endl;
+		prepareForExit(xmlLoader, parser,"System hostname misconfigured exit");
 		exit(EXIT_FAILURE);
 	}
 
@@ -104,6 +112,7 @@ int main(int argc, char* argv[]) {
 
 	if ((socketHandle = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		close(socketHandle);
+		prepareForExit(xmlLoader, parser, "Socket Handle exit");
 		exit(EXIT_FAILURE);
 	}
 
@@ -118,11 +127,11 @@ int main(int argc, char* argv[]) {
 			< 0) {
 		close(socketHandle);
 		perror("bind");
-		cout << "bind exit ";
+		prepareForExit(xmlLoader, parser, "bind exit ");
 		exit(EXIT_FAILURE);
 	}
 	if (listen(socketHandle, 5) == -1) {
-		cout << "listen exit ";
+		prepareForExit(xmlLoader, parser, "listen exit ");
 		return EXIT_FAILURE;
 	}
 	//Creo una lista donde voy a guardar los threads
@@ -146,8 +155,8 @@ int main(int argc, char* argv[]) {
 	for(int i=1; i< maxNumberOfClients; i++){
 		clientThreads[i].join();
 	}
-	close(socketHandle);
-	cout << "Close ";
 
+	close(socketHandle);
+	prepareForExit(xmlLoader, parser, "Close");
 	return EXIT_SUCCESS;
 }

@@ -57,14 +57,16 @@ void XmlParser::obtenerIp(string &ip){
 		cout<<"Error al obtener la ip";
 }
 
-void XmlParser::obtenerMaxClientes(int &maxClientes){
+int XmlParser::getMaxNumberOfClients(){
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* maxElem = docHandle.FirstChild("Servidor").FirstChild("CantidadMaximaClientes").ToElement();
 
 	if (maxElem)
-		maxClientes = atoi(maxElem->GetText());
-	else
+		return atoi(maxElem->GetText());
+	else {
 		cout<<"Error al obtener el numero maximo de clientes";
+		return 0;
+	}
 }
 
 XmlParser::~XmlParser() {

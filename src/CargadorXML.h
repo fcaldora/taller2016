@@ -8,18 +8,16 @@
 
 using namespace std;
 
-class CargadorXML {
+class XMLLoader {
 public:
-	CargadorXML();
-	void cargarServidor(string nombreArchivo);
+	XMLLoader();
 	void cargarCliente(string nombreArchivo);
-	TiXmlDocument* getDocumento();
 	bool serverXMLIsValid(const char* fileName);
-	virtual ~CargadorXML();
+	virtual ~XMLLoader();
 
 private:
-	TiXmlDocument archivo;
-	ofstream archivoErrores;
+	TiXmlDocument xmlDocument;
+	ofstream errorLogFile;
 	void writeErrorInFile(string error);
 	void writeNotFoundFileForNameError(string fileName);
 	void writeNotFoundElementInXML(string element);

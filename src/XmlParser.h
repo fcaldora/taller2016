@@ -23,7 +23,7 @@ public:
 	int getServerPort();
 	void obtenerPuertoCl(int &puerto);
 	void obtenerIp(string &ip);
-	void obtenerMaxClientes(int &maxClientes);
+	int getMaxNumberOfClients();
 private:
 	TiXmlDocument doc;
 };
