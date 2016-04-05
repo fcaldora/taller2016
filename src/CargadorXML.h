@@ -13,12 +13,12 @@ public:
 	XMLLoader();
 	void cargarCliente(string nombreArchivo);
 	bool serverXMLIsValid(const char* fileName);
+	void writeErrorInFile(string error);
 	virtual ~XMLLoader();
 
 private:
 	TiXmlDocument xmlDocument;
 	ofstream errorLogFile;
-	void writeErrorInFile(string error);
 	void writeNotFoundFileForNameError(string fileName);
 	void writeNotFoundElementInXML(string element);
 	bool serverXMLHasValidValues(TiXmlDocument xmlFile);

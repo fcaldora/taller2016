@@ -76,7 +76,8 @@ int main(int argc, char* argv[]) {
 
 	if(argc != 2){
 		fileName = kServerTestFile;
-		cout<<"Falta escribir el nombre del archivo, se usara uno por defecto"<<endl;
+		string error = "Falta escribir el nombre del archivo, se usara uno por defecto";
+		xmlLoader->writeErrorInFile(error);
 	} else {
 		fileName = argv[1];
 		if (!xmlLoader->serverXMLIsValid(fileName)){
