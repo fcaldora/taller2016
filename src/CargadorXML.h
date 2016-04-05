@@ -6,24 +6,21 @@
 #ifndef CARGADORXML_H_
 #define CARGADORXML_H_
 
+#include "ErrorLogWriter.h"
 using namespace std;
 
 class XMLLoader {
+
 public:
-	XMLLoader();
-	void cargarCliente(string nombreArchivo);
+	XMLLoader(ErrorLogWriter *errorLogWriter);
 	bool serverXMLIsValid(const char* fileName);
-	void writeErrorInFile(string error);
 	virtual ~XMLLoader();
 
 private:
+	ErrorLogWriter *errorLogWriter;
 	TiXmlDocument xmlDocument;
-	ofstream errorLogFile;
-	void writeNotFoundFileForNameError(string fileName);
-	void writeNotFoundElementInXML(string element);
 	bool serverXMLHasValidValues(TiXmlDocument xmlFile);
 	bool serverXMLHasValidElements(TiXmlDocument xmlFile);
-	void writeValueErrorForElementInXML(string element);
 };
 
 #endif /* CARGADORXML_H_ */

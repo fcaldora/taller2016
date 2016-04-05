@@ -19,10 +19,7 @@ class XmlParser {
 public:
 	XmlParser(const char* fileName);
 	virtual ~XmlParser();
-	void obtenerMensaje(clientMsj &mensaje, int nroMensaje);
 	int getServerPort();
-	void obtenerPuertoCl(int &puerto);
-	void obtenerIp(string &ip);
 	int getMaxNumberOfClients();
 private:
 	TiXmlDocument doc;

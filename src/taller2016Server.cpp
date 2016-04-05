@@ -13,6 +13,7 @@
 #include "ClientMessage.h"
 #include "XmlParser.h"
 #include "CargadorXML.h"
+#include "ErrorLogWriter.h"
 
 #define MAXHOSTNAME 256
 #define kServerTestFile "serverTest.txt"
@@ -64,28 +65,28 @@ void* clientReader(int socketConnection){
 	pthread_exit(NULL);
 }
 
-void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser ,string exitMessage){
+void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser , ErrorLogWriter *errorLogWriter, string exitMessage){
 	cout << exitMessage << endl;
+	delete errorLogWriter;
 	delete xmlLoader;
 	delete xmlParser;
 }
 
 int main(int argc, char* argv[]) {
 	const char* fileName;
-	XMLLoader *xmlLoader = new XMLLoader();
+	ErrorLogWriter *errorLogWriter = new ErrorLogWriter;
+	XMLLoader *xmlLoader = new XMLLoader(errorLogWriter);
 
 	if(argc != 2){
 		fileName = kServerTestFile;
 		string error = "Falta escribir el nombre del archivo, se usara uno por defecto";
-		xmlLoader->writeErrorInFile(error);
+		errorLogWriter->writeErrorInFile(error);
 	} else {
 		fileName = argv[1];
 		if (!xmlLoader->serverXMLIsValid(fileName)){
 			fileName = kServerTestFile;
 		}
 	}
-	
-	xmlLoader->serverXMLIsValid(fileName);
 
 	std::thread clientThreads[5];
 
@@ -105,7 +106,7 @@ int main(int argc, char* argv[]) {
 	gethostname(sysHost, MAXHOSTNAME); // Get the name of this computer we are running on
 	if ((hPtr = gethostbyname(sysHost)) == NULL) {
 		cerr << "System hostname misconfigured." << endl;
-		prepareForExit(xmlLoader, parser,"System hostname misconfigured exit");
+		prepareForExit(xmlLoader, parser, errorLogWriter, "System hostname misconfigured exit");
 		exit(EXIT_FAILURE);
 	}
 
@@ -113,7 +114,7 @@ int main(int argc, char* argv[]) {
 
 	if ((socketHandle = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		close(socketHandle);
-		prepareForExit(xmlLoader, parser, "Socket Handle exit");
+		prepareForExit(xmlLoader, parser, errorLogWriter, "Socket Handle exit");
 		exit(EXIT_FAILURE);
 	}
 
@@ -128,11 +129,11 @@ int main(int argc, char* argv[]) {
 			< 0) {
 		close(socketHandle);
 		perror("bind");
-		prepareForExit(xmlLoader, parser, "bind exit ");
+		prepareForExit(xmlLoader, parser, errorLogWriter, "bind exit ");
 		exit(EXIT_FAILURE);
 	}
 	if (listen(socketHandle, 5) == -1) {
-		prepareForExit(xmlLoader, parser, "listen exit ");
+		prepareForExit(xmlLoader, parser, errorLogWriter, "listen exit ");
 		return EXIT_FAILURE;
 	}
 	//Creo una lista donde voy a guardar los threads
@@ -158,6 +159,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	close(socketHandle);
-	prepareForExit(xmlLoader, parser, "Close");
+	prepareForExit(xmlLoader, parser, errorLogWriter, "Close");
 	return EXIT_SUCCESS;
 }

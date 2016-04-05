@@ -7,23 +7,6 @@ XmlParser::XmlParser(const char* fileName) {
 	}
 }
 
-void XmlParser::obtenerMensaje(clientMsj &mensaje, int nroMensaje){
-	TiXmlHandle docHandle(&this->doc);
-	TiXmlElement* msj = docHandle.FirstChild("Cliente").FirstChild("Mensajes").Child("Mensaje", nroMensaje).ToElement();
-	if (msj){
-		string id(msj->FirstChild("Id")->ToElement()->GetText());
-		memset(mensaje.id,0,LONGCHAR);
-		strncpy(mensaje.id, id.c_str(), id.size());
-		string type(msj->FirstChild("Tipo")->ToElement()->GetText());
-		memset(mensaje.type,0,LONGCHAR);
-		strncpy(mensaje.type, type.c_str(), type.size());
-		string value(msj->FirstChild("Valor")->ToElement()->GetText());
-		memset(mensaje.value,0,LONGCHAR);
-		strncpy(mensaje.value, value.c_str(), value.size());
-	}else
-		cout<<"Error al obtener el mensaje";
-}
-
 int XmlParser::getServerPort(){
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* puertoElem = docHandle.FirstChild("Servidor").FirstChild("Puerto").ToElement();
@@ -34,27 +17,6 @@ int XmlParser::getServerPort(){
 		cout<<"Error al obtener el puerto";
 		return 8080;
 	}
-}
-
-void XmlParser::obtenerPuertoCl(int &puerto){
-	TiXmlHandle docHandle(&this->doc);
-	TiXmlElement* puertoElem = docHandle.FirstChild("Cliente").FirstChild("Conexion").FirstChild("Puerto").ToElement();
-
-	if(puertoElem)
-		puerto = atoi(puertoElem->GetText());
-	else
-		cout<< "Error al obtener el puerto";
-
-}
-
-void XmlParser::obtenerIp(string &ip){
-	TiXmlHandle docHandle(&this->doc);
-	TiXmlElement* ipElem = docHandle.FirstChild("Cliente").FirstChild("Conexion").FirstChild("Ip").ToElement();
-
-	if(ipElem)
-		ip = string(ipElem->GetText());
-	else
-		cout<<"Error al obtener la ip";
 }
 
 int XmlParser::getMaxNumberOfClients(){
