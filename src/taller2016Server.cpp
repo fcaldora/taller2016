@@ -59,19 +59,24 @@ void* clientReader(int socketConnection){
 		}
 		write(socketConnection,&msj,sizeof(msj));
 	}
+	pthread_exit(NULL);
 }
 
 int main(int argc, char* argv[]) {
+	string fileName;
+
 	if(argc != 2){
-	cout<<"Falta escribir el nombre del archivo!"<<endl;
-	return -1;
+		fileName = "serverTest.txt";
+		cout<<"Falta escribir el nombre del archivo, se usara uno por defecto"<<endl;
+	} else {
+		fileName = argv[1];
 	}
 	
 	std::thread clientThreads[5];
 
 	CargadorXML cargador;
 
-	cargador.cargarServidor(argv[1]);
+	cargador.cargarServidor(fileName);
 	//cargador.cargarServidor("serverTest.txt");
 
 	XmlParser parser(cargador.getDocumento());

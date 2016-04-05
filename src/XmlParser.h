@@ -10,7 +10,6 @@ struct clientMsj {
 	char value[LONGCHAR];
 };
 
-
 #ifndef XMLPARSER_H_
 #define XMLPARSER_H_
 
