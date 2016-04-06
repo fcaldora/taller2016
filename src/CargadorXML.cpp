@@ -5,7 +5,7 @@
 //Constantes para crear el archivo en caso de que no exista.
 #define MAXCLIENTES "7"
 #define IP "127.0.0.1"
-#define PUERTO "8080lude <sstream>"
+#define PUERTO "8080"
 #define kMaxNumberOfClients 10
 #define kMaxNumberOfValidPort 65535
 

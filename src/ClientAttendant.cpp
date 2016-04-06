@@ -29,7 +29,6 @@ void* receiveClientMessages(void *arguments)
 	//struct arg_struct *args = (struct arg_struct *)arguments;
 	char buffer[1024];
 	int clientSocket = args.clientSocket;
-	std::list<ClientMessage>* messages = args.messages;
 
 	int sizeOfMessageReceived = recv(clientSocket, buffer, 1024, 0);
 
