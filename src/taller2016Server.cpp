@@ -23,13 +23,11 @@ using namespace std;
 list<clientMsj> messagesList;
 list<ClientMessage> clientMessageList;
 
-int sendMsj(int socket, string buffer){
-	uint32_t enviados = 0;
+int sendMsj(int socket,int bytesAEnviar, clientMsj* mensaje){
+	int enviados = 0;
 	int res = 0;
-	uint32_t bytesAEnviar = (buffer.size());
-	res = send(socket, &bytesAEnviar, sizeof(uint32_t), MSG_WAITALL);//Envio la longitud del mensaje primero.
 	while(enviados<bytesAEnviar){
-		res = send(socket, &(buffer.c_str())[enviados], bytesAEnviar - enviados, MSG_WAITALL);
+		res = send(socket, &(mensaje)[enviados], bytesAEnviar - enviados, MSG_WAITALL);
 		if (res == 0){ //Se cerró la conexion. Escribir en log de errores de conexion.
 			return 0;
 		}else if(res<0){ //Error en el envio del mensaje. Escribir en el log.
@@ -41,15 +39,11 @@ int sendMsj(int socket, string buffer){
 	return enviados;
 }
 
-int readMsj(int socket, char* buffer){
-	uint32_t totalBytesRecibidos = 0;
+int readMsj(int socket, int bytesARecibir, clientMsj* mensaje){
 	int recibidos = 0;
-	uint32_t numBytes;
-	recv(socket, &numBytes, sizeof(uint32_t), MSG_WAITALL);
-	int tamBuffer = numBytes;
-	memset(buffer,0,20);
-	while (totalBytesRecibidos < numBytes){
-		recibidos = recv(socket, &buffer[totalBytesRecibidos], tamBuffer - totalBytesRecibidos, MSG_WAITALL);
+	int totalBytesRecibidos = 0;
+	while (recibidos < bytesARecibir){
+		recibidos = recv(socket, &mensaje[totalBytesRecibidos], bytesARecibir - totalBytesRecibidos, MSG_WAITALL);
 		if (recibidos < 0){
 			shutdown(socket, SHUT_RDWR);
 			return -1;
@@ -60,7 +54,7 @@ int readMsj(int socket, char* buffer){
 			totalBytesRecibidos += recibidos;
 		}
 	}
-	return 0;
+	return 1;
 }
 
 void readMsjs() {
@@ -77,19 +71,22 @@ void readMsjs() {
 }
 
 void* clientReader(int socketConnection){
-	char buffer[20];
 	int res = 0;
 	bool fin = false;
 	while(!fin){
-		memset(buffer, 0, 20);
-		res = readMsj(socketConnection, buffer);
+		clientMsj recibido;
+		res = readMsj(socketConnection, sizeof(clientMsj), &recibido);
 		if (res< 0){
 			shutdown(socketConnection, SHUT_RDWR);
 			fin = true;
 		}else{
-			cout << "socket connection: " << socketConnection << ", msj:" << buffer << endl;
-			string respuesta("MENSAJE RECIBIDO CORRECTAMENTE: " + string(buffer) + "\n.");
-			sendMsj(socketConnection, respuesta);
+			cout << "socket connection: " << socketConnection << ", msj:" << recibido.value << endl;
+			cout<<"Tipo: "<<recibido.type<<" con id: "<<recibido.id<<endl;
+			clientMsj respuesta;
+			strncpy(respuesta.id,"1",sizeof(respuesta.id));
+			strncpy(respuesta.type, "STRING", sizeof(respuesta.type));
+			strncpy(respuesta.value, "OK", sizeof(respuesta.value));
+			sendMsj(socketConnection, sizeof(respuesta), &respuesta);
 		}
 	}
 	pthread_exit(NULL);
