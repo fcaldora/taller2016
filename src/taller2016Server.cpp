@@ -14,14 +14,20 @@
 #include "XmlParser.h"
 #include "CargadorXML.h"
 #include "ErrorLogWriter.h"
+#include "Procesador.h"
+#include <mutex>
 
 #define MAXHOSTNAME 256
 #define kServerTestFile "serverTest.txt"
 
 using namespace std;
-
-list<clientMsj> messagesList;
+struct msjProcesado{
+	clientMsj mensaje;
+	int socket;
+	bool procesado;
+};
 list<ClientMessage> clientMessageList;
+std::mutex mutexColaMensajes;
 
 int sendMsj(int socket,int bytesAEnviar, clientMsj* mensaje){
 	int enviados = 0;
@@ -56,8 +62,33 @@ int readMsj(int socket, int bytesARecibir, clientMsj* mensaje){
 	}
 	return 1;
 }
+void *procesarMensajes(list<msjProcesado> *msgList){
+	Procesador procesador;
+	bool fin = false;
+	msjProcesado *auxiliar;
+	while (!fin){
+		mutexColaMensajes.lock();
+		auxiliar = &msgList->front();
+		mutexColaMensajes.unlock();
+		if(!msgList->empty() && auxiliar->procesado == false){
+			clientMsj respuesta;
+			strncpy(respuesta.id,"1", 20);
+			strncpy(respuesta.type,"STRING",20);
+			if(procesador.isMsgValid(auxiliar->mensaje.type, auxiliar->mensaje.value)){
+				strncpy(respuesta.value,"Mensaje correcto",20);
+				cout<<"Mensaje correcto"<<endl;
+			}else{
+				strncpy(respuesta.value,"Mensaje incorrecto",20);
+				cout<<"Mensaje incorrecto"<<endl;
+			}
+			auxiliar->mensaje = respuesta;
+		auxiliar->procesado = true;
+		//DESPUES CADA CLIENTE EN SU THREAD DE SALIDA, SACA UN MENSAJE Y SI ESTA PROCESADO ENVIA RESPUESTA.
+		}
+	}
+}
 
-void readMsjs() {
+/*void readMsjs() {
 	clientMsj clientMessage = { };
 	while (1) {
 		if (!messagesList.empty()) {
@@ -68,9 +99,9 @@ void readMsjs() {
 			messagesList.pop_front();
 		}
 	}
-}
+}*/
 
-void* clientReader(int socketConnection){
+void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
 	int res = 0;
 	bool fin = false;
 	while(!fin){
@@ -83,9 +114,17 @@ void* clientReader(int socketConnection){
 			cout << "socket connection: " << socketConnection << ", msj:" << recibido.value << endl;
 			cout<<"Tipo: "<<recibido.type<<" con id: "<<recibido.id<<endl;
 			clientMsj respuesta;
+			msjProcesado mensaje;
+			mensaje.mensaje = recibido;
+			mensaje.procesado = false;
+			mensaje.socket = socketConnection;
 			strncpy(respuesta.id,"1",sizeof(respuesta.id));
 			strncpy(respuesta.type, "STRING", sizeof(respuesta.type));
 			strncpy(respuesta.value, "OK", sizeof(respuesta.value));
+			mutexColaMensajes.lock();
+			messagesList->push_front(mensaje);//CAMBIAR POR PUSH BACK!! PUSH FRONT SOLO PARA PROBAR
+			mutexColaMensajes.unlock();
+			cout<<"Numero de mensajes en la cola: "<<messagesList->size()<<endl;
 			sendMsj(socketConnection, sizeof(respuesta), &respuesta);
 		}
 	}
@@ -103,7 +142,7 @@ int main(int argc, char* argv[]) {
 	const char* fileName;
 	ErrorLogWriter *errorLogWriter = new ErrorLogWriter;
 	XMLLoader *xmlLoader = new XMLLoader(errorLogWriter);
-
+	list<msjProcesado> messagesList;
 	if(argc != 2){
 		fileName = kServerTestFile;
 		string error = "Falta escribir el nombre del archivo, se usara uno por defecto";
@@ -169,12 +208,14 @@ int main(int argc, char* argv[]) {
 
 	//std::thread messageReaderThread(readMsjs);
 
+	//Thread que agarra mensajes de la cola y los procesa.
+	std::thread procesadorMensajes(procesarMensajes, &messagesList);
 	while (1) {
 		if (numberOfCurrentAcceptedClients < maxNumberOfClients) {
 			cout << "Waiting for a client connection" << endl;
 			int socketConnection = accept(socketHandle, NULL, NULL);
 			cout << "connection received" << endl;
-			clientThreads[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection);
+			clientThreads[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection, &messagesList);
 			numberOfCurrentAcceptedClients++;
 		}
 	}

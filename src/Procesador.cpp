@@ -45,12 +45,14 @@ bool Procesador::isADouble(string string){
 }
 
 bool Procesador::isMsgValid(string type, string valor){
-	if(type.compare("INT"))
+	if(type.compare("INT")==0)
 		return(isAnInt(valor));
-	if(type.compare("CHAR"))
+	if(type.compare("CHAR")==0)
 		return(isAChar(valor));
-	if(type.compare("DOUBLE"))
+	if(type.compare("DOUBLE")==0)
 		return(isADouble(valor));
+	if(type.compare("STRING")==0)
+		return true;
 	return false;
 }
 Procesador::~Procesador() {
