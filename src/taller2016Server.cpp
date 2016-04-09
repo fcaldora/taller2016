@@ -62,6 +62,7 @@ int readMsj(int socket, int bytesARecibir, clientMsj* mensaje){
 	}
 	return 1;
 }
+
 void *procesarMensajes(list<msjProcesado> *msgList){
 	Procesador procesador;
 	bool fin = false;
@@ -83,24 +84,12 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 			}
 			auxiliar->mensaje = respuesta;
 		auxiliar->procesado = true;
-		//DESPUES CADA CLIENTE EN SU THREAD DE SALIDA, SACA UN MENSAJE Y SI ESTA PROCESADO ENVIA RESPUESTA.
 		}
 	}
+
+	cout<<"Termino el procesador de mensajes"<<endl;
 	pthread_exit(NULL);
 }
-
-/*void readMsjs() {
-	clientMsj clientMessage = { };
-	while (1) {
-		if (!messagesList.empty()) {
-			clientMessage = messagesList.front();
-			cout << clientMessage.id << endl;
-			cout << clientMessage.value << endl;
-			cout << clientMessage.type << endl;
-			messagesList.pop_front();
-		}
-	}
-}*/
 
 void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
 	int res = 0;
@@ -122,15 +111,36 @@ void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
 			strncpy(respuesta.id,mensaje.mensaje.id,sizeof(respuesta.id));
 			strncpy(respuesta.type, mensaje.mensaje.type, sizeof(respuesta.type));
 			strncpy(respuesta.value, mensaje.mensaje.value, sizeof(respuesta.value));
+
 			mutexColaMensajes.lock();
 			messagesList->push_front(mensaje);//CAMBIAR POR PUSH BACK!! PUSH FRONT SOLO PARA PROBAR
 			mutexColaMensajes.unlock();
+
 			cout<<"Numero de mensajes en la cola: "<<messagesList->size()<<endl;
-			sendMsj(socketConnection, sizeof(respuesta), &respuesta);
 		}
 	}
 	pthread_exit(NULL);
 }
+
+void *responderCliente(int socket, list<msjProcesado> *msgList){
+	bool fin = false;
+	msjProcesado auxiliar;
+	int respuesta;
+	while(!fin){
+		mutexColaMensajes.lock();
+		auxiliar = msgList->front();
+		if(auxiliar.socket == socket && auxiliar.procesado == true){
+			msgList->pop_front();
+			respuesta = sendMsj(socket, sizeof(auxiliar.mensaje), &(auxiliar.mensaje));
+			if(respuesta<=0){
+				fin = true;
+			}
+		}
+		mutexColaMensajes.unlock();
+	}
+	pthread_exit(NULL);
+}
+
 
 void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser , ErrorLogWriter *errorLogWriter, string exitMessage){
 	cout << exitMessage << endl;
@@ -144,6 +154,7 @@ int main(int argc, char* argv[]) {
 	ErrorLogWriter *errorLogWriter = new ErrorLogWriter;
 	XMLLoader *xmlLoader = new XMLLoader(errorLogWriter);
 	list<msjProcesado> messagesList;
+	int numberOfCurrentAcceptedClients = 0;
 	if(argc != 2){
 		fileName = kServerTestFile;
 		string error = "Falta escribir el nombre del archivo, se usara uno por defecto";
@@ -155,7 +166,8 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	std::thread clientThreads[5];
+	std::thread clientEntrada[5];
+	std::thread clientSalida[5];
 
 	XmlParser *parser = new XmlParser(fileName);
 	struct sockaddr_in socketInfo;
@@ -164,7 +176,6 @@ int main(int argc, char* argv[]) {
 	int socketHandle;
 	int portNumber = parser->getServerPort();
 	int maxNumberOfClients = parser->getMaxNumberOfClients();
-	int numberOfCurrentAcceptedClients = 0;
 
 	bzero(&socketInfo, sizeof(sockaddr_in));  // Clear structure memory
 
@@ -203,28 +214,25 @@ int main(int argc, char* argv[]) {
 		prepareForExit(xmlLoader, parser, errorLogWriter, "listen exit ");
 		return EXIT_FAILURE;
 	}
-	//Creo una lista donde voy a guardar los threads
 
-	//arranco el thread que va a ir desencolando los mensajes que recibe el server
-
-	//std::thread messageReaderThread(readMsjs);
-
-	//Thread que agarra mensajes de la cola y los procesa.
+	bool fin = false;
 	std::thread procesadorMensajes(procesarMensajes, &messagesList);
-	while (1) {
+	while (!fin) {
 		if (numberOfCurrentAcceptedClients < maxNumberOfClients) {
 			cout << "Waiting for a client connection" << endl;
 			int socketConnection = accept(socketHandle, NULL, NULL);
 			cout << "connection received" << endl;
-			clientThreads[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection, &messagesList);
+			clientEntrada[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection, &messagesList);
+			clientSalida[numberOfCurrentAcceptedClients] = std::thread(responderCliente, socketConnection, &messagesList);
 			numberOfCurrentAcceptedClients++;
 		}
 	}
 
-	//messageReaderThread.join();
 	for(int i=1; i< maxNumberOfClients; i++){
-		clientThreads[i].join();
+		clientEntrada[i].join();
+		clientSalida[i].join();
 	}
+	procesadorMensajes.join();
 
 	close(socketHandle);
 	prepareForExit(xmlLoader, parser, errorLogWriter, "Close");
