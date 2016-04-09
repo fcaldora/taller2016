@@ -26,13 +26,20 @@ struct msjProcesado{
 	int socket;
 	bool procesado;
 };
-list<ClientMessage> clientMessageList;
+
+list<msjProcesado> messagesList;
 std::mutex mutexColaMensajes;
+std::thread clientEntrada[5];
+std::thread clientSalida[5];
+bool appShouldTerminate;
+
 
 int sendMsj(int socket,int bytesAEnviar, clientMsj* mensaje){
 	int enviados = 0;
 	int res = 0;
-	while(enviados<bytesAEnviar){
+	cout << "send message starts" << endl;
+
+	while(enviados < bytesAEnviar){
 		res = send(socket, &(mensaje)[enviados], bytesAEnviar - enviados, MSG_WAITALL);
 		if (res == 0){ //Se cerró la conexion. Escribir en log de errores de conexion.
 			return 0;
@@ -42,6 +49,8 @@ int sendMsj(int socket,int bytesAEnviar, clientMsj* mensaje){
 			enviados += res;
 		}
 	}
+	cout << "send message finish" << endl;
+
 	return enviados;
 }
 
@@ -65,13 +74,12 @@ int readMsj(int socket, int bytesARecibir, clientMsj* mensaje){
 
 void *procesarMensajes(list<msjProcesado> *msgList){
 	Procesador procesador;
-	bool fin = false;
 	msjProcesado *auxiliar;
-	while (!fin){
+	while (!appShouldTerminate){
 		mutexColaMensajes.lock();
 		auxiliar = &msgList->front();
 		mutexColaMensajes.unlock();
-		if(!msgList->empty() && auxiliar->procesado == false){
+		if(!msgList->empty() && (auxiliar->procesado == false) && !appShouldTerminate){
 			clientMsj respuesta;
 			strncpy(respuesta.id,auxiliar->mensaje.id, 20);
 			strncpy(respuesta.type,auxiliar->mensaje.type,20);
@@ -86,20 +94,17 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 		auxiliar->procesado = true;
 		}
 	}
-
-	cout<<"Termino el procesador de mensajes"<<endl;
 	pthread_exit(NULL);
 }
 
 void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
 	int res = 0;
-	bool fin = false;
-	while(!fin){
+	while(!appShouldTerminate){
 		clientMsj recibido;
 		res = readMsj(socketConnection, sizeof(clientMsj), &recibido);
 		if (res< 0){
 			shutdown(socketConnection, SHUT_RDWR);
-			fin = true;
+			appShouldTerminate = true;
 		}else{
 			cout << "socket connection: " << socketConnection << ", msj:" << recibido.value << endl;
 			cout<<"Tipo: "<<recibido.type<<" con id: "<<recibido.id<<endl;
@@ -123,24 +128,38 @@ void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
 }
 
 void *responderCliente(int socket, list<msjProcesado> *msgList){
-	bool fin = false;
 	msjProcesado auxiliar;
 	int respuesta;
-	while(!fin){
+
+	while(!appShouldTerminate){
 		mutexColaMensajes.lock();
 		auxiliar = msgList->front();
-		if(auxiliar.socket == socket && auxiliar.procesado == true){
+		if((auxiliar.socket == socket) && (auxiliar.procesado == true)){
 			msgList->pop_front();
 			respuesta = sendMsj(socket, sizeof(auxiliar.mensaje), &(auxiliar.mensaje));
 			if(respuesta<=0){
-				fin = true;
+				appShouldTerminate = true;
 			}
 		}
 		mutexColaMensajes.unlock();
 	}
+
 	pthread_exit(NULL);
 }
 
+void* waitForClientConnection(int numberOfCurrentAcceptedClients, int maxNumberOfClients, int socketHandle) {
+	while (!appShouldTerminate) {
+		if (numberOfCurrentAcceptedClients < maxNumberOfClients) {
+			cout << "Waiting for a client connection" << endl;
+			int socketConnection = accept(socketHandle, NULL, NULL);
+			cout << "connection received" << endl;
+			clientEntrada[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection, &messagesList);
+			clientSalida[numberOfCurrentAcceptedClients] = std::thread(responderCliente, socketConnection, &messagesList);
+			numberOfCurrentAcceptedClients++;
+		}
+	}
+	pthread_exit(NULL);
+}
 
 void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser , ErrorLogWriter *errorLogWriter, string exitMessage){
 	cout << exitMessage << endl;
@@ -153,7 +172,6 @@ int main(int argc, char* argv[]) {
 	const char* fileName;
 	ErrorLogWriter *errorLogWriter = new ErrorLogWriter;
 	XMLLoader *xmlLoader = new XMLLoader(errorLogWriter);
-	list<msjProcesado> messagesList;
 	int numberOfCurrentAcceptedClients = 0;
 	if(argc != 2){
 		fileName = kServerTestFile;
@@ -165,9 +183,6 @@ int main(int argc, char* argv[]) {
 			fileName = kServerTestFile;
 		}
 	}
-
-	std::thread clientEntrada[5];
-	std::thread clientSalida[5];
 
 	XmlParser *parser = new XmlParser(fileName);
 	struct sockaddr_in socketInfo;
@@ -215,24 +230,29 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	bool fin = false;
+	appShouldTerminate = false;
 	std::thread procesadorMensajes(procesarMensajes, &messagesList);
-	while (!fin) {
-		if (numberOfCurrentAcceptedClients < maxNumberOfClients) {
-			cout << "Waiting for a client connection" << endl;
-			int socketConnection = accept(socketHandle, NULL, NULL);
-			cout << "connection received" << endl;
-			clientEntrada[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection, &messagesList);
-			clientSalida[numberOfCurrentAcceptedClients] = std::thread(responderCliente, socketConnection, &messagesList);
-			numberOfCurrentAcceptedClients++;
+	std::thread clientConnectionWaiter(waitForClientConnection, numberOfCurrentAcceptedClients, maxNumberOfClients, socketHandle);
+	while (!appShouldTerminate) {
+		cout << "Menu:" << endl;
+		cout << "1. Salir" << endl;
+		cout << "Ingresar opcion:" << endl;
+		unsigned int userDidChooseOption;
+		cin >> userDidChooseOption;
+		if (userDidChooseOption == 1) {
+			appShouldTerminate = true;
+		} else {
+			cout << "Opcion incorrecta" << endl;
 		}
 	}
 
-	for(int i=1; i< maxNumberOfClients; i++){
+	for(int i = 0; i < numberOfCurrentAcceptedClients; i++){
 		clientEntrada[i].join();
 		clientSalida[i].join();
 	}
-	procesadorMensajes.join();
+	procesadorMensajes.detach();
+
+	clientConnectionWaiter.detach();
 
 	close(socketHandle);
 	prepareForExit(xmlLoader, parser, errorLogWriter, "Close");
