@@ -8,22 +8,24 @@
 #ifndef ERRORLOGWRITER_H_
 #define ERRORLOGWRITER_H_
 
-#include <string>
-#include <iostream>
-#include <fstream>
-using namespace std;
+#include "Constants.h"
 
-class ErrorLogWriter {
+class LogWriter {
 public:
-	ErrorLogWriter();
-	virtual ~ErrorLogWriter();
-	void writeErrorInFile(string error);
+	LogWriter();
+	virtual ~LogWriter();
+
+	void setLogLevel(LogLevelType logLevel);
+
+	void writeLogInFile(string error);
 	void writeValueErrorForElementInXML(string element);
 	void writeNotFoundFileForNameError(string fileName);
 	void writeNotFoundElementInXML(string element);
+	void writeUserDidnotEnterFileName();
 
 private:
-	ofstream errorLogFile;
+	LogLevelType logLevel;
+	ofstream logFile;
 };
 
 #endif /* ERRORLOGWRITER_H_ */

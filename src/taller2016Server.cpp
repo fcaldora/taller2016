@@ -9,15 +9,15 @@
 #include <string.h>
 #include <list>
 #include <thread>
-#include "ClientAttendant.h"
-#include "ClientMessage.h"
 #include "XmlParser.h"
 #include "CargadorXML.h"
-#include "ErrorLogWriter.h"
+#include "LogWriter.h"
 #include "Procesador.h"
 #include <mutex>
 
-#define MAXHOSTNAME 256
+#include "Constants.h"
+
+#define kMaxHostName 256
 #define kServerTestFile "serverTest.txt"
 
 using namespace std;
@@ -33,11 +33,9 @@ std::thread clientEntrada[5];
 std::thread clientSalida[5];
 bool appShouldTerminate;
 
-
 int sendMsj(int socket,int bytesAEnviar, clientMsj* mensaje){
 	int enviados = 0;
 	int res = 0;
-	cout << "send message starts" << endl;
 
 	while(enviados < bytesAEnviar){
 		res = send(socket, &(mensaje)[enviados], bytesAEnviar - enviados, MSG_WAITALL);
@@ -49,7 +47,6 @@ int sendMsj(int socket,int bytesAEnviar, clientMsj* mensaje){
 			enviados += res;
 		}
 	}
-	cout << "send message finish" << endl;
 
 	return enviados;
 }
@@ -97,14 +94,16 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 	pthread_exit(NULL);
 }
 
-void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
+void *clientReader(int socketConnection, list<msjProcesado>* messagesList, int numberOfCurrentAcceptedClients){
 	int res = 0;
-	while(!appShouldTerminate){
+	bool clientHasDisconnected = false;
+	while(!appShouldTerminate && !clientHasDisconnected){
 		clientMsj recibido;
 		res = readMsj(socketConnection, sizeof(clientMsj), &recibido);
 		if (res< 0){
 			shutdown(socketConnection, SHUT_RDWR);
-			appShouldTerminate = true;
+			clientHasDisconnected = true;
+			numberOfCurrentAcceptedClients --;
 		}else{
 			cout << "socket connection: " << socketConnection << ", msj:" << recibido.value << endl;
 			cout<<"Tipo: "<<recibido.type<<" con id: "<<recibido.id<<endl;
@@ -153,7 +152,7 @@ void* waitForClientConnection(int numberOfCurrentAcceptedClients, int maxNumberO
 			cout << "Waiting for a client connection" << endl;
 			int socketConnection = accept(socketHandle, NULL, NULL);
 			cout << "connection received" << endl;
-			clientEntrada[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection, &messagesList);
+			clientEntrada[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection, &messagesList, numberOfCurrentAcceptedClients);
 			clientSalida[numberOfCurrentAcceptedClients] = std::thread(responderCliente, socketConnection, &messagesList);
 			numberOfCurrentAcceptedClients++;
 		}
@@ -161,7 +160,7 @@ void* waitForClientConnection(int numberOfCurrentAcceptedClients, int maxNumberO
 	pthread_exit(NULL);
 }
 
-void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser , ErrorLogWriter *errorLogWriter, string exitMessage){
+void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser , LogWriter *errorLogWriter, string exitMessage){
 	cout << exitMessage << endl;
 	delete errorLogWriter;
 	delete xmlLoader;
@@ -170,13 +169,12 @@ void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser , ErrorLogWriter 
 
 int main(int argc, char* argv[]) {
 	const char* fileName;
-	ErrorLogWriter *errorLogWriter = new ErrorLogWriter;
-	XMLLoader *xmlLoader = new XMLLoader(errorLogWriter);
+	LogWriter *logWriter = new LogWriter;
+	XMLLoader *xmlLoader = new XMLLoader(logWriter);
 	int numberOfCurrentAcceptedClients = 0;
 	if(argc != 2){
 		fileName = kServerTestFile;
-		string error = "Falta escribir el nombre del archivo, se usara uno por defecto";
-		errorLogWriter->writeErrorInFile(error);
+		logWriter->writeUserDidnotEnterFileName();
 	} else {
 		fileName = argv[1];
 		if (!xmlLoader->serverXMLIsValid(fileName)){
@@ -185,8 +183,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	XmlParser *parser = new XmlParser(fileName);
+	logWriter->setLogLevel(parser->getLogLevel());
 	struct sockaddr_in socketInfo;
-	char sysHost[MAXHOSTNAME + 1]; // Hostname of this computer we are running on
+	char sysHost[kMaxHostName + 1]; // Hostname of this computer we are running on
 	struct hostent *hPtr;
 	int socketHandle;
 	int portNumber = parser->getServerPort();
@@ -196,10 +195,10 @@ int main(int argc, char* argv[]) {
 
 	// Get system information
 
-	gethostname(sysHost, MAXHOSTNAME); // Get the name of this computer we are running on
+	gethostname(sysHost, kMaxHostName); // Get the name of this computer we are running on
 	if ((hPtr = gethostbyname(sysHost)) == NULL) {
 		cerr << "System hostname misconfigured." << endl;
-		prepareForExit(xmlLoader, parser, errorLogWriter, "System hostname misconfigured exit");
+		prepareForExit(xmlLoader, parser, logWriter, "System hostname misconfigured exit");
 		exit(EXIT_FAILURE);
 	}
 
@@ -207,7 +206,7 @@ int main(int argc, char* argv[]) {
 
 	if ((socketHandle = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		close(socketHandle);
-		prepareForExit(xmlLoader, parser, errorLogWriter, "Socket Handle exit");
+		prepareForExit(xmlLoader, parser, logWriter, "Socket Handle exit");
 		exit(EXIT_FAILURE);
 	}
 
@@ -222,11 +221,11 @@ int main(int argc, char* argv[]) {
 			< 0) {
 		close(socketHandle);
 		perror("bind");
-		prepareForExit(xmlLoader, parser, errorLogWriter, "bind exit ");
+		prepareForExit(xmlLoader, parser, logWriter, "bind exit ");
 		exit(EXIT_FAILURE);
 	}
 	if (listen(socketHandle, 5) == -1) {
-		prepareForExit(xmlLoader, parser, errorLogWriter, "listen exit ");
+		prepareForExit(xmlLoader, parser, logWriter, "listen exit ");
 		return EXIT_FAILURE;
 	}
 
@@ -255,6 +254,6 @@ int main(int argc, char* argv[]) {
 	clientConnectionWaiter.detach();
 
 	close(socketHandle);
-	prepareForExit(xmlLoader, parser, errorLogWriter, "Close");
+	prepareForExit(xmlLoader, parser, logWriter, "Close");
 	return EXIT_SUCCESS;
 }

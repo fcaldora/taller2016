@@ -6,18 +6,18 @@
 #ifndef CARGADORXML_H_
 #define CARGADORXML_H_
 
-#include "ErrorLogWriter.h"
-using namespace std;
+#include "LogWriter.h"
+#include "Constants.h"
 
 class XMLLoader {
 
 public:
-	XMLLoader(ErrorLogWriter *errorLogWriter);
+	XMLLoader(LogWriter *errorLogWriter);
 	bool serverXMLIsValid(const char* fileName);
 	virtual ~XMLLoader();
 
 private:
-	ErrorLogWriter *errorLogWriter;
+	LogWriter *errorLogWriter;
 	TiXmlDocument xmlDocument;
 	bool serverXMLHasValidValues(TiXmlDocument xmlFile);
 	bool serverXMLHasValidElements(TiXmlDocument xmlFile);

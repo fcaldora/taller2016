@@ -31,6 +31,31 @@ int XmlParser::getMaxNumberOfClients(){
 	}
 }
 
+LogLevelType XmlParser::getLogLevel() {
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement *configurationElement = docHandle.FirstChild(kServerTag).FirstChild(kConfigurationTag).ToElement();
+	if (configurationElement == NULL)
+		return LogLevelTypeOnlyErrors;
+	TiXmlElement *logLevelElement = configurationElement->FirstChild(kLogLevelTag)->ToElement();
+	if(logLevelElement == NULL)
+		return LogLevelTypeOnlyErrors;
+
+	const char* logLevelChar = logLevelElement->GetText();
+	std::stringstream logLevelStrValue;
+	logLevelStrValue << logLevelChar;
+	unsigned int logLevelValue;
+	logLevelStrValue >> logLevelValue;
+
+	switch(logLevelValue){
+	case 1:
+		return LogLevelTypeOnlyErrors;
+	case 2:
+		return LogLevelTypeEverything;
+	default :
+		return LogLevelTypeOnlyErrors;
+	}
+}
+
 XmlParser::~XmlParser() {
 	// TODO Auto-generated destructor stub
 }

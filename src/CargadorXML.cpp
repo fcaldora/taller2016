@@ -2,21 +2,17 @@
 #include <iostream>
 #include <sstream>
 
-//Constantes para crear el archivo en caso de que no exista.
-#define MAXCLIENTES "7"
-#define IP "127.0.0.1"
-#define PUERTO "8080"
 #define kMaxNumberOfClients 10
 #define kMaxNumberOfValidPort 65535
 
-XMLLoader::XMLLoader(ErrorLogWriter *errorLogWriter) {
+XMLLoader::XMLLoader(LogWriter *errorLogWriter) {
 	this->errorLogWriter = errorLogWriter;
 }
 
 bool XMLLoader::serverXMLHasValidElements(TiXmlDocument xmlFile) {
-	TiXmlElement *server = xmlFile.FirstChildElement("Servidor");
+	TiXmlElement *server = xmlFile.FirstChildElement(kServerTag);
 	if (server == NULL){
-		this->errorLogWriter->writeNotFoundElementInXML("Servidor");
+		this->errorLogWriter->writeNotFoundElementInXML(kServerTag);
 		return false;
 	}
 

@@ -12,8 +12,6 @@ Procesador::Procesador() {
 
 }
 
-
-
 //Si el string tiene un solo caracter, entonces es un char.
 bool Procesador::isAChar(string string){
 	return (string.size()==1);
