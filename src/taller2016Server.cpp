@@ -72,8 +72,8 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 		mutexColaMensajes.unlock();
 		if(!msgList->empty() && auxiliar->procesado == false){
 			clientMsj respuesta;
-			strncpy(respuesta.id,"1", 20);
-			strncpy(respuesta.type,"STRING",20);
+			strncpy(respuesta.id,auxiliar->mensaje.id, 20);
+			strncpy(respuesta.type,auxiliar->mensaje.type,20);
 			if(procesador.isMsgValid(auxiliar->mensaje.type, auxiliar->mensaje.value)){
 				strncpy(respuesta.value,"Mensaje correcto",20);
 				cout<<"Mensaje correcto"<<endl;
@@ -86,6 +86,7 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 		//DESPUES CADA CLIENTE EN SU THREAD DE SALIDA, SACA UN MENSAJE Y SI ESTA PROCESADO ENVIA RESPUESTA.
 		}
 	}
+	pthread_exit(NULL);
 }
 
 /*void readMsjs() {
@@ -118,9 +119,9 @@ void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
 			mensaje.mensaje = recibido;
 			mensaje.procesado = false;
 			mensaje.socket = socketConnection;
-			strncpy(respuesta.id,"1",sizeof(respuesta.id));
-			strncpy(respuesta.type, "STRING", sizeof(respuesta.type));
-			strncpy(respuesta.value, "OK", sizeof(respuesta.value));
+			strncpy(respuesta.id,mensaje.mensaje.id,sizeof(respuesta.id));
+			strncpy(respuesta.type, mensaje.mensaje.type, sizeof(respuesta.type));
+			strncpy(respuesta.value, mensaje.mensaje.value, sizeof(respuesta.value));
 			mutexColaMensajes.lock();
 			messagesList->push_front(mensaje);//CAMBIAR POR PUSH BACK!! PUSH FRONT SOLO PARA PROBAR
 			mutexColaMensajes.unlock();
