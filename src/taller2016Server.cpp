@@ -29,9 +29,11 @@ struct msjProcesado{
 
 list<msjProcesado> messagesList;
 std::mutex mutexColaMensajes;
+std::mutex writingInLogFileMutex;
 std::thread clientEntrada[5];
 std::thread clientSalida[5];
 bool appShouldTerminate;
+LogWriter *logWriter;
 
 int sendMsj(int socket,int bytesAEnviar, clientMsj* mensaje){
 	int enviados = 0;
@@ -87,6 +89,10 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 				strncpy(respuesta.value,"Mensaje incorrecto",20);
 				cout<<"Mensaje incorrecto"<<endl;
 			}
+			writingInLogFileMutex.lock();
+			logWriter->writeMessageWasprossed(respuesta);
+			writingInLogFileMutex.unlock();
+
 			auxiliar->mensaje = respuesta;
 		auxiliar->procesado = true;
 		}
@@ -105,8 +111,9 @@ void *clientReader(int socketConnection, list<msjProcesado>* messagesList, int n
 			clientHasDisconnected = true;
 			numberOfCurrentAcceptedClients --;
 		}else{
-			cout << "socket connection: " << socketConnection << ", msj:" << recibido.value << endl;
-			cout<<"Tipo: "<<recibido.type<<" con id: "<<recibido.id<<endl;
+			writingInLogFileMutex.lock();
+			logWriter->writeClientMessageReceviedFromSocketConnection(recibido, socketConnection);
+			writingInLogFileMutex.unlock();
 			clientMsj respuesta;
 			msjProcesado mensaje;
 			mensaje.mensaje = recibido;
@@ -149,9 +156,9 @@ void *responderCliente(int socket, list<msjProcesado> *msgList){
 void* waitForClientConnection(int numberOfCurrentAcceptedClients, int maxNumberOfClients, int socketHandle) {
 	while (!appShouldTerminate) {
 		if (numberOfCurrentAcceptedClients < maxNumberOfClients) {
-			cout << "Waiting for a client connection" << endl;
+			logWriter->writeWaitingForClientConnection();
 			int socketConnection = accept(socketHandle, NULL, NULL);
-			cout << "connection received" << endl;
+			logWriter->writeClientConnectionReceived();
 			clientEntrada[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection, &messagesList, numberOfCurrentAcceptedClients);
 			clientSalida[numberOfCurrentAcceptedClients] = std::thread(responderCliente, socketConnection, &messagesList);
 			numberOfCurrentAcceptedClients++;
@@ -160,16 +167,15 @@ void* waitForClientConnection(int numberOfCurrentAcceptedClients, int maxNumberO
 	pthread_exit(NULL);
 }
 
-void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser , LogWriter *errorLogWriter, string exitMessage){
-	cout << exitMessage << endl;
-	delete errorLogWriter;
+void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser , LogWriter *logWriter){
+	delete logWriter;
 	delete xmlLoader;
 	delete xmlParser;
 }
 
 int main(int argc, char* argv[]) {
 	const char* fileName;
-	LogWriter *logWriter = new LogWriter;
+	logWriter = new LogWriter;
 	XMLLoader *xmlLoader = new XMLLoader(logWriter);
 	int numberOfCurrentAcceptedClients = 0;
 	if(argc != 2){
@@ -198,7 +204,8 @@ int main(int argc, char* argv[]) {
 	gethostname(sysHost, kMaxHostName); // Get the name of this computer we are running on
 	if ((hPtr = gethostbyname(sysHost)) == NULL) {
 		cerr << "System hostname misconfigured." << endl;
-		prepareForExit(xmlLoader, parser, logWriter, "System hostname misconfigured exit");
+		logWriter->writeError("Error al obtener el hostname");
+		prepareForExit(xmlLoader, parser, logWriter);
 		exit(EXIT_FAILURE);
 	}
 
@@ -206,7 +213,8 @@ int main(int argc, char* argv[]) {
 
 	if ((socketHandle = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		close(socketHandle);
-		prepareForExit(xmlLoader, parser, logWriter, "Socket Handle exit");
+		logWriter->writeError("Error al crear el socket");
+		prepareForExit(xmlLoader, parser, logWriter);
 		exit(EXIT_FAILURE);
 	}
 
@@ -221,11 +229,13 @@ int main(int argc, char* argv[]) {
 			< 0) {
 		close(socketHandle);
 		perror("bind");
-		prepareForExit(xmlLoader, parser, logWriter, "bind exit ");
+		logWriter->writeError("Error en el bind");
+		prepareForExit(xmlLoader, parser, logWriter);
 		exit(EXIT_FAILURE);
 	}
 	if (listen(socketHandle, 5) == -1) {
-		prepareForExit(xmlLoader, parser, logWriter, "listen exit ");
+		prepareForExit(xmlLoader, parser, logWriter);
+		logWriter->writeError("Error en el listen");
 		return EXIT_FAILURE;
 	}
 
@@ -254,6 +264,7 @@ int main(int argc, char* argv[]) {
 	clientConnectionWaiter.detach();
 
 	close(socketHandle);
-	prepareForExit(xmlLoader, parser, logWriter, "Close");
+	logWriter->writeUserDidFinishTheApp();
+	prepareForExit(xmlLoader, parser, logWriter);
 	return EXIT_SUCCESS;
 }
