@@ -77,7 +77,6 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 	while (!appShouldTerminate){
 		mutexColaMensajes.lock();
 		auxiliar = &msgList->front();
-		mutexColaMensajes.unlock();
 		if(!msgList->empty() && (auxiliar->procesado == false) && !appShouldTerminate){
 			clientMsj respuesta;
 			strncpy(respuesta.id,auxiliar->mensaje.id, 20);
@@ -95,6 +94,7 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 			auxiliar->mensaje = respuesta;
 		auxiliar->procesado = true;
 		}
+		mutexColaMensajes.unlock();
 	}
 	pthread_exit(NULL);
 }
