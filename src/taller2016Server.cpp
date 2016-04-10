@@ -170,8 +170,8 @@ void* waitForClientConnection(int numberOfCurrentAcceptedClients, int maxNumberO
 			strncpy(message.value,"Try again later",20);
 		}else{
 			strncpy(message.id,"0", 20);
-			strncpy(message.type,"server_full",20);
-			strncpy(message.value,"Try again later",20);
+			strncpy(message.type,"connection_successful",20);
+			strncpy(message.value,"Client successfully connected",20);
 		}
 		int response = sendMsj(socketConnection, sizeof(message), &(message));
 		numberOfCurrentAcceptedClients++;
