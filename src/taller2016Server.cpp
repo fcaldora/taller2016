@@ -84,11 +84,10 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 			strncpy(respuesta.type,auxiliar->mensaje.type,20);
 			if(procesador.isMsgValid(auxiliar->mensaje.type, auxiliar->mensaje.value)){
 				strncpy(respuesta.value,"Mensaje correcto",20);
-				cout<<"Mensaje correcto"<<endl;
 			}else{
 				strncpy(respuesta.value,"Mensaje incorrecto",20);
-				cout<<"Mensaje incorrecto"<<endl;
 			}
+
 			writingInLogFileMutex.lock();
 			logWriter->writeMessageWasprossed(respuesta);
 			writingInLogFileMutex.unlock();
@@ -136,15 +135,16 @@ void *clientReader(int socketConnection, list<msjProcesado>* messagesList, int n
 void *responderCliente(int socket, list<msjProcesado> *msgList){
 	msjProcesado auxiliar;
 	int respuesta;
+	bool clientHasDisconnected = false;
 
-	while(!appShouldTerminate){
+	while(!appShouldTerminate && !clientHasDisconnected){
 		mutexColaMensajes.lock();
 		auxiliar = msgList->front();
 		if((auxiliar.socket == socket) && (auxiliar.procesado == true)){
 			msgList->pop_front();
 			respuesta = sendMsj(socket, sizeof(auxiliar.mensaje), &(auxiliar.mensaje));
 			if(respuesta<=0){
-				appShouldTerminate = true;
+				clientHasDisconnected = true;
 			}
 		}
 		mutexColaMensajes.unlock();
