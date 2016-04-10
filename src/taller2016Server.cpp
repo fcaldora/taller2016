@@ -155,14 +155,27 @@ void *responderCliente(int socket, list<msjProcesado> *msgList){
 
 void* waitForClientConnection(int numberOfCurrentAcceptedClients, int maxNumberOfClients, int socketHandle) {
 	while (!appShouldTerminate) {
-		if (numberOfCurrentAcceptedClients < maxNumberOfClients) {
-			logWriter->writeWaitingForClientConnection();
-			int socketConnection = accept(socketHandle, NULL, NULL);
-			logWriter->writeClientConnectionReceived();
-			clientEntrada[numberOfCurrentAcceptedClients] = std::thread(clientReader, socketConnection, &messagesList, numberOfCurrentAcceptedClients);
-			clientSalida[numberOfCurrentAcceptedClients] = std::thread(responderCliente, socketConnection, &messagesList);
-			numberOfCurrentAcceptedClients++;
+		logWriter->writeWaitingForClientConnection();
+		int socketConnection = accept(socketHandle, NULL, NULL);
+		logWriter->writeClientConnectionReceived();
+		clientEntrada[numberOfCurrentAcceptedClients] = std::thread(
+				clientReader, socketConnection, &messagesList,
+				numberOfCurrentAcceptedClients);
+		clientSalida[numberOfCurrentAcceptedClients] = std::thread(
+				responderCliente, socketConnection, &messagesList);
+		clientMsj message;
+		if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
+			strncpy(message.id,"0", 20);
+			strncpy(message.type,"server_full",20);
+			strncpy(message.value,"Try again later",20);
+		}else{
+			strncpy(message.id,"0", 20);
+			strncpy(message.type,"server_full",20);
+			strncpy(message.value,"Try again later",20);
 		}
+		int response = sendMsj(socketConnection, sizeof(message), &(message));
+		numberOfCurrentAcceptedClients++;
+
 	}
 	pthread_exit(NULL);
 }
