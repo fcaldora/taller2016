@@ -56,7 +56,7 @@ int sendMsj(int socket,int bytesAEnviar, clientMsj* mensaje){
 int readMsj(int socket, int bytesARecibir, clientMsj* mensaje){
 	int recibidos = 0;
 	int totalBytesRecibidos = 0;
-	while (recibidos < bytesARecibir){
+	while (totalBytesRecibidos < bytesARecibir){
 		recibidos = recv(socket, &mensaje[totalBytesRecibidos], bytesARecibir - totalBytesRecibidos, MSG_WAITALL);
 		if (recibidos < 0){
 			shutdown(socket, SHUT_RDWR);
@@ -170,13 +170,16 @@ void* waitForClientConnection(int numberOfCurrentAcceptedClients, int maxNumberO
 			strncpy(message.value,"Try again later",20);
 		}else{
 			strncpy(message.id,"0", 20);
-			strncpy(message.type,"connection_successful",20);
-			strncpy(message.value,"Client successfully connected",20);
+			strncpy(message.type,"connection_ok",20);
+			strncpy(message.value,"Client connected",20);
 		}
 		int response = sendMsj(socketConnection, sizeof(message), &(message));
 		numberOfCurrentAcceptedClients++;
-
 	}
+	/*for(int i = 0; i < numberOfCurrentAcceptedClients; i++){
+		clientEntrada[i].join();
+		clientSalida[i].join();
+	}*/
 	pthread_exit(NULL);
 }
 
@@ -273,10 +276,7 @@ int main(int argc, char* argv[]) {
 		clientSalida[i].join();
 	}
 	procesadorMensajes.detach();
-
 	clientConnectionWaiter.detach();
-
-	close(socketHandle);
 	logWriter->writeUserDidFinishTheApp();
 	prepareForExit(xmlLoader, parser, logWriter);
 	return EXIT_SUCCESS;
