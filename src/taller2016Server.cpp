@@ -97,7 +97,6 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 		}
 		mutexColaMensajes.unlock();
 	}
-	pthread_exit(NULL);
 }
 
 void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
@@ -130,7 +129,6 @@ void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
 			cout<<"Numero de mensajes en la cola: "<<messagesList->size()<<endl;
 		}
 	}
-	pthread_exit(NULL);
 }
 
 void *responderCliente(int socket, list<msjProcesado> *msgList){
@@ -151,7 +149,6 @@ void *responderCliente(int socket, list<msjProcesado> *msgList){
 		mutexColaMensajes.unlock();
 	}
 
-	pthread_exit(NULL);
 }
 
 void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
@@ -178,7 +175,6 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 		int response = sendMsj(socketConnection, sizeof(message), &(message));
 		numberOfCurrentAcceptedClients++;
 	}
-	pthread_exit(NULL);
 }
 
 void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser , LogWriter *logWriter){
@@ -269,12 +265,19 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	for(int i = 0; i < numberOfCurrentAcceptedClients; i++){
-		clientEntranceMessages[i].join();
-		clientExitMessages[i].join();
-	}
-	procesadorMensajes.detach();
+	procesadorMensajes.join();
 	clientConnectionWaiter.detach();
+	//Creo un iterador para hacer detach en los threads abiertos antes de cerrar el server
+	map<unsigned int,thread>::iterator threadItr;
+
+	//Recorro ambos mapas y hago detach.
+	for(threadItr = clientEntranceMessages.begin(); threadItr != clientEntranceMessages.end(); ++threadItr){
+		threadItr->second.detach();
+	}
+	for(threadItr = clientExitMessages.begin(); threadItr != clientExitMessages.end(); ++threadItr){
+		threadItr->second.detach();
+	}
+
 	logWriter->writeUserDidFinishTheApp();
 	prepareForExit(xmlLoader, parser, logWriter);
 	return EXIT_SUCCESS;
