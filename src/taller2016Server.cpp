@@ -109,6 +109,18 @@ void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
 			shutdown(socketConnection, SHUT_RDWR);
 			clientHasDisconnected = true;
 			numberOfCurrentAcceptedClients --;
+			map<unsigned int,thread>::iterator threadItr;
+
+			for(threadItr = clientEntranceMessages.begin(); threadItr != clientEntranceMessages.end(); ++threadItr){
+				if(threadItr->first == socketConnection)
+					threadItr->second.detach();
+			}
+
+			for(threadItr = clientExitMessages.begin(); threadItr != clientExitMessages.end(); ++threadItr){
+				if(threadItr->first == socketConnection)
+					threadItr->second.detach();
+			}
+
 		}else{
 			writingInLogFileMutex.lock();
 			logWriter->writeClientMessageReceviedFromSocketConnection(recibido, socketConnection);
