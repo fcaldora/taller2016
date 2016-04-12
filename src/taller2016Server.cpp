@@ -30,10 +30,11 @@ struct msjProcesado{
 list<msjProcesado> messagesList;
 std::mutex mutexColaMensajes;
 std::mutex writingInLogFileMutex;
-std::thread clientEntrada[5];
-std::thread clientSalida[5];
+map<unsigned int,thread> clientEntranceMessages;
+map<unsigned int,thread> clientExitMessages;
 bool appShouldTerminate;
 LogWriter *logWriter;
+int numberOfCurrentAcceptedClients;
 
 int sendMsj(int socket,int bytesAEnviar, clientMsj* mensaje){
 	int enviados = 0;
@@ -99,7 +100,7 @@ void *procesarMensajes(list<msjProcesado> *msgList){
 	pthread_exit(NULL);
 }
 
-void *clientReader(int socketConnection, list<msjProcesado>* messagesList, int numberOfCurrentAcceptedClients){
+void *clientReader(int socketConnection, list<msjProcesado>* messagesList){
 	int res = 0;
 	bool clientHasDisconnected = false;
 	while(!appShouldTerminate && !clientHasDisconnected){
@@ -153,16 +154,17 @@ void *responderCliente(int socket, list<msjProcesado> *msgList){
 	pthread_exit(NULL);
 }
 
-void* waitForClientConnection(int numberOfCurrentAcceptedClients, int maxNumberOfClients, int socketHandle) {
+void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
 		logWriter->writeClientConnectionReceived();
-		clientEntrada[numberOfCurrentAcceptedClients] = std::thread(
-				clientReader, socketConnection, &messagesList,
-				numberOfCurrentAcceptedClients);
-		clientSalida[numberOfCurrentAcceptedClients] = std::thread(
+
+		clientEntranceMessages[socketConnection] = std::thread(
+				clientReader, socketConnection, &messagesList);
+		clientExitMessages[socketConnection] = std::thread(
 				responderCliente, socketConnection, &messagesList);
+
 		clientMsj message;
 		if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
 			strncpy(message.id,"0", 20);
@@ -176,10 +178,6 @@ void* waitForClientConnection(int numberOfCurrentAcceptedClients, int maxNumberO
 		int response = sendMsj(socketConnection, sizeof(message), &(message));
 		numberOfCurrentAcceptedClients++;
 	}
-	/*for(int i = 0; i < numberOfCurrentAcceptedClients; i++){
-		clientEntrada[i].join();
-		clientSalida[i].join();
-	}*/
 	pthread_exit(NULL);
 }
 
@@ -193,7 +191,7 @@ int main(int argc, char* argv[]) {
 	const char* fileName;
 	logWriter = new LogWriter;
 	XMLLoader *xmlLoader = new XMLLoader(logWriter);
-	int numberOfCurrentAcceptedClients = 0;
+	numberOfCurrentAcceptedClients = 0;
 	if(argc != 2){
 		fileName = kServerTestFile;
 		logWriter->writeUserDidnotEnterFileName();
@@ -257,7 +255,7 @@ int main(int argc, char* argv[]) {
 
 	appShouldTerminate = false;
 	std::thread procesadorMensajes(procesarMensajes, &messagesList);
-	std::thread clientConnectionWaiter(waitForClientConnection, numberOfCurrentAcceptedClients, maxNumberOfClients, socketHandle);
+	std::thread clientConnectionWaiter(waitForClientConnection, maxNumberOfClients, socketHandle);
 	while (!appShouldTerminate) {
 		cout << "Menu:" << endl;
 		cout << "1. Salir" << endl;
@@ -272,8 +270,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	for(int i = 0; i < numberOfCurrentAcceptedClients; i++){
-		clientEntrada[i].join();
-		clientSalida[i].join();
+		clientEntranceMessages[i].join();
+		clientExitMessages[i].join();
 	}
 	procesadorMensajes.detach();
 	clientConnectionWaiter.detach();
