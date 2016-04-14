@@ -16,6 +16,7 @@ using namespace std;
 #include <string.h>
 #include <stdlib.h>
 #include <map>
+#include <algorithm>
 
 #define kLongChar 20
 

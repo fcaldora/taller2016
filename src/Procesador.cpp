@@ -20,7 +20,7 @@ bool Procesador::isAChar(string string){
 bool Procesador::isAnInt(string string){
 	string::const_iterator it = string.begin();
 	while(it != string.end()){
-		if(!std::isdigit(*it))
+		if(!std::isdigit(*it) && *it!='+' && *it!='-')
 			return false;
 		it++;
 	}
@@ -29,12 +29,12 @@ bool Procesador::isAnInt(string string){
 
 bool Procesador::isADouble(string string){
 	//Si no contiene ningun punto, no es un double.
-	if(string.find(".")==string::npos){
-		return false;
-	}
+	//if(string.find(".")==string::npos){
+	//	return false;
+	//}
 	string::const_iterator it = string.begin();
 	while(it != string.end()){
-		if(!std::isdigit(*it) && *it!= '.' ){
+		if(!std::isdigit(*it) && *it!= '.' && *it!='e' && *it!='+' && *it!='-' ){
 			return false;
 		}
 		it++;
@@ -43,6 +43,7 @@ bool Procesador::isADouble(string string){
 }
 
 bool Procesador::isMsgValid(string type, string valor){
+	std::transform(type.begin(), type.end(), type.begin(), ::toupper);
 	if(type.compare("INT")==0)
 		return(isAnInt(valor));
 	if(type.compare("CHAR")==0)

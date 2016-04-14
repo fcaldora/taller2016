@@ -5,6 +5,7 @@
  *      Author: gusta
  */
 #include <string>
+#include "Constants.h"
 #ifndef PROCESADOR_H_
 #define PROCESADOR_H_
 
