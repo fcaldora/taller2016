@@ -13,6 +13,7 @@
 #include "CargadorXML.h"
 #include "LogWriter.h"
 #include "Procesador.h"
+#include "Client.h"
 #include <mutex>
 
 #include "Constants.h"
@@ -28,6 +29,7 @@ struct msjProcesado{
 };
 
 list<msjProcesado> messagesList;
+list<Client*> clients;
 std::mutex mutexColaMensajes;
 std::mutex writingInLogFileMutex;
 map<unsigned int,thread> clientEntranceMessages;
@@ -163,29 +165,57 @@ void *responderCliente(int socket, list<msjProcesado> *msgList){
 
 }
 
+bool checkNameAvailability(char value[]){
+	std::list<Client*>::iterator it;
+	for(it = clients.begin(); it != clients.end(); ++it){
+		if(strcmp((*it)->getName().c_str(), value) == 0){
+			return false;
+		}
+	}
+	return true;
+}
+
 void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
 		logWriter->writeClientConnectionReceived();
 
-		clientEntranceMessages[socketConnection] = std::thread(
-				clientReader, socketConnection, &messagesList);
-		clientExitMessages[socketConnection] = std::thread(
-				responderCliente, socketConnection, &messagesList);
-
 		clientMsj message;
-		if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
-			strncpy(message.id,"0", 20);
-			strncpy(message.type,"server_full",20);
-			strncpy(message.value,"Try again later",20);
+		//Leo el mensaje de conexion
+		readMsj(socketConnection, sizeof(message), &message);
+
+		if(checkNameAvailability(message.value)){
+
+			if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
+				strncpy(message.id,"0", 20);
+				strncpy(message.type,"server_full",20);
+				strncpy(message.value,"Try again later",20);
+			}else{
+				//Creo el cliente con el nombre del mensaje y lo agrego a la lista
+				string name(message.value);
+				Client* client = new Client(name, socketConnection, 0);
+				clients.push_back(client);
+
+				strncpy(message.id,"0", 20);
+				strncpy(message.type,"connection_ok",20);
+				strncpy(message.value,"Client connected",20);
+				clientEntranceMessages[socketConnection] = std::thread(
+						clientReader, socketConnection, &messagesList);
+				clientExitMessages[socketConnection] = std::thread(
+						responderCliente, socketConnection, &messagesList);
+				numberOfCurrentAcceptedClients++;
+			}
 		}else{
+			cout << "Name already used: " <<  message.value << endl;
+
 			strncpy(message.id,"0", 20);
-			strncpy(message.type,"connection_ok",20);
-			strncpy(message.value,"Client connected",20);
+			strncpy(message.type,"error",20);
+			strncpy(message.value,"Name already used",20);
 		}
+
 		int response = sendMsj(socketConnection, sizeof(message), &(message));
-		numberOfCurrentAcceptedClients++;
+
 	}
 }
 
