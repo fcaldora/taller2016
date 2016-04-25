@@ -1,21 +1,20 @@
-#include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <stdlib.h>
 #include <strings.h>
 #include <stdio.h>
 #include <sys/unistd.h>
-#include <string.h>
-#include <list>
 #include <thread>
 #include "XmlParser.h"
 #include "CargadorXML.h"
 #include "LogWriter.h"
 #include "Procesador.h"
-#include "Client.h"
+#include "Avion.h"
+#include "Escenario.h"
+#include "Sprite.h"
+#include "Window.h"
 #include <mutex>
-
+#include "Client.h"
 #include "Constants.h"
 
 #define kMaxHostName 256
@@ -248,7 +247,6 @@ int main(int argc, char* argv[]) {
 	int socketHandle;
 	int portNumber = parser->getServerPort();
 	int maxNumberOfClients = parser->getMaxNumberOfClients();
-
 	bzero(&socketInfo, sizeof(sockaddr_in));  // Clear structure memory
 
 	// Get system information
