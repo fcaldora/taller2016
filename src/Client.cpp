@@ -22,6 +22,4 @@ Client::~Client() {
 	// TODO Auto-generated destructor stub
 }
 
-string Client::getName(){
-	return this->name;
-}
+
