@@ -22,6 +22,7 @@
 #include "Constants.h"
 #include "MenuPresenter.h"
 #include <sys/socket.h>
+#include "MessageBuilder.h"
 
 #define kServerTestFile "serverTest.txt"
 
@@ -175,10 +176,7 @@ void *clientReader(int socketConnection) {
 			disconnectClientForSocketConnection(socketConnection);
 
 		} else {
-			mensaje respuesta;
 			Client* client = getClientByName(message.id);
-			respuesta.id = client->getPlane()->getId();
-			strcpy(respuesta.action, "draw");
 			if(strcmp(message.value, "DER") == 0){
 				if((client->plane->getPosX() + client -> getPlane()->getWidth()) < screenWidth){
 					client->plane->moveOneStepRight();
@@ -196,8 +194,9 @@ void *clientReader(int socketConnection) {
 					client->plane->moveOneStepUp();
 				}
 			}
-			respuesta.posX = client->plane->getPosX();
-			respuesta.posY = client->plane->getPosY();
+
+			mensaje respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
+
 			broadcastMsj(respuesta);
 		}
 	}
@@ -235,51 +234,33 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		if (checkNameAvailability(message.value)) {
 
 			if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
-				strncpy(message.id, "0", 20);
-				strncpy(message.type, "server_full", 20);
-				strncpy(message.value, "Try again later", 20);
+				message = MessageBuilder().createServerFullMessage();
 			} else {
 				//Creo el cliente con el nombre del mensaje y lo agrego a la lista
 				string name(message.value);
 				Avion *clientPlane = clientPlaneBuilder(parser);
 				Client* client = new Client(name, socketConnection, 0, clientPlane);
-//				client->plane = clientPlane;
 
 				clients.push_back(client);
 
-				strncpy(message.id, "0", 20);
-				strncpy(message.type, "connection_ok", 20);
-				strncpy(message.value, "Client connected", 20);
+				message = MessageBuilder().createSuccessfullyConnectedMessage();
+
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, socketConnection);
 
 				numberOfCurrentAcceptedClients++;
-				strcpy(mensajeInicial.action, "create");
-				strcpy(mensajeInicial.imagePath, client->getPlane()->getPath().c_str());
-				mensajeInicial.id = client->getPlane()->getId();
-				mensajeInicial.photograms = client->getPlane()->getPhotograms();
-				mensajeInicial.actualPhotogram = client->getPlane()->getActualPhotogram();
-				mensajeInicial.height = client->getPlane()->getHeigth();
-				mensajeInicial.width = client->getPlane()->getWidth();
-				mensajeInicial.posX = client->getPlane()->getPosX();
-				mensajeInicial.posY = client->getPlane()->getPosY();
-				mensajeInicial.activeState = true;
-
+				mensajeInicial = MessageBuilder().createInitialMessageForClient(client);
 			}
 		} else {
 			Client* client = getClientByName(message.value);
 			if (client->getConnnectionState()) {
 				logWriter->writeUserNameAlreadyInUse(message.value);
-				strncpy(message.id, "0", 20);
-				strncpy(message.type, "error", 20);
-				strncpy(message.value, "Name already used", 20);
+				message = MessageBuilder().createUserNameAlreadyInUseMessage();
 			} else {
 				logWriter->writeResumeGameForUserName(message.value);
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
-				strncpy(message.id, "0", 20);
-				strncpy(message.type, "connection_ok", 20);
-				strncpy(message.value, "Client connected", 20);
+				message = MessageBuilder().createSuccessfullyConnectedMessage();
 				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection);
 			}
 		}

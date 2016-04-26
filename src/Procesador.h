@@ -14,12 +14,12 @@ using namespace std;
 class Procesador {
 public:
 	Procesador();
-	bool isMsgValid(string type, string string);
 	virtual ~Procesador();
+
+
+
 private:
-	bool isAnInt(string string);
-	bool isAChar(string string);
-	bool isADouble(string string);
+
 };
 
 #endif /* PROCESADOR_H_ */
