@@ -8,15 +8,9 @@
 
 #include "GameManager.h"
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
 #include <strings.h>
 #include <stdio.h>
-#include <sys/unistd.h>
 #include <thread>
-#include "XmlParser.h"
-#include "CargadorXML.h"
 #include "LogWriter.h"
 #include "Procesador.h"
 #include "Avion.h"
@@ -27,9 +21,9 @@
 #include "Client.h"
 #include "Constants.h"
 #include "MenuPresenter.h"
+#include <sys/socket.h>
 
 
-#define kMaxHostName 256
 #define kServerTestFile "serverTest.txt"
 
 struct msjProcesado {
@@ -53,13 +47,9 @@ int screenWidth = 480;
 GameManager::GameManager() {
 	this->appShouldTerminate = false;
 	this->menuPresenter = NULL;
-}
-
-void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser,
-		LogWriter *logWriter) {
-	delete logWriter;
-	delete xmlLoader;
-	delete xmlParser;
+	this->parser = NULL;
+	this->socketManager = NULL;
+	this->xmlLoader = NULL;
 }
 
 int sendMsj(int socket, int bytesAEnviar, clientMsj* mensaje) {
@@ -335,71 +325,30 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 
 	const char* fileName;
 	logWriter = new LogWriter;
-	XMLLoader *xmlLoader = new XMLLoader(logWriter);
+	this->xmlLoader = new XMLLoader(logWriter);
 	numberOfCurrentAcceptedClients = 0;
 	if (argc != 2) {
 		fileName = kServerTestFile;
 		logWriter->writeUserDidnotEnterFileName();
 	} else {
 		fileName = argv[1];
-		if (!xmlLoader->serverXMLIsValid(fileName)) {
+		if (!this->xmlLoader->serverXMLIsValid(fileName)) {
 			fileName = kServerTestFile;
 		}
 	}
 
-	XmlParser *parser = new XmlParser(fileName);
-	logWriter->setLogLevel(parser->getLogLevel());
-	struct sockaddr_in socketInfo;
-	char sysHost[kMaxHostName + 1]; // Hostname of this computer we are running on
-	struct hostent *hPtr;
-	int socketHandle;
-	int portNumber = parser->getServerPort();
-	int maxNumberOfClients = parser->getMaxNumberOfClients();
-	bzero(&socketInfo, sizeof(sockaddr_in));  // Clear structure memory
+	this->parser = new XmlParser(fileName);
+	logWriter->setLogLevel(this->parser->getLogLevel());
+	this->socketManager = new SocketManager(logWriter, this->parser);
 
-	// Get system information
+	int maxNumberOfClients = this->parser->getMaxNumberOfClients();
 
-	gethostname(sysHost, kMaxHostName); // Get the name of this computer we are running on
-	if ((hPtr = gethostbyname(sysHost)) == NULL) {
-		cerr << "System hostname misconfigured." << endl;
-		logWriter->writeError("Error al obtener el hostname");
-		prepareForExit(xmlLoader, parser, logWriter);
-		exit(EXIT_FAILURE);
-	}
-
-	// create socket
-
-	if ((socketHandle = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		close(socketHandle);
-		logWriter->writeError("Error al crear el socket");
-		prepareForExit(xmlLoader, parser, logWriter);
-		exit(EXIT_FAILURE);
-	}
-
-	// Load system information into socket data structures
-
-	socketInfo.sin_family = AF_INET;
-	socketInfo.sin_addr.s_addr = htonl(INADDR_ANY); // Use any address available to the system
-	socketInfo.sin_port = htons(portNumber);  // Set port number
-
-	// Bind the socket to a local socket address
-	if (bind(socketHandle, (struct sockaddr *) &socketInfo, sizeof(socketInfo))
-			< 0) {
-		close(socketHandle);
-		perror("bind");
-		logWriter->writeError("Error en el bind");
-		prepareForExit(xmlLoader, parser, logWriter);
-		exit(EXIT_FAILURE);
-	}
-	if (listen(socketHandle, 5) == -1) {
-		prepareForExit(xmlLoader, parser, logWriter);
-		logWriter->writeError("Error en el listen");
+	int success = this->socketManager->createSocketConnection();
+	if (success == EXIT_FAILURE)
 		return EXIT_FAILURE;
-	}
 
-	//appShouldTerminate = false;
 	std::thread clientConnectionWaiter(waitForClientConnection,
-			maxNumberOfClients, socketHandle);
+			maxNumberOfClients, this->socketManager->socketHandle);
 
 	this->menuPresenter->presentMenu();
 
@@ -418,16 +367,20 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	}
 
 	logWriter->writeUserDidFinishTheApp();
-	prepareForExit(xmlLoader, parser, logWriter);
 
 	return EXIT_SUCCESS;
 }
 
 void GameManager::userDidChooseExitoption() {
 	this->appShouldTerminate = true;
+	appShouldTerminate = true;
 }
 
 GameManager::~GameManager() {
 	delete this->menuPresenter;
+	delete this->parser;
+	delete this->xmlLoader;
+	delete this->socketManager;
+	delete logWriter;
 }
 

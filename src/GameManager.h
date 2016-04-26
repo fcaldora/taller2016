@@ -8,6 +8,10 @@
 #ifndef GAMEMANAGER_H_
 #define GAMEMANAGER_H_
 
+#include "XmlParser.h"
+#include "CargadorXML.h"
+#include "SocketManager.h"
+
 class MenuPresenter;
 
 class GameManager {
@@ -22,6 +26,9 @@ public:
 private:
 	bool appShouldTerminate;
 	MenuPresenter *menuPresenter;
+	XmlParser *parser;
+	XMLLoader *xmlLoader;
+	SocketManager *socketManager;
 };
 
 #endif /* GAMEMANAGER_H_ */
