@@ -7,12 +7,12 @@
 
 #include "Client.h"
 
-Client::Client(string name, int socketM, int socketKA) {
+Client::Client(string name, int socketM, int socketKA, Avion* plane) {
 	this->name = name;
 	this->connected = true;
 	this->socketKeepAlive = socketKA;
 	this->socketMessages = socketM;
-	this->plane = NULL;
+	this->plane = plane;
 }
 
 Client::~Client() {

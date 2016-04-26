@@ -16,7 +16,8 @@ using namespace std;
 
 class Avion: public DrawableObject {
 public:
-	Avion(int velDesplazamiento, int velDisparo);
+	Avion(int velDesplazamiento, int velDisparo, int numberOfPhotograms,
+			int actualPhotogram, int postionX, int positionY, int height, int width, string imagePath);
 	virtual ~Avion();
 
 	void setVelDesplazamiento(int velDesplazamiento);

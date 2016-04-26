@@ -18,7 +18,7 @@ using namespace std;
 
 class Client {
 public:
-	Client(string name, int socketM, int socketKA);
+	Client(string name, int socketM, int socketKA, Avion* plane);
 	virtual ~Client();
 
 	string getName(){

@@ -7,9 +7,17 @@
 
 #include "Avion.h"
 
-Avion::Avion(int velDesplazamiento, int velDisparo) :DrawableObject() {
+Avion::Avion(int velDesplazamiento, int velDisparo, int numberOfPhotograms,
+		int actualPhotogram, int postionX, int positionY, int height, int width, string imagePath) :DrawableObject() {
 	this->velDesplazamiento = velDesplazamiento;
 	this->velDisparo = velDisparo;
+	this->numberOfPhotograms = numberOfPhotograms;
+	this->actualPhotogram = actualPhotogram;
+	this->posX = postionX;
+	this->posY = positionY;
+	this->heigth = height;
+	this->width = width;
+	this->imagePath = imagePath;
 	avionSprite = NULL;
 	disparoSprite = NULL;
 	vueltaSprite = NULL;

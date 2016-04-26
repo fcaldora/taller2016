@@ -45,11 +45,11 @@ public:
 	}
 
 	int getPhotograms() const {
-		return photograms;
+		return numberOfPhotograms;
 	}
 
 	void setPhotograms(int photograms) {
-		this->photograms = photograms;
+		this->numberOfPhotograms = photograms;
 	}
 
 	int getPosX() const {
@@ -88,7 +88,7 @@ protected:
 	int id;
 	string imagePath;
 	int actualPhotogram;
-	int photograms;
+	int numberOfPhotograms;
 	int posX;
 	int posY;
 	int width;

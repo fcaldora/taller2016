@@ -23,7 +23,6 @@
 #include "MenuPresenter.h"
 #include <sys/socket.h>
 
-
 #define kServerTestFile "serverTest.txt"
 
 struct msjProcesado {
@@ -32,7 +31,6 @@ struct msjProcesado {
 	bool procesado;
 };
 
-list<msjProcesado> messagesList;
 list<Client*> clients;
 std::mutex mutexColaMensajes;
 std::mutex writingInLogFileMutex;
@@ -41,8 +39,8 @@ map<unsigned int, thread> clientExitMessages;
 bool appShouldTerminate;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
-int screenHeight = 640;
-int screenWidth = 480;
+int screenHeight;
+int screenWidth;
 
 GameManager::GameManager() {
 	this->appShouldTerminate = false;
@@ -109,52 +107,12 @@ int readMsj(int socket, int bytesARecibir, clientMsj* mensaje) {
 	return 1;
 }
 
-int readMsg(int socket, int bytesARecibir, mensaje* mensaje) {
-	int recibidos = 0;
-	int totalBytesRecibidos = 0;
-	while (totalBytesRecibidos < bytesARecibir) {
-		recibidos = recv(socket, &mensaje[totalBytesRecibidos],
-				bytesARecibir - totalBytesRecibidos, MSG_WAITALL);
-		if (recibidos < 0) {
-			shutdown(socket, SHUT_RDWR);
-			return -1;
-		} else if (recibidos == 0) { //se corto la conexion desde el lado del servidor.
-			shutdown(socket, SHUT_RDWR);
-			return -1;
-		} else {
-			totalBytesRecibidos += recibidos;
-		}
-	}
-	return 1;
-}
-
-void *procesarMensajes(list<msjProcesado> *msgList) {
-	Procesador procesador;
-	//msjProcesado *auxiliar;
-	mensaje msj;
-	while (!appShouldTerminate) {
-		std::list<Client*>::iterator it, it2;
-		for (it = clients.begin(); it != clients.end(); ++it) {
-			for(it2 = clients.begin(); it2 != clients.end(); ++it2){
-				strcpy(msj.action, "draw");
-				msj.id = (*it2)->getPlane()->getId();
-				msj.posX = (*it2)->plane->getPosX();
-				msj.posY = (*it2)->plane->getPosY();
-				sendMsjInfo((*it)->getSocketMessages(), sizeof(msj), &msj);
-			}
-		}
-	}
-
-	pthread_exit(NULL);
-}
-
 void broadcastMsj(mensaje msg) {
 	std::list<Client*>::iterator it;
 	for (it = clients.begin(); it != clients.end(); ++it) {
 		sendMsjInfo((*it)->getSocketMessages(), sizeof(msg), &msg);
 	}
 }
-
 
 bool checkNameAvailability(char value[]) {
 	std::list<Client*>::iterator it;
@@ -188,7 +146,23 @@ Client* getClientBySocketMessages(int socket) {
 	return response;
 }
 
-void *clientReader(int socketConnection, list<msjProcesado>* messagesList) {
+void disconnectClientForSocketConnection(int socketConnection) {
+	Client* clientDisconnect = getClientBySocketMessages(socketConnection);
+	clientDisconnect -> setConnected(false);
+	map<unsigned int, thread>::iterator threadItr;
+
+	for(threadItr = clientEntranceMessages.begin(); threadItr != clientEntranceMessages.end(); ++threadItr){
+		if(threadItr->first == socketConnection)
+			threadItr->second.detach();
+	}
+
+	for(threadItr = clientExitMessages.begin(); threadItr != clientExitMessages.end(); ++threadItr){
+		if(threadItr->first == socketConnection)
+			threadItr->second.detach();
+	}
+}
+
+void *clientReader(int socketConnection) {
 	int res = 0;
 	bool clientHasDisconnected = false;
 	while (!appShouldTerminate && !clientHasDisconnected) {
@@ -198,19 +172,7 @@ void *clientReader(int socketConnection, list<msjProcesado>* messagesList) {
 
 			shutdown(socketConnection, SHUT_RDWR);
 			clientHasDisconnected = true;
-			Client* clientDisconnect = getClientBySocketMessages(socketConnection);
-			clientDisconnect -> setConnected(false);
-			map<unsigned int, thread>::iterator threadItr;
-
-			for(threadItr = clientEntranceMessages.begin(); threadItr != clientEntranceMessages.end(); ++threadItr){
-				if(threadItr->first == socketConnection)
-					threadItr->second.detach();
-			}
-
-			for(threadItr = clientExitMessages.begin(); threadItr != clientExitMessages.end(); ++threadItr){
-				if(threadItr->first == socketConnection)
-					threadItr->second.detach();
-			}
+			disconnectClientForSocketConnection(socketConnection);
 
 		} else {
 			mensaje respuesta;
@@ -242,7 +204,24 @@ void *clientReader(int socketConnection, list<msjProcesado>* messagesList) {
 	pthread_exit(NULL);
 }
 
-void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
+Avion* clientPlaneBuilder(XmlParser *parser) {
+	int travelingSpeed = parser->getVelocidadDespAvion();
+	int shootingSpeed = parser->getVelocidadDispAvion();
+	int numberOfPhotograms = 1;
+	int actualPhotogram = 1;
+	int positionX = 200;
+	int positionY = 200;
+	int height = 81;
+	int width = 81;
+	string imagePath = "avionPrueba.png";
+	Avion* clientPlane = new Avion(travelingSpeed,shootingSpeed, numberOfPhotograms,
+			actualPhotogram, positionX, positionY, height, width,imagePath);
+
+	cout << clients.size()+1 << endl;
+	return clientPlane;
+}
+
+void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser) {
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
@@ -262,18 +241,9 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 			} else {
 				//Creo el cliente con el nombre del mensaje y lo agrego a la lista
 				string name(message.value);
-				Client* client = new Client(name, socketConnection, 0);
-				Avion* planeClient = new Avion(1,1);
-				planeClient->setHeigth(81);
-				planeClient->setWidth(81);
-				planeClient->setId(clients.size()+1);
-				cout << clients.size()+1 << endl;
-				planeClient->setPath("avionPrueba.png");
-				planeClient->setPhotograms(1);
-				planeClient->setActualPhotogram(1);
-				planeClient->setPosX(200);
-				planeClient->setPosY(200);
-				client->plane = planeClient;
+				Avion *clientPlane = clientPlaneBuilder(parser);
+				Client* client = new Client(name, socketConnection, 0, clientPlane);
+//				client->plane = clientPlane;
 
 				clients.push_back(client);
 
@@ -281,7 +251,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 				strncpy(message.type, "connection_ok", 20);
 				strncpy(message.value, "Client connected", 20);
 				clientEntranceMessages[socketConnection] = std::thread(
-						clientReader, socketConnection, &messagesList);
+						clientReader, socketConnection);
 
 				numberOfCurrentAcceptedClients++;
 				strcpy(mensajeInicial.action, "create");
@@ -310,7 +280,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 				strncpy(message.id, "0", 20);
 				strncpy(message.type, "connection_ok", 20);
 				strncpy(message.value, "Client connected", 20);
-				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, &messagesList);
+				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection);
 			}
 		}
 
@@ -342,13 +312,15 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->socketManager = new SocketManager(logWriter, this->parser);
 
 	int maxNumberOfClients = this->parser->getMaxNumberOfClients();
+	screenHeight = this->parser->getAltoVentana();
+	screenWidth = this->parser->getAnchoVentana();
 
 	int success = this->socketManager->createSocketConnection();
 	if (success == EXIT_FAILURE)
 		return EXIT_FAILURE;
 
 	std::thread clientConnectionWaiter(waitForClientConnection,
-			maxNumberOfClients, this->socketManager->socketHandle);
+			maxNumberOfClients, this->socketManager->socketHandle, this->parser);
 
 	this->menuPresenter->presentMenu();
 

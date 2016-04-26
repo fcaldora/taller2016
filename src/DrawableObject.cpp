@@ -11,7 +11,7 @@ DrawableObject::DrawableObject() {
 	id = 0;
 	imagePath = "";
 	actualPhotogram = 0;
-	photograms = 0;
+	numberOfPhotograms = 0;
 	posX = 0;
 	posY = 200;
 	width = 200;

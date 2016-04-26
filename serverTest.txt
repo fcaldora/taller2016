@@ -13,7 +13,7 @@
 <sprites>
 	<sprite>
 		<id>avion</id>
-		<path>path/a/avion.png</path>
+		<path>avionPrueba.png</path>
 		<cantidad>1</cantidad>
 		<ancho>10</ancho>
 		<alto>10</alto>
