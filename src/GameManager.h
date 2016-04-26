@@ -8,6 +8,8 @@
 #ifndef GAMEMANAGER_H_
 #define GAMEMANAGER_H_
 
+class MenuPresenter;
+
 class GameManager {
 public:
 	GameManager();
@@ -15,8 +17,11 @@ public:
 
 	int initGameWithArguments(int argc, char* argv[]);
 
-private:
+	void userDidChooseExitoption();
 
+private:
+	bool appShouldTerminate;
+	MenuPresenter *menuPresenter;
 };
 
 #endif /* GAMEMANAGER_H_ */

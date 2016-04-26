@@ -26,6 +26,8 @@
 #include <mutex>
 #include "Client.h"
 #include "Constants.h"
+#include "MenuPresenter.h"
+
 
 #define kMaxHostName 256
 #define kServerTestFile "serverTest.txt"
@@ -49,6 +51,8 @@ int screenHeight = 640;
 int screenWidth = 480;
 
 GameManager::GameManager() {
+	this->appShouldTerminate = false;
+	this->menuPresenter = NULL;
 }
 
 void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser,
@@ -327,6 +331,8 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 }
 
 int GameManager::initGameWithArguments(int argc, char* argv[]) {
+	this->menuPresenter = new MenuPresenter(this->appShouldTerminate, this);
+
 	const char* fileName;
 	logWriter = new LogWriter;
 	XMLLoader *xmlLoader = new XMLLoader(logWriter);
@@ -391,21 +397,11 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	appShouldTerminate = false;
+	//appShouldTerminate = false;
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, socketHandle);
-	while (!appShouldTerminate) {
-		cout << "Menu:" << endl;
-		cout << "1. Salir" << endl;
-		cout << "Ingresar opcion:" << endl;
-		unsigned int userDidChooseOption;
-		cin >> userDidChooseOption;
-		if (userDidChooseOption == 1) {
-			appShouldTerminate = true;
-		} else {
-			cout << "Opcion incorrecta" << endl;
-		}
-	}
+
+	this->menuPresenter->presentMenu();
 
 	clientConnectionWaiter.detach();
 	//Creo un iterador para hacer detach en los threads abiertos antes de cerrar el server
@@ -427,7 +423,11 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	return EXIT_SUCCESS;
 }
 
+void GameManager::userDidChooseExitoption() {
+	this->appShouldTerminate = true;
+}
+
 GameManager::~GameManager() {
-	// TODO Auto-generated destructor stub
+	delete this->menuPresenter;
 }
 
