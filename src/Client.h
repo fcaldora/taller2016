@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <stdio.h>
+#include "Object.h"
 
 using namespace std;
 
@@ -68,6 +69,14 @@ public:
 		this->socketMessages = socketMessages;
 	}
 
+	 Object* getPlane()  {
+		return plane;
+	}
+
+	void setPlane(Object* plane) {
+		this->plane = plane;
+	}
+
 private:
 	string name;
 	int posX;
@@ -75,6 +84,7 @@ private:
 	bool connected;
 	int socketMessages;
 	int socketKeepAlive;
+	Object* plane;
 };
 
 #endif /* CLIENT_H_ */

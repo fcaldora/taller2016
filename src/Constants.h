@@ -80,6 +80,20 @@ struct clientMsj {
 	char value[kLongChar];
 };
 
+struct mensaje {
+	char action[kLongChar];
+	int id;
+	char imagePath[kLongChar];
+	int posX;
+	int posY;
+	int width;
+	int height;
+	bool activeState;
+	int actualPhotogram;
+	int photograms;
+	char errorMsj[kLongChar];
+};
+
 enum LogLevelType {
 	LogLevelTypeOnlyErrors = 1,
 	LogLevelTypeEverything = 2

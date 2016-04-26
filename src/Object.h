@@ -37,11 +37,11 @@ public:
 	}
 
 	const string& getPath() const {
-		return path;
+		return imagePath;
 	}
 
 	void setPath(const string& path) {
-		this->path = path;
+		this->imagePath = path;
 	}
 
 	int getPhotograms() const {
@@ -76,9 +76,18 @@ public:
 		this->width = width;
 	}
 
+	int getActualPhotogram() const {
+			return actualPhotogram;
+		}
+
+	void setActualPhotogram(int photogram) {
+		this->actualPhotogram = photogram;
+	}
+
 private:
 	int id;
-	string path;
+	string imagePath;
+	int actualPhotogram;
 	int photograms;
 	int posX;
 	int posY;
