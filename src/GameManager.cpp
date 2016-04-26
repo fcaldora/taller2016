@@ -353,6 +353,17 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->menuPresenter->presentMenu();
 
 	clientConnectionWaiter.detach();
+
+	return EXIT_SUCCESS;
+}
+
+void GameManager::userDidChooseExitoption() {
+	logWriter->writeUserDidFinishTheApp();
+	this->appShouldTerminate = true;
+	appShouldTerminate = true;
+}
+
+void GameManager::detachClientMessagesThreads() {
 	//Creo un iterador para hacer detach en los threads abiertos antes de cerrar el server
 	map<unsigned int, thread>::iterator threadItr;
 
@@ -365,18 +376,10 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 			threadItr != clientExitMessages.end(); ++threadItr) {
 		threadItr->second.detach();
 	}
-
-	logWriter->writeUserDidFinishTheApp();
-
-	return EXIT_SUCCESS;
-}
-
-void GameManager::userDidChooseExitoption() {
-	this->appShouldTerminate = true;
-	appShouldTerminate = true;
 }
 
 GameManager::~GameManager() {
+	detachClientMessagesThreads();
 	delete this->menuPresenter;
 	delete this->parser;
 	delete this->xmlLoader;

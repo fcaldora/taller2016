@@ -29,6 +29,8 @@ private:
 	XmlParser *parser;
 	XMLLoader *xmlLoader;
 	SocketManager *socketManager;
+
+	void detachClientMessagesThreads();
 };
 
 #endif /* GAMEMANAGER_H_ */
