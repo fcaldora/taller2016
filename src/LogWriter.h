@@ -27,6 +27,8 @@ public:
 	void writeClientConnectionReceived();
 	void writeClientMessageReceviedFromSocketConnection(clientMsj message, int socketConnection);
 	void writeMessageWasprossed(clientMsj message);
+	void writeUserNameAlreadyInUse(char* userName);
+	void writeResumeGameForUserName(char *userName);
 
 private:
 	LogLevelType logLevel;

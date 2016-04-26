@@ -234,6 +234,7 @@ int XmlParser::getFondoEscenario(Sprite &fondo){
 	fondo.setHeight(atoi(altoElem->GetText()));
 	return 0;
 }
+
 XmlParser::~XmlParser() {
 	// TODO Auto-generated destructor stub
 }

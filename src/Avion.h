@@ -10,30 +10,33 @@
 #ifndef AVION_H_
 #define AVION_H_
 
+#include "DrawableObject.h"
+
 using namespace std;
 
-class Avion {
+class Avion: public DrawableObject {
 public:
-	Avion();
+	Avion(int velDesplazamiento, int velDisparo);
 	virtual ~Avion();
+
 	void setVelDesplazamiento(int velDesplazamiento);
 	int getVelDesplazamiento();
 	void setVelDisparo(int velDisparo);
 	int getVelDisparo();
 	void moveVerical(int movement);
 	void moveHorizontal(int movement);
-	int getPosX();
-	int getPosY();
+
+	void moveOneStepRight();
+	void moveOneStepLeft();
+	void moveOneStepUp();
+	void moveOneStepDown();
 
 private:
 	int velDesplazamiento;
 	int velDisparo;
-	int posActualX;
-	int posActualY;
-	Sprite avionSprite;
-	Sprite disparoSprite;
-	Sprite vueltaSprite;
-
+	Sprite *avionSprite;
+	Sprite *disparoSprite;
+	Sprite *vueltaSprite;
 };
 
 #endif /* AVION_H_ */

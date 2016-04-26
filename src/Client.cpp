@@ -9,13 +9,10 @@
 
 Client::Client(string name, int socketM, int socketKA) {
 	this->name = name;
-	this->posX = 0;
-	this->posY = 0;
 	this->connected = true;
 	this->socketKeepAlive = socketKA;
 	this->socketMessages = socketM;
-	// TODO Auto-generated constructor stub
-
+	this->plane = NULL;
 }
 
 Client::~Client() {

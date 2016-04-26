@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <stdio.h>
-#include "Object.h"
+#include "Avion.h"
 
 using namespace std;
 
@@ -37,22 +37,6 @@ public:
 		this->name = name;
 	}
 
-	int getPosX() const {
-		return posX;
-	}
-
-	void setPosX(int posX) {
-		this->posX = posX;
-	}
-
-	int getPosY() const {
-		return posY;
-	}
-
-	void setPosY(int posY) {
-		this->posY = posY;
-	}
-
 	int getSocketKeepAlive() const {
 		return socketKeepAlive;
 	}
@@ -69,22 +53,17 @@ public:
 		this->socketMessages = socketMessages;
 	}
 
-	 Object* getPlane()  {
+	 Avion* getPlane()  {
 		return plane;
 	}
 
-	void setPlane(Object* plane) {
-		this->plane = plane;
-	}
+	Avion* plane;
 
 private:
 	string name;
-	int posX;
-	int posY;
 	bool connected;
 	int socketMessages;
 	int socketKeepAlive;
-	Object* plane;
 };
 
 #endif /* CLIENT_H_ */

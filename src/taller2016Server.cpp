@@ -117,7 +117,7 @@ int readMsg(int socket, int bytesARecibir, mensaje* mensaje) {
 
 void *procesarMensajes(list<msjProcesado> *msgList) {
 	Procesador procesador;
-	msjProcesado *auxiliar;
+	//msjProcesado *auxiliar;
 	mensaje msj;
 	while (!appShouldTerminate) {
 		std::list<Client*>::iterator it, it2;
@@ -125,12 +125,14 @@ void *procesarMensajes(list<msjProcesado> *msgList) {
 			for(it2 = clients.begin(); it2 != clients.end(); ++it2){
 				strcpy(msj.action, "draw");
 				msj.id = (*it2)->getPlane()->getId();
-				msj.posX = (*it2)->getPosX();
-				msj.posY = (*it2)->getPosY();
+				msj.posX = (*it2)->plane->getPosX();
+				msj.posY = (*it2)->plane->getPosY();
 				sendMsjInfo((*it)->getSocketMessages(), sizeof(msj), &msj);
 			}
 		}
 	}
+
+	pthread_exit(NULL);
 }
 
 void broadcastMsj(mensaje msg) {
@@ -203,48 +205,28 @@ void *clientReader(int socketConnection, list<msjProcesado>* messagesList) {
 			respuesta.id = client->getPlane()->getId();
 			strcpy(respuesta.action, "draw");
 			if(strcmp(message.value, "DER") == 0){
-				if((client->getPosX() + client -> getPlane()->getWidth()) < screenWidth){
-					client->setPosX(client->getPosX() + 1);
+				if((client->plane->getPosX() + client -> getPlane()->getWidth()) < screenWidth){
+					client->plane->moveOneStepRight();
 				}
 			}else if(strcmp(message.value, "IZQ") == 0){
-				if(client->getPosX()>0){
-					client->setPosX(client->getPosX() - 1);
+				if(client->plane->getPosX() > 0){
+					client->plane->moveOneStepLeft();
 				}
 			}else if(strcmp(message.value, "ABJ") == 0){
-				if((client->getPosY() + client -> getPlane()->getHeigth()) < screenHeight){
-					client->setPosY(client->getPosY() + 1);
+				if((client->plane->getPosY() + client -> getPlane()->getHeigth()) < screenHeight){
+					client->plane->moveOneStepDown();
 				}
 			}else if(strcmp(message.value, "ARR") == 0){
-				if(client->getPosY()>0){
-					client->setPosY(client->getPosY() - 1);
+				if(client->plane->getPosY() > 0){
+					client->plane->moveOneStepUp();
 				}
 			}
-			respuesta.posX = client->getPosX();
-			respuesta.posY = client->getPosY();
+			respuesta.posX = client->plane->getPosX();
+			respuesta.posY = client->plane->getPosY();
 			broadcastMsj(respuesta);
 		}
 	}
-}
-
-void *responderCliente(int socket, list<msjProcesado> *msgList) {
-	msjProcesado auxiliar;
-	int respuesta;
-	bool clientHasDisconnected = false;
-
-	while (!appShouldTerminate && !clientHasDisconnected) {
-		mutexColaMensajes.lock();
-		auxiliar = msgList->front();
-		if ((auxiliar.socket == socket) && (auxiliar.procesado == true)) {
-			msgList->pop_front();
-			respuesta = sendMsj(socket, sizeof(auxiliar.mensaje),
-					&(auxiliar.mensaje));
-			if (respuesta <= 0) {
-				clientHasDisconnected = true;
-			}
-		}
-		mutexColaMensajes.unlock();
-	}
-
+	pthread_exit(NULL);
 }
 
 void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
@@ -268,7 +250,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 				//Creo el cliente con el nombre del mensaje y lo agrego a la lista
 				string name(message.value);
 				Client* client = new Client(name, socketConnection, 0);
-				Object* planeClient = new Object();
+				Avion* planeClient = new Avion(1,1);
 				planeClient->setHeigth(81);
 				planeClient->setWidth(81);
 				planeClient->setId(clients.size()+1);
@@ -278,9 +260,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 				planeClient->setActualPhotogram(1);
 				planeClient->setPosX(200);
 				planeClient->setPosY(200);
-				client->setPlane(planeClient);
-				client->setPosX(200);
-				client->setPosY(200);
+				client->plane = planeClient;
 
 				clients.push_back(client);
 
@@ -289,8 +269,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 				strncpy(message.value, "Client connected", 20);
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, socketConnection, &messagesList);
-				//clientExitMessages[socketConnection] = std::thread(
-					//	responderCliente, socketConnection, &messagesList);
+
 				numberOfCurrentAcceptedClients++;
 				strcpy(mensajeInicial.action, "create");
 				strcpy(mensajeInicial.imagePath, client->getPlane()->getPath().c_str());
@@ -307,29 +286,25 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle) {
 		} else {
 			Client* client = getClientByName(message.value);
 			if (client->getConnnectionState()) {
-				cout
-						<< "El nombre de cliente no esta disponible, ya que hay un cliente jugando con ese nombre. "
-						<< message.value << endl;
+				logWriter->writeUserNameAlreadyInUse(message.value);
 				strncpy(message.id, "0", 20);
 				strncpy(message.type, "error", 20);
 				strncpy(message.value, "Name already used", 20);
 			} else {
-				cout << "Nombre ya utilizado, reaunudando partida de: "
-						<< message.value << endl;
+				logWriter->writeResumeGameForUserName(message.value);
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
 				strncpy(message.id, "0", 20);
 				strncpy(message.type, "connection_ok", 20);
 				strncpy(message.value, "Client connected", 20);
 				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, &messagesList);
-				//clientExitMessages[socketConnection] = std::thread(responderCliente, socketConnection, &messagesList);
 			}
 		}
 
-		int response = sendMsj(socketConnection, sizeof(message), &(message));
+		sendMsj(socketConnection, sizeof(message), &(message));
 		broadcastMsj(mensajeInicial);
-
 	}
+	pthread_exit(NULL);
 }
 
 void prepareForExit(XMLLoader *xmlLoader, XmlParser *xmlParser,
@@ -405,7 +380,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	appShouldTerminate = false;
-	//std::thread procesadorMensajes(procesarMensajes, &messagesList);
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, socketHandle);
 	while (!appShouldTerminate) {
@@ -421,7 +395,6 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	//procesadorMensajes.join();
 	clientConnectionWaiter.detach();
 	//Creo un iterador para hacer detach en los threads abiertos antes de cerrar el server
 	map<unsigned int, thread>::iterator threadItr;

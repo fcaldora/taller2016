@@ -7,12 +7,12 @@
 
 #include "Avion.h"
 
-Avion::Avion() {
-	velDesplazamiento = 0;
-	velDisparo = 0;
-	//ACA HAY QUE SETEAR LA POSICION INICIAL DEL AVION.
-	posActualX = 0;
-	posActualY = 0;
+Avion::Avion(int velDesplazamiento, int velDisparo) :DrawableObject() {
+	this->velDesplazamiento = velDesplazamiento;
+	this->velDisparo = velDisparo;
+	avionSprite = NULL;
+	disparoSprite = NULL;
+	vueltaSprite = NULL;
 }
 
 void Avion::setVelDesplazamiento(int velDesplazamiento){
@@ -32,22 +32,33 @@ int Avion::getVelDisparo(){
 }
 
 void Avion::moveHorizontal(int movement){
-	this->posActualX += movement;
+	posX += movement;
 }
 
 void Avion::moveVerical(int movement){
-	this->posActualY += movement;
+	posY += movement;
 }
 
-int Avion::getPosX(){
-	return posActualX;
+void Avion::moveOneStepRight() {
+	moveHorizontal(1);
 }
 
-int Avion::getPosY(){
-	return posActualY;
+void Avion::moveOneStepLeft() {
+	moveHorizontal(-1);
+}
+
+void Avion::moveOneStepUp() {
+	moveVerical(-1);
+}
+
+void Avion::moveOneStepDown() {
+	moveVerical(1);
 }
 
 Avion::~Avion() {
+	delete(avionSprite);
+	delete(disparoSprite);
+	delete(vueltaSprite);
 	// TODO Auto-generated destructor stub
 }
 
