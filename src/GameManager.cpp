@@ -26,13 +26,6 @@
 
 #define kServerTestFile "serverTest.txt"
 
-struct msjProcesado {
-	clientMsj mensaje;
-	int socket;
-	bool procesado;
-};
-
-list<Client*> clients;
 std::mutex mutexColaMensajes;
 std::mutex writingInLogFileMutex;
 map<unsigned int, thread> clientEntranceMessages;
@@ -108,47 +101,15 @@ int readMsj(int socket, int bytesARecibir, clientMsj* mensaje) {
 	return 1;
 }
 
-void broadcastMsj(mensaje msg) {
+void broadcastMsj(mensaje msg, ClientList *clientList) {
 	std::list<Client*>::iterator it;
-	for (it = clients.begin(); it != clients.end(); ++it) {
+	for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
 		sendMsjInfo((*it)->getSocketMessages(), sizeof(msg), &msg);
 	}
 }
 
-bool checkNameAvailability(char value[]) {
-	std::list<Client*>::iterator it;
-	for (it = clients.begin(); it != clients.end(); ++it) {
-		if (strcmp((*it)->getName().c_str(), value) == 0) {
-			return false;
-		}
-	}
-	return true;
-}
-
-Client* getClientByName(char name[]) {
-	std::list<Client*>::iterator it;
-	Client* response;
-	for (it = clients.begin(); it != clients.end(); ++it) {
-		if (strcmp((*it)->getName().c_str(), name) == 0) {
-			response = (*it);
-		}
-	}
-	return response;
-}
-
-Client* getClientBySocketMessages(int socket) {
-	std::list<Client*>::iterator it;
-	Client* response;
-	for (it = clients.begin(); it != clients.end(); ++it) {
-		if (socket == (*it)->getSocketMessages()) {
-			response = (*it);
-		}
-	}
-	return response;
-}
-
-void disconnectClientForSocketConnection(int socketConnection) {
-	Client* clientDisconnect = getClientBySocketMessages(socketConnection);
+void disconnectClientForSocketConnection(int socketConnection, ClientList *clientList) {
+	Client* clientDisconnect = clientList->getClientForSocket(socketConnection);
 	clientDisconnect -> setConnected(false);
 	map<unsigned int, thread>::iterator threadItr;
 
@@ -163,7 +124,7 @@ void disconnectClientForSocketConnection(int socketConnection) {
 	}
 }
 
-void *clientReader(int socketConnection) {
+void *clientReader(int socketConnection, ClientList *clientList) {
 	int res = 0;
 	bool clientHasDisconnected = false;
 	while (!appShouldTerminate && !clientHasDisconnected) {
@@ -173,10 +134,10 @@ void *clientReader(int socketConnection) {
 
 			shutdown(socketConnection, SHUT_RDWR);
 			clientHasDisconnected = true;
-			disconnectClientForSocketConnection(socketConnection);
+			disconnectClientForSocketConnection(socketConnection, clientList);
 
 		} else {
-			Client* client = getClientByName(message.id);
+			Client* client = clientList->getClientForName(message.id);
 			if(strcmp(message.value, "DER") == 0){
 				if((client->plane->getPosX() + client -> getPlane()->getWidth()) < screenWidth){
 					client->plane->moveOneStepRight();
@@ -197,7 +158,7 @@ void *clientReader(int socketConnection) {
 
 			mensaje respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
 
-			broadcastMsj(respuesta);
+			broadcastMsj(respuesta, clientList);
 		}
 	}
 	pthread_exit(NULL);
@@ -216,11 +177,11 @@ Avion* clientPlaneBuilder(XmlParser *parser) {
 	Avion* clientPlane = new Avion(travelingSpeed,shootingSpeed, numberOfPhotograms,
 			actualPhotogram, positionX, positionY, height, width,imagePath);
 
-	cout << clients.size()+1 << endl;
+	//cout << clients.size()+1 << endl;
 	return clientPlane;
 }
 
-void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser) {
+void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList) {
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
@@ -231,7 +192,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		readMsj(socketConnection, sizeof(message), &message);
 		mensaje mensajeInicial;
 
-		if (checkNameAvailability(message.value)) {
+		if (clientList->checkIfUserNameIsAlreadyInUse(message.value)) {
 
 			if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
 				message = MessageBuilder().createServerFullMessage();
@@ -241,18 +202,18 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				Avion *clientPlane = clientPlaneBuilder(parser);
 				Client* client = new Client(name, socketConnection, 0, clientPlane);
 
-				clients.push_back(client);
+				clientList->addClient(client);
 
 				message = MessageBuilder().createSuccessfullyConnectedMessage();
 
 				clientEntranceMessages[socketConnection] = std::thread(
-						clientReader, socketConnection);
+						clientReader, socketConnection, clientList);
 
 				numberOfCurrentAcceptedClients++;
 				mensajeInicial = MessageBuilder().createInitialMessageForClient(client);
 			}
 		} else {
-			Client* client = getClientByName(message.value);
+			Client* client = clientList->getClientForName(message.value);
 			if (client->getConnnectionState()) {
 				logWriter->writeUserNameAlreadyInUse(message.value);
 				message = MessageBuilder().createUserNameAlreadyInUseMessage();
@@ -261,18 +222,20 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
 				message = MessageBuilder().createSuccessfullyConnectedMessage();
-				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection);
+				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList);
 			}
 		}
 
 		sendMsj(socketConnection, sizeof(message), &(message));
-		broadcastMsj(mensajeInicial);
+		broadcastMsj(mensajeInicial, clientList);
 	}
 	pthread_exit(NULL);
 }
 
 int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->menuPresenter = new MenuPresenter(this->appShouldTerminate, this);
+
+	this->clientList = new ClientList();
 
 	const char* fileName;
 	logWriter = new LogWriter;
@@ -301,7 +264,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 
 	std::thread clientConnectionWaiter(waitForClientConnection,
-			maxNumberOfClients, this->socketManager->socketHandle, this->parser);
+			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList);
 
 	this->menuPresenter->presentMenu();
 
@@ -332,6 +295,7 @@ void GameManager::detachClientMessagesThreads() {
 }
 
 GameManager::~GameManager() {
+	delete this->clientList;
 	detachClientMessagesThreads();
 	delete this->menuPresenter;
 	delete this->parser;

@@ -11,6 +11,7 @@
 #include "XmlParser.h"
 #include "CargadorXML.h"
 #include "SocketManager.h"
+#include "ClientList.h"
 
 class MenuPresenter;
 
@@ -29,6 +30,7 @@ private:
 	XmlParser *parser;
 	XMLLoader *xmlLoader;
 	SocketManager *socketManager;
+	ClientList *clientList;
 
 	void detachClientMessagesThreads();
 };
