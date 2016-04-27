@@ -2,3 +2,7 @@ ErroresArchivoXML
 Debug/
 LogFile.txt
 Release/
+src/CargadorXML.o
+src/LogWriter.o
+src/Procesador.o
+src/XmlParser.o

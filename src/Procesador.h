@@ -11,15 +11,20 @@
 
 using namespace std;
 
+#include "ClientList.h"
+
 class Procesador {
 public:
 	Procesador();
+	Procesador(ClientList *clientList, int screenWidth, int screenHeight);
 	virtual ~Procesador();
 
-
+	void processMessage(clientMsj message);
 
 private:
-
+	ClientList *clientList;
+	int screenWidth;
+	int screenHeight;
 };
 
 #endif /* PROCESADOR_H_ */

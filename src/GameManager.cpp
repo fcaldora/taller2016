@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <thread>
 #include "LogWriter.h"
-#include "Procesador.h"
 #include "Avion.h"
 #include "Escenario.h"
 #include "Sprite.h"
@@ -33,8 +32,7 @@ map<unsigned int, thread> clientExitMessages;
 bool appShouldTerminate;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
-int screenHeight;
-int screenWidth;
+
 
 GameManager::GameManager() {
 	this->appShouldTerminate = false;
@@ -124,7 +122,7 @@ void disconnectClientForSocketConnection(int socketConnection, ClientList *clien
 	}
 }
 
-void *clientReader(int socketConnection, ClientList *clientList) {
+void *clientReader(int socketConnection, ClientList *clientList, Procesador *procesor) {
 	int res = 0;
 	bool clientHasDisconnected = false;
 	while (!appShouldTerminate && !clientHasDisconnected) {
@@ -137,24 +135,8 @@ void *clientReader(int socketConnection, ClientList *clientList) {
 			disconnectClientForSocketConnection(socketConnection, clientList);
 
 		} else {
+			procesor->processMessage(message);
 			Client* client = clientList->getClientForName(message.id);
-			if(strcmp(message.value, "DER") == 0){
-				if((client->plane->getPosX() + client -> getPlane()->getWidth()) < screenWidth){
-					client->plane->moveOneStepRight();
-				}
-			}else if(strcmp(message.value, "IZQ") == 0){
-				if(client->plane->getPosX() > 0){
-					client->plane->moveOneStepLeft();
-				}
-			}else if(strcmp(message.value, "ABJ") == 0){
-				if((client->plane->getPosY() + client -> getPlane()->getHeigth()) < screenHeight){
-					client->plane->moveOneStepDown();
-				}
-			}else if(strcmp(message.value, "ARR") == 0){
-				if(client->plane->getPosY() > 0){
-					client->plane->moveOneStepUp();
-				}
-			}
 
 			mensaje respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
 
@@ -181,7 +163,7 @@ Avion* clientPlaneBuilder(XmlParser *parser) {
 	return clientPlane;
 }
 
-void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList) {
+void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor) {
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
@@ -207,7 +189,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				message = MessageBuilder().createSuccessfullyConnectedMessage();
 
 				clientEntranceMessages[socketConnection] = std::thread(
-						clientReader, socketConnection, clientList);
+						clientReader, socketConnection, clientList, procesor);
 
 				numberOfCurrentAcceptedClients++;
 				mensajeInicial = MessageBuilder().createInitialMessageForClient(client);
@@ -222,7 +204,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
 				message = MessageBuilder().createSuccessfullyConnectedMessage();
-				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList);
+				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList, procesor);
 			}
 		}
 
@@ -256,15 +238,17 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->socketManager = new SocketManager(logWriter, this->parser);
 
 	int maxNumberOfClients = this->parser->getMaxNumberOfClients();
-	screenHeight = this->parser->getAltoVentana();
-	screenWidth = this->parser->getAnchoVentana();
+	int screenHeight = this->parser->getAltoVentana();
+	int screenWidth = this->parser->getAnchoVentana();
+
+	this->procesor = new Procesador(this->clientList, screenWidth, screenHeight);
 
 	int success = this->socketManager->createSocketConnection();
 	if (success == EXIT_FAILURE)
 		return EXIT_FAILURE;
 
 	std::thread clientConnectionWaiter(waitForClientConnection,
-			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList);
+			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor);
 
 	this->menuPresenter->presentMenu();
 
@@ -295,6 +279,7 @@ void GameManager::detachClientMessagesThreads() {
 }
 
 GameManager::~GameManager() {
+	delete this->procesor;
 	delete this->clientList;
 	detachClientMessagesThreads();
 	delete this->menuPresenter;

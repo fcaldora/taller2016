@@ -12,6 +12,7 @@
 #include "CargadorXML.h"
 #include "SocketManager.h"
 #include "ClientList.h"
+#include "Procesador.h"
 
 class MenuPresenter;
 
@@ -31,6 +32,7 @@ private:
 	XMLLoader *xmlLoader;
 	SocketManager *socketManager;
 	ClientList *clientList;
+	Procesador *procesor;
 
 	void detachClientMessagesThreads();
 };
