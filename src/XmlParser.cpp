@@ -1,10 +1,11 @@
 #include "XmlParser.h"
 
-XmlParser::XmlParser(const char* fileName) {
-	TiXmlDocument xmlFile(fileName);
-	if (xmlFile.LoadFile()) {
-		this->doc = xmlFile;
+XmlParser::XmlParser(const char* filename) {
+	TiXmlDocument file;
+	if(file.LoadFile(filename)){
+		this->doc = file;
 	}
+	else cout<<"El archivo no existe"<<endl;
 }
 
 int XmlParser::getServerPort(){
@@ -56,7 +57,218 @@ LogLevelType XmlParser::getLogLevel() {
 	}
 }
 
+int XmlParser::getAnchoVentana(){
+	int anchoValue = -1;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* ventana = docHandle.FirstChild(tagVentana).ToElement();
+	if(ventana == NULL){
+		cout<<"Error al obtener la ventana"<<endl;
+		return -1;
+	}
+	TiXmlElement* ancho = ventana->FirstChild(tagAncho)->ToElement();
+	if(ancho == NULL){
+		cout<<"Error al obtener el ancho de la ventana"<<endl;
+		return -1;
+	}
+	anchoValue = atoi(ancho->GetText());
+	return(anchoValue);
+}
+
+int XmlParser::getAltoVentana(){
+	int altoValue = -1;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* ventana = docHandle.FirstChild(tagVentana).ToElement();
+	if(ventana == NULL){
+		cout<<"Error al obtener la ventana"<<endl;
+		return -1;
+	}
+	TiXmlElement* alto = ventana->FirstChild(tagAlto)->ToElement();
+	if(alto == NULL){
+		cout<<"Error al obtener el alto de la ventana"<<endl;
+		return -1;
+	}
+	altoValue = atoi(alto->GetText());
+	return(altoValue);
+}
+
+int XmlParser::getAltoEscenario(){
+	int altoValue = -1;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* escenario = docHandle.FirstChild(tagEscenario).ToElement();
+	if(escenario == NULL){
+		cout<<"Error al obtener el escenario"<<endl;
+		return -1;
+	}
+	TiXmlElement* alto = escenario->FirstChild(tagAlto)->ToElement();
+	if(alto == NULL){
+		cout<<"Error al obtener el alto del escenario"<<endl;
+		return -1;
+	}
+	altoValue = atoi(alto->GetText());
+	return altoValue;
+}
+
+int XmlParser::getAnchoEscenario(){
+	int anchoValue = -1;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* escenario = docHandle.FirstChild(tagEscenario).ToElement();
+	if(escenario == NULL){
+		cout<<"Error al obtener el escenario"<<endl;
+		return -1;
+	}
+	TiXmlElement* ancho = escenario->FirstChild(tagAncho)->ToElement();
+	if(ancho == NULL){
+		cout<<"Error al obtener el ancho del escenario"<<endl;
+		return -1;
+	}
+	anchoValue = atoi(ancho->GetText());
+	return(anchoValue);
+}
+
+int XmlParser::getVelocidadDespAvion(){
+	int velocidad = -1;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* avion = docHandle.FirstChild(tagAvion).ToElement();
+	if(avion == NULL){
+			cout<<"Error al obtener el avion"<<endl;
+			return -1;
+		}
+	TiXmlElement* velocidadElem = avion->FirstChild(tagVelDesplazamiento)->ToElement();
+	if(velocidadElem == NULL){
+			cout<<"Error al obtener la velocidad de desplazamiento"<<endl;
+			return -1;
+		}
+	velocidad = atoi(velocidadElem->GetText());
+	return velocidad;
+}
+
+int XmlParser::getVelocidadDispAvion(){
+	int velocidad = -1;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* avion = docHandle.FirstChild(tagAvion).ToElement();
+	if(avion == NULL){
+			cout<<"Error al obtener el avion"<<endl;
+			return -1;
+		}
+	TiXmlElement* velocidadDisp = avion->FirstChild(tagVelDisparo)->ToElement();
+	if(velocidadDisp == NULL){
+			cout<<"Error al obtener la velocidad de disparo"<<endl;
+			return -1;
+		}
+	velocidad = atoi(velocidadDisp->GetText());
+	return velocidad;
+}
+
+int XmlParser::getSprite(DrawableObject &object, int numSprite){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* spritesElem = docHandle.FirstChildElement(tagSprites).ToElement();
+	TiXmlElement* aux = spritesElem->FirstChildElement(tagSprite);
+
+	for (int i = 0; i < numSprite; i++){
+		aux = aux->NextSiblingElement(tagSprite);
+	}
+	if(aux == NULL)
+		return -1;
+
+	TiXmlElement* pathElem = aux->FirstChildElement(tagPath);
+	object.setPath(string(pathElem->GetText()));
+	TiXmlElement* cantElem = aux->FirstChildElement(tagCantidad);
+	object.setPhotograms(atoi(cantElem->GetText()));
+	TiXmlElement* altoElem = aux->FirstChildElement(tagAlto);
+	object.setHeigth(atoi(altoElem->GetText()));
+	TiXmlElement* anchoElem = aux->FirstChildElement(tagAncho);
+	object.setWidth(atoi(anchoElem->GetText()));
+	TiXmlElement* idElem = aux->FirstChildElement(tagId);
+	object.setId(atoi(idElem->GetText()));
+	return 0;
+}
+
+int XmlParser::getElement(struct elemento &element, int elementNum){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
+	if(escenarioElem == NULL){
+		cout<<"Error al obtener el escenario"<<endl;
+		return -1;
+	}
+	TiXmlElement* elementosElem = escenarioElem->FirstChild(tagElementos)->ToElement();
+	if(elementosElem == NULL){
+		cout<<"Error al obtener los elementos"<<endl;
+		return -1;
+	}
+	TiXmlElement* elementoElem = elementosElem->FirstChild(tagElemento)->ToElement();
+
+	for(int i=0;i<elementNum;i++)
+		elementoElem = elementoElem->NextSiblingElement(tagElemento);
+
+	if(elementoElem == NULL){
+		return -1;
+	}
+
+	TiXmlElement* idElem = elementoElem->FirstChildElement(tagSpriteId);
+	element.id = atoi(idElem->GetText());
+	TiXmlElement* posicionElem = elementoElem->FirstChildElement(tagPosicion);
+	TiXmlElement* posxElem = posicionElem->FirstChildElement(tagPosX);
+	element.x = atoi(posxElem->GetText());
+	TiXmlElement* posyElem = posicionElem->FirstChildElement(tagPosY);
+	element.y = atoi(posyElem->GetText());
+	return 0;
+}
+
+Escenario* XmlParser::getFondoEscenario(){
+	Escenario *scenery = new Escenario;
+
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
+	if(escenarioElem == NULL){
+		cout<<"Error al obtener el escenario"<<endl;
+		return NULL;
+	}
+	TiXmlElement* fondoElem = escenarioElem->FirstChildElement(tagFondo)->ToElement();
+	if(fondoElem == NULL){
+		cout<<"Error al obtener el fondo del escenario"<<endl;
+		return NULL;
+	}
+	TiXmlElement* idElem = fondoElem->FirstChildElement(tagSpriteId);
+	scenery->setId(atoi(idElem->GetText()));
+	TiXmlElement* anchoElem = fondoElem->FirstChildElement(tagAncho);
+	scenery->setWidth(atoi(anchoElem->GetText()));
+	TiXmlElement* altoElem = fondoElem->FirstChildElement(tagAlto);
+	scenery->setHeigth(atoi(altoElem->GetText()));
+	TiXmlElement* pathElem = fondoElem->FirstChildElement(tagPath);
+	scenery->setPath(pathElem->GetText());
+	return scenery;
+}
+
+int XmlParser::getAvion(Avion* avion, int nroCliente){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* avionesElem = docHandle.FirstChild(tagAviones).ToElement();
+	if(avionesElem == NULL){
+		cout<<"Error al obtener los aviones"<<endl;
+		return -1;
+	}
+	TiXmlElement* avionElem = avionesElem->FirstChildElement(tagAvion);
+	for(int i = 1; i < nroCliente; i++){
+		avionElem = avionElem->NextSiblingElement(tagAvion);
+	}
+	TiXmlElement* pathElem = avionElem->FirstChildElement(tagPath);
+	avion->setPath(pathElem->GetText());
+	TiXmlElement* posXElem = avionElem->FirstChildElement(tagPosX);
+	avion->setPosX(atoi(posXElem->GetText()));
+	TiXmlElement* posYElem = avionElem->FirstChildElement(tagPosY);
+	avion->setPosY(atoi(posYElem->GetText()));
+	TiXmlElement* anchoElem = avionElem->FirstChildElement(tagAncho);
+	avion->setWidth(atoi(anchoElem->GetText()));
+	TiXmlElement* altoElem = avionElem->FirstChildElement(tagAlto);
+	avion->setHeigth(atoi(altoElem->GetText()));
+	TiXmlElement* idElem = avionElem->FirstChildElement(tagId);
+	avion->setId(atoi(idElem->GetText()));
+	TiXmlElement* velDisparoElem = avionElem->FirstChildElement(tagVelDisparo);
+	avion->setVelDisparo(atoi(velDisparoElem->GetText()));
+	TiXmlElement* velDesplElem = avionElem->FirstChildElement(tagVelDesplazamiento);
+	avion->setVelDesplazamiento(atoi(velDesplElem->GetText()));
+	return 0;
+}
+
 XmlParser::~XmlParser() {
 	// TODO Auto-generated destructor stub
 }
-

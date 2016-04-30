@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 
-#define kMaxNumberOfClients 10
+#define kMaxNumberOfClients 4
 #define kMaxNumberOfValidPort 65535
 
 XMLLoader::XMLLoader(LogWriter *errorLogWriter) {
@@ -38,7 +38,7 @@ bool XMLLoader::serverXMLHasValidValues(TiXmlDocument xmlFile){
 	unsigned int intValue;
 	strValue >> intValue;
 
-	if (intValue <= 0 || intValue >= kMaxNumberOfClients) {
+	if (intValue <= 0 || intValue > kMaxNumberOfClients) {
 		this->errorLogWriter->writeValueErrorForElementInXML("CantidadMaximaClientes");
 		return false;
 	}
@@ -73,6 +73,36 @@ bool XMLLoader::serverXMLIsValid(const char* fileName) {
 
 	xmlFile.Clear();
 	return true;
+}
+
+bool XMLLoader::cargarEscenario(Escenario &escenario, string pathDoc){
+	XmlParser parser(pathDoc.c_str());
+	escenario.setHeigth(parser.getAltoEscenario());
+	escenario.setWidth(parser.getAnchoEscenario());
+	return true;
+}
+
+bool XMLLoader::cargarAvion(Avion &avion, string pathDoc){
+	XmlParser parser(pathDoc.c_str());
+	avion.setVelDesplazamiento(parser.getVelocidadDespAvion());
+	avion.setVelDisparo(parser.getVelocidadDispAvion());
+	return true;
+}
+
+bool XMLLoader::obtenerSprite(DrawableObject &sprite, int numSprite, string pathDoc){
+	XmlParser parser(pathDoc.c_str());
+	if (parser.getSprite(sprite, numSprite) != -1)
+		return true;
+	return false;
+}
+
+bool XMLLoader::cargarElemento(elemento &elemento, int numElemento, string pathDoc){
+	XmlParser parser(pathDoc.c_str());
+	if(parser.getElement(elemento, numElemento) != -1)
+		return true;
+	return false;
+
+
 }
 
 XMLLoader::~XMLLoader() {

@@ -102,6 +102,28 @@ void LogWriter::writeUserDidFinishTheApp() {
 	writeLogInFile(log);
 }
 
+void LogWriter::writeUserNameAlreadyInUse(char* userName) {
+	char* str1 = "El nombre del cliente: ";
+	char *str2 = " no esta disponible, ya que hay un cliente jugando con ese nombre.";
+
+	char * str4 = (char *) malloc(1 + strlen(str1)+ strlen(userName)+ strlen(str2));
+	strcpy(str4, str1);
+	strcat(str4, userName);
+	strcat(str4, str2);
+
+	writeLogInFile(str4);
+}
+
+void LogWriter::writeResumeGameForUserName(char *userName) {
+	char* str1 = "Nombre ya utilizado, reanudando partida de: ";
+
+	char * str2 = (char *) malloc(1 + strlen(str1)+ strlen(userName));
+	strcpy(str2, str1);
+	strcat(str2, userName);
+
+	writeLogInFile(str2);
+}
+
 void LogWriter::writeLogInFile(string error) {
 	cout << error << endl;
 	this->logFile << error << endl;
