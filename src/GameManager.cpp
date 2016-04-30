@@ -164,7 +164,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		clientMsj message;
 		//Leo el mensaje de conexion
 		readMsj(socketConnection, sizeof(message), &message);
-		mensaje* mensajeInicial = (mensaje*) malloc(sizeof(mensaje));
+		mensaje* mensajeInicial;
 		if (clientList->checkIfUserNameIsAlreadyInUse(message.value)) {
 
 			if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
@@ -184,7 +184,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, socketConnection, clientList, procesor);
 
-				MessageBuilder().createInitialMessageForClient(client, mensajeInicial);
+				mensajeInicial =  MessageBuilder().createInitialMessageForClient(client);
 			}
 		} else {
 			Client* client = clientList->getClientForName(message.value);
@@ -243,14 +243,13 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	if (success == EXIT_FAILURE)
 		return EXIT_FAILURE;
 
-	mensaje ventanaMsj, escenarioMsj;
-	Escenario escenario;
-	parser->getFondoEscenario(escenario);
-	ventanaMsj.height = parser->getAltoVentana();;
-	ventanaMsj.width = parser->getAnchoVentana();
-	escenarioMsj = MessageBuilder().createInitBackgroundMessage(&escenario);
-	drawableList.push_back(&ventanaMsj);
-	drawableList.push_back(&escenarioMsj);
+	mensaje *ventanaMsj = new mensaje;
+	this->scenery = parser->getFondoEscenario();
+	ventanaMsj->height = parser->getAltoVentana();
+	ventanaMsj->width = parser->getAnchoVentana();
+	mensaje * escenarioMsj = MessageBuilder().createInitBackgroundMessageForScenery(this->scenery);
+	drawableList.push_back(ventanaMsj);
+	drawableList.push_back(escenarioMsj);
 
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor);
@@ -292,9 +291,13 @@ GameManager::~GameManager() {
 	delete this->xmlLoader;
 	delete this->socketManager;
 	delete logWriter;
-	for (unsigned int i = 0; i<drawableList.size(); i++){
-		free(drawableList.front());
+	delete this->scenery;
+	for (unsigned int i = 0; i < drawableList.size(); i++){
+		delete drawableList.front();
 		drawableList.pop_front();
+		//delete drawableList.at(i);// [i];
+		//delete(drawableList.front());
+		//bdrawableList.pop_front();
 	}
 }
 

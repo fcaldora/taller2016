@@ -36,7 +36,9 @@ clientMsj MessageBuilder::createUserNameAlreadyInUseMessage() {
 }
 
 
-void MessageBuilder::createInitialMessageForClient(Client *client, mensaje* message) {
+mensaje* MessageBuilder::createInitialMessageForClient(Client *client) {
+	mensaje *message = new mensaje;
+
 	strcpy(message->action, "create");
 	strcpy(message->imagePath, client->getPlane()->getPath().c_str());
 	message->id = client->getPlane()->getId();
@@ -47,6 +49,8 @@ void MessageBuilder::createInitialMessageForClient(Client *client, mensaje* mess
 	message->posX = client->getPlane()->getPosX();
 	message->posY = client->getPlane()->getPosY();
 	message->activeState = true;
+
+	return message;
 }
 
 mensaje MessageBuilder::createPlaneMovementMessageForClient(Client *client) {
@@ -58,18 +62,20 @@ mensaje MessageBuilder::createPlaneMovementMessageForClient(Client *client) {
 	return message;
 }
 
-mensaje MessageBuilder::createInitBackgroundMessage(Escenario *escenario){
-	mensaje message;
-	message.id = escenario->getId();
-	strncpy(message.action,"create", kLongChar);
-	strncpy(message.imagePath, escenario->getPath().c_str(), kLongChar);
-	message.photograms = escenario->getPhotograms();
-	message.actualPhotogram = escenario->getActualPhotogram();
-	message.height = escenario->getHeigth();
-	message.width = escenario->getWidth();
-	message.posX = escenario->getPosX();
-	message.posY = escenario->getPosY();
-	message.activeState = true;
+mensaje* MessageBuilder::createInitBackgroundMessageForScenery(Escenario *escenario){
+	mensaje *message = new mensaje;
+
+	message->id = escenario->getId();
+	strncpy(message->action,"create", kLongChar);
+	strncpy(message->imagePath, escenario->getPath().c_str(), kLongChar);
+	message->photograms = escenario->getPhotograms();
+	message->actualPhotogram = escenario->getActualPhotogram();
+	message->height = escenario->getHeigth();
+	message->width = escenario->getWidth();
+	message->posX = escenario->getPosX();
+	message->posY = escenario->getPosY();
+	message->activeState = true;
+
 	return message;
 }
 

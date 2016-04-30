@@ -6,6 +6,8 @@
 #ifndef XMLPARSER_H_
 #define XMLPARSER_H_
 
+#include "Escenario.h"
+
 using namespace std;
 
 class XmlParser {
@@ -23,7 +25,7 @@ public:
 	int getVelocidadDispAvion();
 	int getSprite(DrawableObject &object, int numSprite);
 	int getElement(struct elemento &element, int elementNum);
-	int getFondoEscenario(DrawableObject &object);
+	Escenario* getFondoEscenario();
 	int getAvion(Avion* avion, int nroCliente);
 
 private:

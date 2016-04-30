@@ -214,27 +214,29 @@ int XmlParser::getElement(struct elemento &element, int elementNum){
 	return 0;
 }
 
-int XmlParser::getFondoEscenario(DrawableObject &object){
+Escenario* XmlParser::getFondoEscenario(){
+	Escenario *scenery = new Escenario;
+
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
 	if(escenarioElem == NULL){
 		cout<<"Error al obtener el escenario"<<endl;
-		return -1;
+		return NULL;
 	}
 	TiXmlElement* fondoElem = escenarioElem->FirstChildElement(tagFondo)->ToElement();
 	if(fondoElem == NULL){
 		cout<<"Error al obtener el fondo del escenario"<<endl;
-		return -1;
+		return NULL;
 	}
 	TiXmlElement* idElem = fondoElem->FirstChildElement(tagSpriteId);
-	object.setId(atoi(idElem->GetText()));
+	scenery->setId(atoi(idElem->GetText()));
 	TiXmlElement* anchoElem = fondoElem->FirstChildElement(tagAncho);
-	object.setWidth(atoi(anchoElem->GetText()));
+	scenery->setWidth(atoi(anchoElem->GetText()));
 	TiXmlElement* altoElem = fondoElem->FirstChildElement(tagAlto);
-	object.setHeigth(atoi(altoElem->GetText()));
+	scenery->setHeigth(atoi(altoElem->GetText()));
 	TiXmlElement* pathElem = fondoElem->FirstChildElement(tagPath);
-	object.setPath(pathElem->GetText());
-	return 0;
+	scenery->setPath(pathElem->GetText());
+	return scenery;
 }
 
 int XmlParser::getAvion(Avion* avion, int nroCliente){

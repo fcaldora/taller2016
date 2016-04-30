@@ -33,6 +33,7 @@ private:
 	SocketManager *socketManager;
 	ClientList *clientList;
 	Procesador *procesor;
+	Escenario *scenery;
 
 	void detachClientMessagesThreads();
 };
