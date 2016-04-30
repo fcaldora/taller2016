@@ -14,14 +14,13 @@
 #include "LogWriter.h"
 #include "Avion.h"
 #include "Escenario.h"
-#include "Sprite.h"
-#include "Window.h"
 #include <mutex>
 #include "Client.h"
 #include "Constants.h"
 #include "MenuPresenter.h"
 #include <sys/socket.h>
 #include "MessageBuilder.h"
+#include "DrawableObject.h"
 
 #define kServerTestFile "serverTest.txt"
 
@@ -32,6 +31,8 @@ map<unsigned int, thread> clientExitMessages;
 bool appShouldTerminate;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
+list<mensaje*> drawableList; //lista que guarda todos los mensajes iniciales para levantar el juego :
+							//datos de la ventana, escenario, aviones, elementos del escenario.
 
 
 GameManager::GameManager() {
@@ -39,7 +40,7 @@ GameManager::GameManager() {
 	this->menuPresenter = NULL;
 	this->parser = NULL;
 	this->socketManager = NULL;
-	this->xmlLoader = NULL;
+	this->xmlLoader = NULL;;
 }
 
 int sendMsj(int socket, int bytesAEnviar, clientMsj* mensaje) {
@@ -106,7 +107,14 @@ void broadcastMsj(mensaje msg, ClientList *clientList) {
 	}
 }
 
-void disconnectClientForSocketConnection(int socketConnection, ClientList *clientList) {
+void sendGameInfo(ClientList* clientList){
+	list<mensaje*>::iterator it;
+	for (it = drawableList.begin(); it != drawableList.end(); it++){
+		broadcastMsj(*(*it), clientList);
+	}
+}
+
+void disconnectClientForSocketConnection(unsigned int socketConnection, ClientList *clientList) {
 	Client* clientDisconnect = clientList->getClientForSocket(socketConnection);
 	clientDisconnect -> setConnected(false);
 	map<unsigned int, thread>::iterator threadItr;
@@ -146,24 +154,8 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 	pthread_exit(NULL);
 }
 
-Avion* clientPlaneBuilder(XmlParser *parser) {
-	int travelingSpeed = parser->getVelocidadDespAvion();
-	int shootingSpeed = parser->getVelocidadDispAvion();
-	int numberOfPhotograms = 1;
-	int actualPhotogram = 1;
-	int positionX = 200;
-	int positionY = 200;
-	int height = 81;
-	int width = 81;
-	string imagePath = "avionPrueba.png";
-	Avion* clientPlane = new Avion(travelingSpeed,shootingSpeed, numberOfPhotograms,
-			actualPhotogram, positionX, positionY, height, width,imagePath);
-
-	//cout << clients.size()+1 << endl;
-	return clientPlane;
-}
-
 void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor) {
+	bool gameInitiated = false;
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
@@ -172,16 +164,17 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		clientMsj message;
 		//Leo el mensaje de conexion
 		readMsj(socketConnection, sizeof(message), &message);
-		mensaje mensajeInicial;
-
+		mensaje* mensajeInicial = (mensaje*) malloc(sizeof(mensaje));
 		if (clientList->checkIfUserNameIsAlreadyInUse(message.value)) {
 
 			if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
 				message = MessageBuilder().createServerFullMessage();
 			} else {
+				numberOfCurrentAcceptedClients++;
 				//Creo el cliente con el nombre del mensaje y lo agrego a la lista
 				string name(message.value);
-				Avion *clientPlane = clientPlaneBuilder(parser);
+				Avion *clientPlane = new Avion();
+				parser->getAvion(clientPlane, numberOfCurrentAcceptedClients);
 				Client* client = new Client(name, socketConnection, 0, clientPlane);
 
 				clientList->addClient(client);
@@ -191,8 +184,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, socketConnection, clientList, procesor);
 
-				numberOfCurrentAcceptedClients++;
-				mensajeInicial = MessageBuilder().createInitialMessageForClient(client);
+				MessageBuilder().createInitialMessageForClient(client, mensajeInicial);
 			}
 		} else {
 			Client* client = clientList->getClientForName(message.value);
@@ -209,14 +201,18 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		}
 
 		sendMsj(socketConnection, sizeof(message), &(message));
-		broadcastMsj(mensajeInicial, clientList);
+		drawableList.push_back(mensajeInicial);
+		//Se envia la info para levantar el juego recien cuando todos se conectaron.
+		if(numberOfCurrentAcceptedClients == maxNumberOfClients && !gameInitiated){
+			sendGameInfo(clientList);
+			gameInitiated = true;
+		}
 	}
 	pthread_exit(NULL);
 }
 
 int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->menuPresenter = new MenuPresenter(this->appShouldTerminate, this);
-
 	this->clientList = new ClientList();
 
 	const char* fileName;
@@ -246,6 +242,15 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	int success = this->socketManager->createSocketConnection();
 	if (success == EXIT_FAILURE)
 		return EXIT_FAILURE;
+
+	mensaje ventanaMsj, escenarioMsj;
+	Escenario escenario;
+	parser->getFondoEscenario(escenario);
+	ventanaMsj.height = parser->getAltoVentana();;
+	ventanaMsj.width = parser->getAnchoVentana();
+	escenarioMsj = MessageBuilder().createInitBackgroundMessage(&escenario);
+	drawableList.push_back(&ventanaMsj);
+	drawableList.push_back(&escenarioMsj);
 
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor);
@@ -287,5 +292,9 @@ GameManager::~GameManager() {
 	delete this->xmlLoader;
 	delete this->socketManager;
 	delete logWriter;
+	for (unsigned int i = 0; i<drawableList.size(); i++){
+		free(drawableList.front());
+		drawableList.pop_front();
+	}
 }
 

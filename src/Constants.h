@@ -49,6 +49,7 @@ using namespace std;
 #define tagAvionSpriteId "avionSpriteId"
 #define tagVueltaSpriteID "vueltaSpriteId"
 #define tagDisparosSpriteId "disparosSpriteId"
+#define tagAviones "aviones"
 
 struct sprite{
 	char id[LONG_ID];
@@ -58,7 +59,7 @@ struct sprite{
 	int ancho;
 };
 struct elemento{
-	char id[LONG_ID];
+	int id;
 	int x;
 	int y;
 };

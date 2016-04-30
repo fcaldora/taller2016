@@ -6,7 +6,6 @@
  */
 
 #include <string>
-#include "Sprite.h"
 #ifndef AVION_H_
 #define AVION_H_
 
@@ -16,8 +15,7 @@ using namespace std;
 
 class Avion: public DrawableObject {
 public:
-	Avion(int velDesplazamiento, int velDisparo, int numberOfPhotograms,
-			int actualPhotogram, int postionX, int positionY, int height, int width, string imagePath);
+	Avion();
 	virtual ~Avion();
 
 	void setVelDesplazamiento(int velDesplazamiento);
@@ -35,9 +33,6 @@ public:
 private:
 	int velDesplazamiento;
 	int velDisparo;
-	Sprite *avionSprite;
-	Sprite *disparoSprite;
-	Sprite *vueltaSprite;
 };
 
 #endif /* AVION_H_ */

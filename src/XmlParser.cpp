@@ -159,7 +159,7 @@ int XmlParser::getVelocidadDispAvion(){
 	return velocidad;
 }
 
-int XmlParser::getSprite(Sprite &sprite, int numSprite){
+int XmlParser::getSprite(DrawableObject &object, int numSprite){
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* spritesElem = docHandle.FirstChildElement(tagSprites).ToElement();
 	TiXmlElement* aux = spritesElem->FirstChildElement(tagSprite);
@@ -171,15 +171,15 @@ int XmlParser::getSprite(Sprite &sprite, int numSprite){
 		return -1;
 
 	TiXmlElement* pathElem = aux->FirstChildElement(tagPath);
-	sprite.setPath(string(pathElem->GetText()));
+	object.setPath(string(pathElem->GetText()));
 	TiXmlElement* cantElem = aux->FirstChildElement(tagCantidad);
-	sprite.setCantidad(atoi(cantElem->GetText()));
+	object.setPhotograms(atoi(cantElem->GetText()));
 	TiXmlElement* altoElem = aux->FirstChildElement(tagAlto);
-	sprite.setHeight(atoi(altoElem->GetText()));
+	object.setHeigth(atoi(altoElem->GetText()));
 	TiXmlElement* anchoElem = aux->FirstChildElement(tagAncho);
-	sprite.setWidth(atoi(anchoElem->GetText()));
+	object.setWidth(atoi(anchoElem->GetText()));
 	TiXmlElement* idElem = aux->FirstChildElement(tagId);
-	sprite.setId(string(idElem->GetText()));
+	object.setId(atoi(idElem->GetText()));
 	return 0;
 }
 
@@ -205,7 +205,7 @@ int XmlParser::getElement(struct elemento &element, int elementNum){
 	}
 
 	TiXmlElement* idElem = elementoElem->FirstChildElement(tagSpriteId);
-	strncpy(element.id, idElem->GetText(),20);
+	element.id = atoi(idElem->GetText());
 	TiXmlElement* posicionElem = elementoElem->FirstChildElement(tagPosicion);
 	TiXmlElement* posxElem = posicionElem->FirstChildElement(tagPosX);
 	element.x = atoi(posxElem->GetText());
@@ -214,24 +214,56 @@ int XmlParser::getElement(struct elemento &element, int elementNum){
 	return 0;
 }
 
-int XmlParser::getFondoEscenario(Sprite &fondo){
+int XmlParser::getFondoEscenario(DrawableObject &object){
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
 	if(escenarioElem == NULL){
 		cout<<"Error al obtener el escenario"<<endl;
 		return -1;
 	}
-	TiXmlElement* fondoElem = docHandle.FirstChildElement(tagFondo).ToElement();
+	TiXmlElement* fondoElem = escenarioElem->FirstChildElement(tagFondo)->ToElement();
 	if(fondoElem == NULL){
 		cout<<"Error al obtener el fondo del escenario"<<endl;
 		return -1;
 	}
 	TiXmlElement* idElem = fondoElem->FirstChildElement(tagSpriteId);
-	fondo.setId(idElem->GetText());
+	object.setId(atoi(idElem->GetText()));
 	TiXmlElement* anchoElem = fondoElem->FirstChildElement(tagAncho);
-	fondo.setWidth(atoi(anchoElem->GetText()));
+	object.setWidth(atoi(anchoElem->GetText()));
 	TiXmlElement* altoElem = fondoElem->FirstChildElement(tagAlto);
-	fondo.setHeight(atoi(altoElem->GetText()));
+	object.setHeigth(atoi(altoElem->GetText()));
+	TiXmlElement* pathElem = fondoElem->FirstChildElement(tagPath);
+	object.setPath(pathElem->GetText());
+	return 0;
+}
+
+int XmlParser::getAvion(Avion* avion, int nroCliente){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* avionesElem = docHandle.FirstChild(tagAviones).ToElement();
+	if(avionesElem == NULL){
+		cout<<"Error al obtener los aviones"<<endl;
+		return -1;
+	}
+	TiXmlElement* avionElem = avionesElem->FirstChildElement(tagAvion);
+	for(int i = 1; i < nroCliente; i++){
+		avionElem = avionElem->NextSiblingElement(tagAvion);
+	}
+	TiXmlElement* pathElem = avionElem->FirstChildElement(tagPath);
+	avion->setPath(pathElem->GetText());
+	TiXmlElement* posXElem = avionElem->FirstChildElement(tagPosX);
+	avion->setPosX(atoi(posXElem->GetText()));
+	TiXmlElement* posYElem = avionElem->FirstChildElement(tagPosY);
+	avion->setPosY(atoi(posYElem->GetText()));
+	TiXmlElement* anchoElem = avionElem->FirstChildElement(tagAncho);
+	avion->setWidth(atoi(anchoElem->GetText()));
+	TiXmlElement* altoElem = avionElem->FirstChildElement(tagAlto);
+	avion->setHeigth(atoi(altoElem->GetText()));
+	TiXmlElement* idElem = avionElem->FirstChildElement(tagId);
+	avion->setId(atoi(idElem->GetText()));
+	TiXmlElement* velDisparoElem = avionElem->FirstChildElement(tagVelDisparo);
+	avion->setVelDisparo(atoi(velDisparoElem->GetText()));
+	TiXmlElement* velDesplElem = avionElem->FirstChildElement(tagVelDesplazamiento);
+	avion->setVelDesplazamiento(atoi(velDesplElem->GetText()));
 	return 0;
 }
 

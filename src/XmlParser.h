@@ -1,6 +1,7 @@
 #include "tinyxml.h"
 #include "Constants.h"
-#include "Sprite.h"
+#include "DrawableObject.h"
+#include "Avion.h"
 #include <iostream>
 #ifndef XMLPARSER_H_
 #define XMLPARSER_H_
@@ -20,9 +21,10 @@ public:
 	int getAltoEscenario();
 	int getVelocidadDespAvion();
 	int getVelocidadDispAvion();
-	int getSprite(Sprite &sprite, int numSprite);
+	int getSprite(DrawableObject &object, int numSprite);
 	int getElement(struct elemento &element, int elementNum);
-	int getFondoEscenario(Sprite &fondo);
+	int getFondoEscenario(DrawableObject &object);
+	int getAvion(Avion* avion, int nroCliente);
 
 private:
 	TiXmlDocument doc;

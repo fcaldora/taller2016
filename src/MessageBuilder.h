@@ -10,6 +10,7 @@
 
 #include "Constants.h"
 #include "Client.h"
+#include "Escenario.h"
 
 class MessageBuilder {
 public:
@@ -19,8 +20,9 @@ public:
 	clientMsj createSuccessfullyConnectedMessage();
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
-	mensaje createInitialMessageForClient(Client *client);
+	void createInitialMessageForClient(Client *client, mensaje* message);
 	mensaje createPlaneMovementMessageForClient(Client *client);
+	mensaje createInitBackgroundMessage(Escenario *escenario);
 };
 
 #endif /* MESSAGEBUILDER_H_ */

@@ -13,6 +13,7 @@
 #include <iostream>
 #include <stdlib.h>
 
+
 using namespace std;
 
 class DrawableObject {
@@ -36,12 +37,12 @@ public:
 		this->id = id;
 	}
 
-	const string& getPath() const {
-		return imagePath;
+	string getPath() {
+		return string(imagePath);
 	}
 
-	void setPath(const string& path) {
-		this->imagePath = path;
+	void setPath(string path) {
+		strncpy(this->imagePath, path.c_str(),20);
 	}
 
 	int getPhotograms() const {
@@ -86,7 +87,7 @@ public:
 
 protected:
 	int id;
-	string imagePath;
+	char imagePath[20];
 	int actualPhotogram;
 	int numberOfPhotograms;
 	int posX;

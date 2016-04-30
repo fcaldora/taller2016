@@ -7,20 +7,11 @@
 
 #include "Avion.h"
 
-Avion::Avion(int velDesplazamiento, int velDisparo, int numberOfPhotograms,
-		int actualPhotogram, int postionX, int positionY, int height, int width, string imagePath) :DrawableObject() {
-	this->velDesplazamiento = velDesplazamiento;
-	this->velDisparo = velDisparo;
-	this->numberOfPhotograms = numberOfPhotograms;
-	this->actualPhotogram = actualPhotogram;
-	this->posX = postionX;
-	this->posY = positionY;
-	this->heigth = height;
-	this->width = width;
-	this->imagePath = imagePath;
-	avionSprite = NULL;
-	disparoSprite = NULL;
-	vueltaSprite = NULL;
+Avion::Avion() :DrawableObject() {
+	this->numberOfPhotograms = 1;
+	this->actualPhotogram = 1;
+	velDisparo = 0;
+	velDesplazamiento = 0;
 }
 
 void Avion::setVelDesplazamiento(int velDesplazamiento){
@@ -48,25 +39,21 @@ void Avion::moveVerical(int movement){
 }
 
 void Avion::moveOneStepRight() {
-	moveHorizontal(1);
+	moveHorizontal(this->velDesplazamiento);
 }
 
 void Avion::moveOneStepLeft() {
-	moveHorizontal(-1);
+	moveHorizontal(-this->velDesplazamiento);
 }
 
 void Avion::moveOneStepUp() {
-	moveVerical(-1);
+	moveVerical(-this->velDesplazamiento);
 }
 
 void Avion::moveOneStepDown() {
-	moveVerical(1);
+	moveVerical(this->velDesplazamiento);
 }
 
 Avion::~Avion() {
-	delete(avionSprite);
-	delete(disparoSprite);
-	delete(vueltaSprite);
-	// TODO Auto-generated destructor stub
 }
 

@@ -8,46 +8,17 @@
 #include "Escenario.h"
 
 Escenario::Escenario() {
-	width = 0;
-	height = 0;
-	fondo = NULL;
+	this->id  = 0;
+	this->width = 0;
+	this->heigth = 0;
+	this->actualPhotogram = 1;
+	this->numberOfPhotograms = 1;
+	this->posX = 0;
+	this->posY = 0;
 }
 
-void Escenario::addElement(Sprite* element){
+void Escenario::addElement(DrawableObject* element){
 	elements.push_front(element);
-}
-
-void Escenario::setFondo(Sprite* fondo){
-	this->fondo = fondo;
-}
-
-Sprite* Escenario::getElement(struct elemento element, unsigned int numElement){
-	if(numElement > elements.size())
-		return NULL;
-	list<Sprite*>::iterator it = elements.begin();
-	for(unsigned int contador = 0; contador<numElement; contador++){
-		it++;
-	}
-	strncpy(element.id,(*it)->getId().c_str(), 20);
-	element.x = (*it)->getWidth();
-	element.y = (*it)->getHeight();
-
-}
-
-void Escenario::setHeight(int height){
-	this->height = height;
-}
-
-int Escenario::getHeight(){
-	return height;
-}
-
-void Escenario::setWidth(int width){
-	this->width = width;
-}
-
-int Escenario::getWidth(){
-	return width;
 }
 
 Escenario::~Escenario() {

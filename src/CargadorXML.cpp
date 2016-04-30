@@ -77,7 +77,7 @@ bool XMLLoader::serverXMLIsValid(const char* fileName) {
 
 bool XMLLoader::cargarEscenario(Escenario &escenario, string pathDoc){
 	XmlParser parser(pathDoc.c_str());
-	escenario.setHeight(parser.getAltoEscenario());
+	escenario.setHeigth(parser.getAltoEscenario());
 	escenario.setWidth(parser.getAnchoEscenario());
 	return true;
 }
@@ -89,29 +89,11 @@ bool XMLLoader::cargarAvion(Avion &avion, string pathDoc){
 	return true;
 }
 
-bool XMLLoader::cargarFondo(Sprite &fondo, string pathDoc){
-	XmlParser parser(pathDoc.c_str());
-	parser.getFondoEscenario(fondo);
-	return true;
-}
-
-bool XMLLoader::obtenerSprite(Sprite &sprite, int numSprite, string pathDoc){
+bool XMLLoader::obtenerSprite(DrawableObject &sprite, int numSprite, string pathDoc){
 	XmlParser parser(pathDoc.c_str());
 	if (parser.getSprite(sprite, numSprite) != -1)
 		return true;
 	return false;
-}
-
-bool XMLLoader::cargarVentana(Window &window, string pathDoc){
-	XmlParser parser(pathDoc.c_str());
-	int alto, ancho;
-	alto = parser.getAltoVentana();
-	ancho = parser.getAnchoVentana();
-	if (alto ==-1 || ancho == -1)
-		return false;
-	window.setHeight(alto);
-	window.setWidth(ancho);
-	return true;
 }
 
 bool XMLLoader::cargarElemento(elemento &elemento, int numElemento, string pathDoc){
