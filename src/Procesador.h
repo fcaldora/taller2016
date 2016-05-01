@@ -19,7 +19,23 @@ public:
 	Procesador(ClientList *clientList, int screenWidth, int screenHeight);
 	virtual ~Procesador();
 
-	void processMessage(clientMsj message);
+	int processMessage(clientMsj message);
+
+	int getScreenHeight() const {
+		return screenHeight;
+	}
+
+	void setScreenHeight(int screenHeight) {
+		this->screenHeight = screenHeight;
+	}
+
+	int getScreenWidth() const {
+		return screenWidth;
+	}
+
+	void setScreenWidth(int screenWidth) {
+		this->screenWidth = screenWidth;
+	}
 
 private:
 	ClientList *clientList;

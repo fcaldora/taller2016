@@ -73,6 +73,18 @@ mensaje MessageBuilder::createInitBackgroundMessage(Escenario *escenario){
 	return message;
 }
 
+mensaje MessageBuilder::createBulletMessage(Object* bullet){
+	mensaje message;
+	message.id = bullet->getId();
+	strcpy(message.action,"create");
+	strcpy(message.imagePath, bullet->getPath().c_str());
+	message.height = bullet->getHeigth();
+	message.width = bullet->getWidth();
+	message.posX = bullet->getPosX();
+	message.posY = bullet->getPosY();
+	message.activeState = true;
+	return message;
+}
 
 
 MessageBuilder::~MessageBuilder() {
