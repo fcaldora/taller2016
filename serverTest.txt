@@ -12,14 +12,14 @@
 </ventana>
 <sprites>
 	<sprite>
-		<id>4</id>
+		<id>445</id>
 		<path>path/a/avion.png</path>
 		<cantidad>1</cantidad>
 		<ancho>10</ancho>
 		<alto>10</alto>
 	</sprite>
 	<sprite>
-		<id>3</id>
+		<id>3565</id>
 		<path>path/a/disparo.png</path>
 		<cantidad>1</cantidad>
 		<ancho>5</ancho>
@@ -28,27 +28,37 @@
 </sprites>
 <escenario>
 	<ancho>800</ancho>
-	<alto>1000</alto>
+	<alto>10000</alto>
 	<fondo>
 		<spriteId>0</spriteId>
-		<ancho>800</ancho>
-		<alto>600</alto>
+		<ancho>1024</ancho>
+		<alto>1024</alto>
 		<path>fondo.png</path>
 	</fondo>
 	<elementos>
 		<elemento>
-			<spriteId>1</spriteId>
-			<posicion>
-				<x>10</x>
-				<y>15</y>
-			</posicion>
+			<path>isla1.png</path>
+			<id>3</id>
+			<ancho>64</ancho>
+			<alto>63</alto>
+			<x>50</x>
+			<y>5000</y>
 		</elemento>
 		<elemento>
-			<spriteId>2</spriteId>
-			<posicion>
-				<x>15</x>
-				<y>20</y>
-			</posicion>
+			<path>isla2.png</path>
+			<id>4</id>
+			<ancho>64</ancho>
+			<alto>63</alto>
+			<x>50</x>
+			<y>400</y>
+		</elemento>
+		<elemento>
+			<path>barco1.png</path>
+			<id>5</id>
+			<ancho>33</ancho>
+			<alto>98</alto>
+			<x>50</x>
+			<y>1000</y>
 		</elemento>
 	</elementos>
 </escenario>

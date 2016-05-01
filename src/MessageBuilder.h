@@ -25,6 +25,8 @@ public:
 	mensaje createPlaneMovementMessageForClient(Client *client);
 	mensaje createInitBackgroundMessage(Escenario *escenario);
 	mensaje createBulletMessage(Object*);
+	mensaje createBackgroundUpdateMessage(Escenario *escenario);
+	mensaje createBackgroundElementUpdateMessage(Escenario *escenario, int numElement);
 };
 
 #endif /* MESSAGEBUILDER_H_ */

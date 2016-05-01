@@ -86,6 +86,30 @@ mensaje MessageBuilder::createBulletMessage(Object* bullet){
 	return message;
 }
 
+mensaje MessageBuilder::createBackgroundUpdateMessage(Escenario* escenario){
+	mensaje msg;
+	strncpy(msg.action, "draw", 20);
+	msg.id = escenario->getId();
+	msg.posY = escenario->getPosY();
+	msg.posX = escenario->getPosX();
+	return msg;
+}
+
+mensaje MessageBuilder::createBackgroundElementUpdateMessage(Escenario* escenario, int numElement){
+	mensaje msg;
+	DrawableObject* auxObject;
+	strncpy(msg.action, "draw", 20);
+	auxObject = escenario->getElement(numElement);
+	msg.id = auxObject->getId();
+	msg.posX = auxObject->getPosX();
+	msg.posY = auxObject->getPosY();
+	strncpy(msg.imagePath, auxObject->getPath().c_str(), 20);
+	msg.height = auxObject->getHeigth();
+	msg.width = auxObject->getWidth();
+	msg.activeState = true;
+	return msg;
+}
+
 
 MessageBuilder::~MessageBuilder() {
 	// TODO Auto-generated destructor stub

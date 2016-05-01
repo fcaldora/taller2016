@@ -22,7 +22,8 @@ public:
 	int getVelocidadDespAvion();
 	int getVelocidadDispAvion();
 	int getSprite(DrawableObject &object, int numSprite);
-	int getElement(struct elemento &element, int elementNum);
+	int getElement(DrawableObject &element, int elementNum);
+	int getNumberOfElements();
 	int getFondoEscenario(DrawableObject &object);
 	int getAvion(Avion* avion, int nroCliente);
 
