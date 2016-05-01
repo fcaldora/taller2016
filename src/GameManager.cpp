@@ -37,6 +37,7 @@ map<unsigned int, thread> clientEntranceMessages;
 map<unsigned int, thread> clientExitMessages;
 list<Bullet*> bullets;
 int bulletsCount = 0;
+map<unsigned int, thread> keepAliveThreads;
 bool appShouldTerminate, gameInitiated;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
@@ -53,6 +54,7 @@ GameManager::GameManager() {
 	this->xmlLoader = NULL;
 	this->scenery = NULL;
 }
+
 
 int sendMsj(int socket, int bytesAEnviar, clientMsj* mensaje) {
 	int enviados = 0;
@@ -107,15 +109,18 @@ int readMsj(int socket, int bytesARecibir, clientMsj* mensaje) {
 			totalBytesRecibidos += recibidos;
 		}
 	}
-	return 1;
+	return recibidos;
 }
 
 
 void broadcast(mensaje *msg, ClientList* clientList){
 	std::list<Client*>::iterator it;
 	for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
-		sendMsjInfo((*it)->getSocketMessages(), sizeof(msg), msg);
+		if((*it)->getConnnectionState()){
+			sendMsjInfo((*it)->getSocketMessages(), sizeof(msg), msg);
+		}
 	}
+	delete msg;
 }
 
 void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario) {
@@ -126,22 +131,20 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 		for(objectIt = bullets.begin(); objectIt != bullets.end(); objectIt++){
 			if((*objectIt)->isStatic()){
 				(*objectIt)->move();
-				mensaje msg;
-				if((*objectIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())){
-					strcpy(msg.action, "delete");
-					msg.id = (*objectIt)->getId();
-					bullets.erase(objectIt);
-					objectIt--;
-				}else{
-					strcpy(msg.action, "draw");
-					msg.id = (*objectIt)->getId();
-					msg.posX = (*objectIt)->getPosX();
-					msg.posY = (*objectIt)->getPosY();
-				}
-				for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
-					sendMsjInfo((*it)->getSocketMessages(), sizeof(msg), &msg);
-				}
 			}
+			mensaje *msg = new mensaje;
+			if((*objectIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())){
+				strcpy(msg->action, "delete");
+				msg->id = (*objectIt)->getId();
+				bullets.erase(objectIt);
+				objectIt--;
+			}else{
+				strcpy(msg->action, "draw");
+				msg->id = (*objectIt)->getId();
+				msg->posX = (*objectIt)->getPosX();
+				msg->posY = (*objectIt)->getPosY();
+			}
+			broadcast(msg, clientList);
 		}
 		mensaje *msj = new mensaje;
 		if(gameInitiated){
@@ -153,9 +156,11 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				msj = MessageBuilder().createBackgroundElementUpdateMessage(escenario, i);
 				broadcast(msj, clientList);
 			}
-		}		
+		}
+		cout << "OBJECTS : " << bullets.size() << endl;
 	}
 }
+
 
 void sendGameInfo(ClientList* clientList){
 	list<mensaje*>::iterator it;
@@ -174,7 +179,7 @@ void disconnectClientForSocketConnection(unsigned int socketConnection, ClientLi
 			threadItr->second.detach();
 	}
 
-	for(threadItr = clientExitMessages.begin(); threadItr != clientExitMessages.end(); ++threadItr){
+	for(threadItr = keepAliveThreads.begin(); threadItr != keepAliveThreads.end(); ++threadItr){
 		if(threadItr->first == socketConnection)
 			threadItr->second.detach();
 	}
@@ -191,6 +196,11 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 			shutdown(socketConnection, SHUT_RDWR);
 			clientHasDisconnected = true;
 			disconnectClientForSocketConnection(socketConnection, clientList);
+			mensaje *disconnection = new mensaje;
+			strcpy(disconnection->action, "path");
+			disconnection->id = clientList->getClientForSocket(socketConnection)->plane->getId();
+			strcpy(disconnection->imagePath, "disconnected.png");
+			broadcast(disconnection, clientList);
 
 		} else {
 			procesor->processMessage(message);
@@ -204,6 +214,13 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
 		logWriter->writeClientConnectionReceived();
+
+		struct timeval timeOut;
+		timeOut.tv_sec = 100;
+		timeOut.tv_usec = 0;
+		setsockopt(socketHandle, SOL_SOCKET, SO_RCVTIMEO, &timeOut, sizeof(struct timeval));
+		//cout<<"Error al settear el timeout"<<endl;
+		//cout<<strerror(errno)<<endl;
 
 		clientMsj message;
 		//Leo el mensaje de conexion
@@ -227,7 +244,6 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, socketConnection, clientList, procesor);
-
 				mensajeInicial =  MessageBuilder().createInitialMessageForClient(client);
 			}
 		} else {
@@ -300,7 +316,6 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		DrawableObject* object = new DrawableObject();
 		parser->getElement(*object, i);
 		this->scenery->addElement(object);
-		//mensaje* elementMsg = (mensaje*) malloc(sizeof(mensaje));
 		mensaje *elementMsg = MessageBuilder().createBackgroundElementUpdateMessage(this->scenery, i);
 		strncpy(elementMsg->action, "create", 20);
 		drawableList.push_back(elementMsg);
@@ -346,8 +361,8 @@ void GameManager::detachClientMessagesThreads() {
 			threadItr != clientEntranceMessages.end(); ++threadItr) {
 		threadItr->second.detach();
 	}
-	for (threadItr = clientExitMessages.begin();
-			threadItr != clientExitMessages.end(); ++threadItr) {
+	for (threadItr = keepAliveThreads.begin();
+			threadItr != keepAliveThreads.end(); ++threadItr) {
 		threadItr->second.detach();
 	}
 }

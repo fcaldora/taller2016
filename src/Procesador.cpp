@@ -24,10 +24,12 @@ Procesador::Procesador(ClientList *clientList, int screenWidth, int screenHeight
 }
 
 void Procesador::processMessage(clientMsj message) {
-	if (strcmp(message.value, "movement") == 0) {
+	if (strcmp(message.type, "movement") == 0) {
 		processMovementMessage(message);
-	} else if (strcmp(message.value, "shoot") == 0) {
+	} else if (strcmp(message.type, "shoot") == 0) {
 		processShootingMessage(message);
+	} else if (strcmp(message.type, "alive") == 0) {
+
 	}
 }
 
