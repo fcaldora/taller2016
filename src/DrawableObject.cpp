@@ -9,7 +9,7 @@
 
 DrawableObject::DrawableObject() {
 	id = 0;
-	strncpy(imagePath, "",20);
+	imagePath = "";
 	actualPhotogram = 1;
 	numberOfPhotograms = 1;
 	posX = 0;

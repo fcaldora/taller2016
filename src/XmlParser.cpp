@@ -183,7 +183,29 @@ int XmlParser::getSprite(DrawableObject &object, int numSprite){
 	return 0;
 }
 
-int XmlParser::getElement(struct elemento &element, int elementNum){
+int XmlParser::getNumberOfElements(){
+	int result = 0;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
+	if(escenarioElem == NULL){
+		cout<<"Error al obtener el escenario"<<endl;
+		return -1;
+	}
+	TiXmlElement* elementosElem = escenarioElem->FirstChild(tagElementos)->ToElement();
+	if(elementosElem == NULL){
+		cout<<"Error al obtener los elementos"<<endl;
+		return -1;
+	}
+
+	TiXmlElement* elemento = elementosElem->FirstChildElement(tagElemento);
+	while(elemento != NULL){
+		result++;
+		elemento = elemento->NextSiblingElement(tagElemento);
+	}
+	return result;
+}
+
+int XmlParser::getElement(DrawableObject &element, int elementNum){
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
 	if(escenarioElem == NULL){
@@ -204,13 +226,18 @@ int XmlParser::getElement(struct elemento &element, int elementNum){
 		return -1;
 	}
 
-	TiXmlElement* idElem = elementoElem->FirstChildElement(tagSpriteId);
-	element.id = atoi(idElem->GetText());
-	TiXmlElement* posicionElem = elementoElem->FirstChildElement(tagPosicion);
-	TiXmlElement* posxElem = posicionElem->FirstChildElement(tagPosX);
-	element.x = atoi(posxElem->GetText());
-	TiXmlElement* posyElem = posicionElem->FirstChildElement(tagPosY);
-	element.y = atoi(posyElem->GetText());
+	TiXmlElement* idElem = elementoElem->FirstChildElement(tagId);
+	element.setId(atoi(idElem->GetText()));
+	TiXmlElement* posxElem = elementoElem->FirstChildElement(tagPosX);
+	element.setPosX(atoi(posxElem->GetText()));
+	TiXmlElement* posyElem = elementoElem->FirstChildElement(tagPosY);
+	element.setPosY(atoi(posyElem->GetText()));
+	TiXmlElement* altoElem = elementoElem->FirstChildElement(tagAlto);
+	element.setHeigth(atoi(altoElem->GetText()));
+	TiXmlElement* anchoElem = elementoElem->FirstChildElement(tagAncho);
+	element.setWidth(atoi(anchoElem->GetText()));
+	TiXmlElement* pathElem = elementoElem->FirstChildElement(tagPath);
+	element.setPath(pathElem->GetText());
 	return 0;
 }
 

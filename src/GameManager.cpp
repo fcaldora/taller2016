@@ -10,17 +10,24 @@
 
 #include <strings.h>
 #include <stdio.h>
+#include <sys/time.h>
+#include <unistd.h>
 #include <thread>
 #include "LogWriter.h"
 #include "Avion.h"
 #include "Escenario.h"
 #include <mutex>
 #include "Client.h"
+#include "Object.h"
 #include "Constants.h"
 #include "MenuPresenter.h"
 #include <sys/socket.h>
 #include "MessageBuilder.h"
+#include <chrono>
 #include "DrawableObject.h"
+#include <unistd.h>
+#include "Procesador.h"
+
 
 #define kServerTestFile "serverTest.txt"
 
@@ -28,9 +35,12 @@ std::mutex mutexColaMensajes;
 std::mutex writingInLogFileMutex;
 map<unsigned int, thread> clientEntranceMessages;
 map<unsigned int, thread> clientExitMessages;
-bool appShouldTerminate;
+list<Bullet*> bullets;
+int bulletsCount = 0;
+bool appShouldTerminate, gameInitiated;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
+list<mensaje> messageList;
 list<mensaje*> drawableList; //lista que guarda todos los mensajes iniciales para levantar el juego :
 							//datos de la ventana, escenario, aviones, elementos del escenario.
 
@@ -40,7 +50,8 @@ GameManager::GameManager() {
 	this->menuPresenter = NULL;
 	this->parser = NULL;
 	this->socketManager = NULL;
-	this->xmlLoader = NULL;;
+	this->xmlLoader = NULL;
+	this->scenery = NULL;
 }
 
 int sendMsj(int socket, int bytesAEnviar, clientMsj* mensaje) {
@@ -77,7 +88,6 @@ int sendMsjInfo(int socket, int bytesAEnviar, mensaje* mensaje) {
 			enviados += res;
 		}
 	}
-
 	return enviados;
 }
 
@@ -100,17 +110,57 @@ int readMsj(int socket, int bytesARecibir, clientMsj* mensaje) {
 	return 1;
 }
 
-void broadcastMsj(mensaje msg, ClientList *clientList) {
+
+void broadcast(mensaje *msg, ClientList* clientList){
 	std::list<Client*>::iterator it;
 	for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
-		sendMsjInfo((*it)->getSocketMessages(), sizeof(msg), &msg);
+		sendMsjInfo((*it)->getSocketMessages(), sizeof(msg), msg);
+	}
+}
+
+void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario) {
+	std::list<Client*>::iterator it;
+	std::list<Bullet*>::iterator objectIt;
+	while(!appShouldTerminate){
+		usleep(1000);
+		for(objectIt = bullets.begin(); objectIt != bullets.end(); objectIt++){
+			if((*objectIt)->isStatic()){
+				(*objectIt)->move();
+				mensaje msg;
+				if((*objectIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())){
+					strcpy(msg.action, "delete");
+					msg.id = (*objectIt)->getId();
+					bullets.erase(objectIt);
+					objectIt--;
+				}else{
+					strcpy(msg.action, "draw");
+					msg.id = (*objectIt)->getId();
+					msg.posX = (*objectIt)->getPosX();
+					msg.posY = (*objectIt)->getPosY();
+				}
+				for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
+					sendMsjInfo((*it)->getSocketMessages(), sizeof(msg), &msg);
+				}
+			}
+		}
+		mensaje *msj = new mensaje;
+		if(gameInitiated){
+			usleep(1000);
+			escenario->update();
+			msj = MessageBuilder().createBackgroundUpdateMessage(escenario);
+			broadcast(msj, clientList);
+			for (int i = 0; i < escenario->getNumberElements(); i++){
+				msj = MessageBuilder().createBackgroundElementUpdateMessage(escenario, i);
+				broadcast(msj, clientList);
+			}
+		}		
 	}
 }
 
 void sendGameInfo(ClientList* clientList){
 	list<mensaje*>::iterator it;
 	for (it = drawableList.begin(); it != drawableList.end(); it++){
-		broadcastMsj(*(*it), clientList);
+		broadcast((*it), clientList);
 	}
 }
 
@@ -144,18 +194,12 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 
 		} else {
 			procesor->processMessage(message);
-			Client* client = clientList->getClientForName(message.id);
-
-			mensaje respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
-
-			broadcastMsj(respuesta, clientList);
 		}
 	}
 	pthread_exit(NULL);
 }
 
 void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor) {
-	bool gameInitiated = false;
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
@@ -237,8 +281,8 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	int screenHeight = this->parser->getAltoVentana();
 	int screenWidth = this->parser->getAnchoVentana();
 
-	this->procesor = new Procesador(this->clientList, screenWidth, screenHeight);
-
+	this->procesor = new Procesador(this->clientList, screenWidth, screenHeight, this);
+	gameInitiated = false;
 	int success = this->socketManager->createSocketConnection();
 	if (success == EXIT_FAILURE)
 		return EXIT_FAILURE;
@@ -247,17 +291,30 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->scenery = parser->getFondoEscenario();
 	ventanaMsj->height = parser->getAltoVentana();
 	ventanaMsj->width = parser->getAnchoVentana();
+	this->scenery->setScrollingStep(1);
+	this->scenery->setWindowHeight(ventanaMsj->height);
 	mensaje * escenarioMsj = MessageBuilder().createInitBackgroundMessageForScenery(this->scenery);
 	drawableList.push_back(ventanaMsj);
 	drawableList.push_back(escenarioMsj);
-
+	for(int i = 0; i < parser->getNumberOfElements(); i++){
+		DrawableObject* object = new DrawableObject();
+		parser->getElement(*object, i);
+		this->scenery->addElement(object);
+		//mensaje* elementMsg = (mensaje*) malloc(sizeof(mensaje));
+		mensaje *elementMsg = MessageBuilder().createBackgroundElementUpdateMessage(this->scenery, i);
+		strncpy(elementMsg->action, "create", 20);
+		drawableList.push_back(elementMsg);
+	}
+	this->scenery->transformPositions();
+	bulletsCount = maxNumberOfClients + this->scenery->getNumberElements();
+	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->scenery);
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor);
 
 	this->menuPresenter->presentMenu();
 
 	clientConnectionWaiter.detach();
-
+	broadcastThread.detach();
 	return EXIT_SUCCESS;
 }
 
@@ -265,6 +322,19 @@ void GameManager::userDidChooseExitoption() {
 	logWriter->writeUserDidFinishTheApp();
 	this->appShouldTerminate = true;
 	appShouldTerminate = true;
+}
+
+void GameManager::broadcastMessage(mensaje *message) {
+	broadcast(message, this->clientList);
+}
+
+Bullet* GameManager::createBulletForClient(Client *client) {
+	bulletsCount++;
+
+	Bullet* bullet = new Bullet(bulletsCount, client->plane->getPosX(), client->plane->getPosY() + 1);
+
+	bullets.push_back(bullet);
+	return bullet;
 }
 
 void GameManager::detachClientMessagesThreads() {
@@ -295,9 +365,6 @@ GameManager::~GameManager() {
 	for (unsigned int i = 0; i < drawableList.size(); i++){
 		delete drawableList.front();
 		drawableList.pop_front();
-		//delete drawableList.at(i);// [i];
-		//delete(drawableList.front());
-		//bdrawableList.pop_front();
 	}
 }
 

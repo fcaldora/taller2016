@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/Avion.cpp \
+../src/Bullet.cpp \
 ../src/CargadorXML.cpp \
 ../src/Client.cpp \
 ../src/ClientList.cpp \
@@ -42,6 +43,7 @@ O_SRCS += \
 
 OBJS += \
 ./src/Avion.o \
+./src/Bullet.o \
 ./src/CargadorXML.o \
 ./src/Client.o \
 ./src/ClientList.o \
@@ -63,6 +65,7 @@ OBJS += \
 
 CPP_DEPS += \
 ./src/Avion.d \
+./src/Bullet.d \
 ./src/CargadorXML.d \
 ./src/Client.d \
 ./src/ClientList.d \

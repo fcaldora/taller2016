@@ -53,12 +53,14 @@ mensaje* MessageBuilder::createInitialMessageForClient(Client *client) {
 	return message;
 }
 
-mensaje MessageBuilder::createPlaneMovementMessageForClient(Client *client) {
-	mensaje message;
-	message.id = client->plane->getId();
-	strncpy(message.action, "draw", kLongChar);
-	message.posX = client->plane->getPosX();
-	message.posY = client->plane->getPosY();
+mensaje* MessageBuilder::createPlaneMovementMessageForClient(Client *client) {
+	mensaje *message = new mensaje;
+
+	message->id = client->plane->getId();
+	strncpy(message->action, "draw", kLongChar);
+	message->posX = client->plane->getPosX();
+	message->posY = client->plane->getPosY();
+
 	return message;
 }
 
@@ -79,6 +81,47 @@ mensaje* MessageBuilder::createInitBackgroundMessageForScenery(Escenario *escena
 	return message;
 }
 
+mensaje* MessageBuilder::createBulletMessage(Bullet* bullet){
+	mensaje *message = new mensaje;
+
+	message->id = bullet->getId();
+	strcpy(message->action,"create");
+	strcpy(message->imagePath, bullet->getPath().c_str());
+	message->height = bullet->getHeigth();
+	message->width = bullet->getWidth();
+	message->posX = bullet->getPosX();
+	message->posY = bullet->getPosY();
+	message->activeState = true;
+
+	return message;
+}
+
+mensaje* MessageBuilder::createBackgroundUpdateMessage(Escenario* escenario){
+	mensaje *msg = new mensaje;
+	strncpy(msg->action, "draw", 20);
+	msg->id = escenario->getId();
+	msg->posY = escenario->getPosY();
+	msg->posX = escenario->getPosX();
+
+	return msg;
+}
+
+mensaje* MessageBuilder::createBackgroundElementUpdateMessage(Escenario* escenario, int numElement){
+	mensaje* msg = new mensaje;
+
+	DrawableObject* auxObject;
+	strncpy(msg->action, "draw", 20);
+	auxObject = escenario->getElement(numElement);
+	msg->id = auxObject->getId();
+	msg->posX = auxObject->getPosX();
+	msg->posY = auxObject->getPosY();
+	strncpy(msg->imagePath, auxObject->getPath().c_str(), 20);
+	msg->height = auxObject->getHeigth();
+	msg->width = auxObject->getWidth();
+	msg->activeState = true;
+
+	return msg;
+}
 
 
 MessageBuilder::~MessageBuilder() {

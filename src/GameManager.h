@@ -12,9 +12,10 @@
 #include "CargadorXML.h"
 #include "SocketManager.h"
 #include "ClientList.h"
-#include "Procesador.h"
+#include "Bullet.h"
 
 class MenuPresenter;
+class Procesador;
 
 class GameManager {
 public:
@@ -24,7 +25,9 @@ public:
 	int initGameWithArguments(int argc, char* argv[]);
 
 	void userDidChooseExitoption();
+	void broadcastMessage(mensaje *message);
 
+	Bullet* createBulletForClient(Client *client);
 private:
 	bool appShouldTerminate;
 	MenuPresenter *menuPresenter;

@@ -96,15 +96,6 @@ bool XMLLoader::obtenerSprite(DrawableObject &sprite, int numSprite, string path
 	return false;
 }
 
-bool XMLLoader::cargarElemento(elemento &elemento, int numElemento, string pathDoc){
-	XmlParser parser(pathDoc.c_str());
-	if(parser.getElement(elemento, numElemento) != -1)
-		return true;
-	return false;
-
-
-}
-
 XMLLoader::~XMLLoader() {
 	this->xmlDocument.Clear();
 }

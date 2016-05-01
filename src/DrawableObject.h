@@ -42,7 +42,7 @@ public:
 	}
 
 	void setPath(string path) {
-		strncpy(this->imagePath, path.c_str(),20);
+		this->imagePath = path;
 	}
 
 	int getPhotograms() const {
@@ -85,15 +85,25 @@ public:
 		this->actualPhotogram = photogram;
 	}
 
+	bool isStatic(){
+		return this->status;
+	}
+
+	void setStatus(bool status){
+		this->status = status;
+	}
+
 protected:
 	int id;
-	char imagePath[20];
+	string imagePath;
 	int actualPhotogram;
 	int numberOfPhotograms;
 	int posX;
 	int posY;
 	int width;
 	int heigth;
+	bool status;
+
 };
 
 #endif /* OBJECT_H_ */

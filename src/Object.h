@@ -84,6 +84,18 @@ public:
 		this->actualPhotogram = photogram;
 	}
 
+	bool isStatic(){
+		return this->status;
+	}
+
+	void setStatus(bool status){
+		this->status = status;
+	}
+
+	void move();
+
+	bool notVisible(int width, int height);
+
 private:
 	int id;
 	string imagePath;
@@ -93,6 +105,7 @@ private:
 	int posY;
 	int width;
 	int heigth;
+	bool status;
 
 
 };

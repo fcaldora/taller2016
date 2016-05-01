@@ -17,10 +17,20 @@ class Escenario: public DrawableObject {
 public:
 	Escenario();
 	void addElement(DrawableObject* element);
+	void update();
+	void setScrollingStep(double step);
+	void transformPositions();
+	void setWindowHeight(int windowHeight);
+	DrawableObject* getElement(int numElement);
+	int getNumberElements();
 	virtual ~Escenario();
 
 private:
 	list<DrawableObject*> elements;
+	int posYActual;
+	int scrollingStep;
+	int scrollingOffset;
+	int windowHeight;
 };
 
 #endif /* ESCENARIO_H_ */
