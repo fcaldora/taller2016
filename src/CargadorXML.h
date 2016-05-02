@@ -21,7 +21,6 @@ public:
 	bool cargarEscenario(Escenario &escenario, string pathDoc);
 	bool cargarAvion(Avion &avion, string pathDoc);
 	bool obtenerSprite(DrawableObject &sprite, int numSprite, string pathDoc);
-	bool cargarElemento(elemento &elemento, int numElemento, string pathDoc);
 
 private:
 	LogWriter *errorLogWriter;

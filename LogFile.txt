@@ -1,1 +1,3 @@
 Falta escribir el nombre del archivo del servidor, se usara uno por defecto.
+Esperando conexion de cliente
+El usuario cerro la aplicacion

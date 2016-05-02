@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/Avion.cpp \
+../src/Bullet.cpp \
 ../src/CargadorXML.cpp \
 ../src/Client.cpp \
 ../src/ClientList.cpp \
@@ -14,7 +15,6 @@ CPP_SRCS += \
 ../src/LogWriter.cpp \
 ../src/MenuPresenter.cpp \
 ../src/MessageBuilder.cpp \
-../src/Object.cpp \
 ../src/Procesador.cpp \
 ../src/SocketManager.cpp \
 ../src/XmlParser.cpp \
@@ -42,6 +42,7 @@ O_SRCS += \
 
 OBJS += \
 ./src/Avion.o \
+./src/Bullet.o \
 ./src/CargadorXML.o \
 ./src/Client.o \
 ./src/ClientList.o \
@@ -51,7 +52,6 @@ OBJS += \
 ./src/LogWriter.o \
 ./src/MenuPresenter.o \
 ./src/MessageBuilder.o \
-./src/Object.o \
 ./src/Procesador.o \
 ./src/SocketManager.o \
 ./src/XmlParser.o \
@@ -63,6 +63,7 @@ OBJS += \
 
 CPP_DEPS += \
 ./src/Avion.d \
+./src/Bullet.d \
 ./src/CargadorXML.d \
 ./src/Client.d \
 ./src/ClientList.d \
@@ -72,7 +73,6 @@ CPP_DEPS += \
 ./src/LogWriter.d \
 ./src/MenuPresenter.d \
 ./src/MessageBuilder.d \
-./src/Object.d \
 ./src/Procesador.d \
 ./src/SocketManager.d \
 ./src/XmlParser.d \
