@@ -10,7 +10,6 @@
 
 #include "Constants.h"
 #include "Client.h"
-#include "Object.h"
 #include "Escenario.h"
 #include "Bullet.h"
 

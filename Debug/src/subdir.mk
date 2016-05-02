@@ -15,7 +15,6 @@ CPP_SRCS += \
 ../src/LogWriter.cpp \
 ../src/MenuPresenter.cpp \
 ../src/MessageBuilder.cpp \
-../src/Object.cpp \
 ../src/Procesador.cpp \
 ../src/SocketManager.cpp \
 ../src/XmlParser.cpp \
@@ -53,7 +52,6 @@ OBJS += \
 ./src/LogWriter.o \
 ./src/MenuPresenter.o \
 ./src/MessageBuilder.o \
-./src/Object.o \
 ./src/Procesador.o \
 ./src/SocketManager.o \
 ./src/XmlParser.o \
@@ -75,7 +73,6 @@ CPP_DEPS += \
 ./src/LogWriter.d \
 ./src/MenuPresenter.d \
 ./src/MessageBuilder.d \
-./src/Object.d \
 ./src/Procesador.d \
 ./src/SocketManager.d \
 ./src/XmlParser.d \

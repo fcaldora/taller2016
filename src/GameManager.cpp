@@ -18,7 +18,6 @@
 #include "Escenario.h"
 #include <mutex>
 #include "Client.h"
-#include "Object.h"
 #include "Constants.h"
 #include "MenuPresenter.h"
 #include <sys/socket.h>
