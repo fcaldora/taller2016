@@ -60,11 +60,10 @@ void Procesador::processAnimationMessage (clientMsj message) {
 	sendAnimationMessage(client);
 
 	while (client->plane->getActualPhotogramNumber() != 1) {
-		double seconds = kOneMilisecond;
 		timer t;
 		t.start();
 		while(true) {
-			if(t.elapsedTime() >= seconds) {
+			if(t.elapsedTime() >= kOneMilisecond) {
 				break;
 			}
 		}
