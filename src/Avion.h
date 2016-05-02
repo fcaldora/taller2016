@@ -30,6 +30,7 @@ public:
 	void moveOneStepUp();
 	void moveOneStepDown();
 
+	void incrementPhotogramNumber();
 private:
 	int velDesplazamiento;
 	int velDisparo;

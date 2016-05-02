@@ -173,7 +173,7 @@ int XmlParser::getSprite(DrawableObject &object, int numSprite){
 	TiXmlElement* pathElem = aux->FirstChildElement(tagPath);
 	object.setPath(string(pathElem->GetText()));
 	TiXmlElement* cantElem = aux->FirstChildElement(tagCantidad);
-	object.setPhotograms(atoi(cantElem->GetText()));
+	object.setNumberOfPhotograms(atoi(cantElem->GetText()));
 	TiXmlElement* altoElem = aux->FirstChildElement(tagAlto);
 	object.setHeigth(atoi(altoElem->GetText()));
 	TiXmlElement* anchoElem = aux->FirstChildElement(tagAncho);

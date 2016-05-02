@@ -46,6 +46,8 @@ private:
 
 	void processMovementMessage(clientMsj message);
 	void processShootingMessage (clientMsj message);
+	void processAnimationMessage (clientMsj message);
+	void sendAnimationMessage(Client *client);
 };
 
 #endif /* PROCESADOR_H_ */

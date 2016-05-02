@@ -9,7 +9,7 @@
 
 Avion::Avion() :DrawableObject() {
 	this->numberOfPhotograms = 1;
-	this->actualPhotogram = 1;
+	this->actualPhotogramNumber = 1;
 	velDisparo = 0;
 	velDesplazamiento = 0;
 }
@@ -52,6 +52,13 @@ void Avion::moveOneStepUp() {
 
 void Avion::moveOneStepDown() {
 	moveVerical(this->velDesplazamiento);
+}
+
+void Avion::incrementPhotogramNumber() {
+	if (this->getActualPhotogramNumber() < this->getNumberOfPhotograms())
+		this->actualPhotogramNumber++;
+	else
+		this->actualPhotogramNumber = 1;
 }
 
 Avion::~Avion() {

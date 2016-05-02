@@ -28,6 +28,8 @@ public:
 	mensaje* createBulletMessage(Bullet *bullet);
 	mensaje* createBackgroundUpdateMessage(Escenario *escenario);
 	mensaje* createBackgroundElementUpdateMessage(Escenario *escenario, int numElement);
+	mensaje* createClientPlaneLoopMessage(Client *client);
+
 };
 
 #endif /* MESSAGEBUILDER_H_ */

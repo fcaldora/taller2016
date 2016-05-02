@@ -9,6 +9,25 @@
 
 #include "MessageBuilder.h"
 
+#define kOneMilisecond 0.001
+
+class timer {
+	private:
+		unsigned long begTime;
+	public:
+		void start() {
+			begTime = clock();
+		}
+
+		double elapsedTime() {
+			return ((double) clock() - begTime) /(double) CLOCKS_PER_SEC;
+		}
+
+		bool isTimeout(unsigned long seconds) {
+			return seconds >= elapsedTime();
+		}
+};
+
 Procesador::Procesador() {
 	this->clientList = NULL;
 	this->gameManager = NULL;
@@ -30,7 +49,33 @@ void Procesador::processMessage(clientMsj message) {
 		processShootingMessage(message);
 	} else if (strcmp(message.type, "alive") == 0) {
 
+	} else if (strcmp(message.type, "animation") == 0) {
+		processAnimationMessage(message);
 	}
+}
+
+void Procesador::processAnimationMessage (clientMsj message) {
+	Client* client = this->clientList->getClientForName(message.id);
+
+	sendAnimationMessage(client);
+
+	while (client->plane->getActualPhotogramNumber() != 1) {
+		double seconds = kOneMilisecond;
+		timer t;
+		t.start();
+		while(true) {
+			if(t.elapsedTime() >= seconds) {
+				break;
+			}
+		}
+		sendAnimationMessage(client);
+	}
+}
+
+void Procesador::sendAnimationMessage(Client *client) {
+	client->plane->incrementPhotogramNumber();
+	mensaje *response = MessageBuilder().createClientPlaneLoopMessage(client);
+	this->gameManager->broadcastMessage(response);
 }
 
 void Procesador::processShootingMessage (clientMsj message) {

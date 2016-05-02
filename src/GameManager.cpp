@@ -157,7 +157,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				broadcast(msj, clientList);
 			}
 		}
-		cout << "OBJECTS : " << bullets.size() << endl;
+		//cout << "OBJECTS : " << bullets.size() << endl;
 	}
 }
 

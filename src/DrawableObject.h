@@ -45,11 +45,11 @@ public:
 		this->imagePath = path;
 	}
 
-	int getPhotograms() const {
+	int getNumberOfPhotograms() const {
 		return numberOfPhotograms;
 	}
 
-	void setPhotograms(int photograms) {
+	void setNumberOfPhotograms(int photograms) {
 		this->numberOfPhotograms = photograms;
 	}
 
@@ -77,12 +77,12 @@ public:
 		this->width = width;
 	}
 
-	int getActualPhotogram() const {
-			return actualPhotogram;
+	int getActualPhotogramNumber() const {
+			return actualPhotogramNumber;
 		}
 
-	void setActualPhotogram(int photogram) {
-		this->actualPhotogram = photogram;
+	void setActualPhotogramNumber(int photogramNumber) {
+		this->actualPhotogramNumber = photogramNumber;
 	}
 
 	bool isStatic(){
@@ -96,7 +96,7 @@ public:
 protected:
 	int id;
 	string imagePath;
-	int actualPhotogram;
+	int actualPhotogramNumber;
 	int numberOfPhotograms;
 	int posX;
 	int posY;

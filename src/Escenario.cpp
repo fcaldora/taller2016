@@ -11,7 +11,7 @@ Escenario::Escenario() {
 	this->id  = 0;
 	this->width = 0;
 	this->heigth = 0;
-	this->actualPhotogram = 1;
+	this->actualPhotogramNumber = 1;
 	this->numberOfPhotograms = 1;
 	this->posX = 0;
 	this->posY = 0;

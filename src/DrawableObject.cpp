@@ -10,7 +10,7 @@
 DrawableObject::DrawableObject() {
 	id = 0;
 	imagePath = "";
-	actualPhotogram = 1;
+	actualPhotogramNumber = 1;
 	numberOfPhotograms = 1;
 	posX = 0;
 	posY = 200;

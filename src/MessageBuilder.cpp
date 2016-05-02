@@ -42,8 +42,8 @@ mensaje* MessageBuilder::createInitialMessageForClient(Client *client) {
 	strcpy(message->action, "create");
 	strcpy(message->imagePath, client->getPlane()->getPath().c_str());
 	message->id = client->getPlane()->getId();
-	message->photograms = client->getPlane()->getPhotograms();
-	message->actualPhotogram = client->getPlane()->getActualPhotogram();
+	message->photograms = client->getPlane()->getNumberOfPhotograms();
+	message->actualPhotogram = client->getPlane()->getActualPhotogramNumber();
 	message->height = client->getPlane()->getHeigth();
 	message->width = client->getPlane()->getWidth();
 	message->posX = client->getPlane()->getPosX();
@@ -58,6 +58,8 @@ mensaje* MessageBuilder::createPlaneMovementMessageForClient(Client *client) {
 
 	message->id = client->plane->getId();
 	strncpy(message->action, "draw", kLongChar);
+	strncpy(message->imagePath, client->plane->getPath().c_str(), 20);
+	message->actualPhotogram = client->plane->getActualPhotogramNumber();
 	message->posX = client->plane->getPosX();
 	message->posY = client->plane->getPosY();
 
@@ -70,8 +72,8 @@ mensaje* MessageBuilder::createInitBackgroundMessageForScenery(Escenario *escena
 	message->id = escenario->getId();
 	strncpy(message->action,"create", kLongChar);
 	strncpy(message->imagePath, escenario->getPath().c_str(), kLongChar);
-	message->photograms = escenario->getPhotograms();
-	message->actualPhotogram = escenario->getActualPhotogram();
+	message->photograms = escenario->getNumberOfPhotograms();
+	message->actualPhotogram = escenario->getActualPhotogramNumber();
 	message->height = escenario->getHeigth();
 	message->width = escenario->getWidth();
 	message->posX = escenario->getPosX();
@@ -118,6 +120,22 @@ mensaje* MessageBuilder::createBackgroundElementUpdateMessage(Escenario* escenar
 	strncpy(msg->imagePath, auxObject->getPath().c_str(), 20);
 	msg->height = auxObject->getHeigth();
 	msg->width = auxObject->getWidth();
+	msg->activeState = true;
+
+	return msg;
+}
+
+mensaje* MessageBuilder::createClientPlaneLoopMessage(Client *client) {
+	mensaje* msg = new mensaje;
+
+	strncpy(msg->action, "draw", 20);
+	msg->id = client->plane->getId();
+	msg->posX = client->plane->getPosX();
+	msg->posY = client->plane->getPosY();
+	strncpy(msg->imagePath, client->plane->getPath().c_str(), 20);
+	msg->actualPhotogram = client->plane->getActualPhotogramNumber();
+	msg->height = client->plane->getHeigth();
+	msg->width = client->plane->getWidth();
 	msg->activeState = true;
 
 	return msg;
