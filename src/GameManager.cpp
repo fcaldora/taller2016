@@ -35,7 +35,7 @@ map<unsigned int, thread> clientEntranceMessages;
 map<unsigned int, thread> keepAliveThreads;
 list<Object*> objects;
 int objectsCount = 0;
-bool appShouldTerminate, gameInitiated;
+bool appShouldTerminate, gameInitiated, userWasConnected;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
 list<mensaje> messageList;
@@ -237,7 +237,7 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 	pthread_exit(NULL);
 }
 
-void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor) {
+void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor, Escenario* escenario) {
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
@@ -251,9 +251,11 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		//cout<<strerror(errno)<<endl;
 
 		clientMsj message;
+		mensaje escenarioMsj;
 		//Leo el mensaje de conexion
 		readMsj(socketConnection, sizeof(message), &message);
 		mensaje* mensajeInicial = (mensaje*) malloc(sizeof(mensaje));
+		userWasConnected = false;
 		if (clientList->checkIfUserNameIsAlreadyInUse(message.value)) {
 
 			if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
@@ -284,7 +286,9 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
 				message = MessageBuilder().createSuccessfullyConnectedMessage();
+				escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
 				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList, procesor);
+				userWasConnected = true;
 			}
 		}
 
@@ -294,6 +298,18 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		if(numberOfCurrentAcceptedClients == maxNumberOfClients && !gameInitiated){
 			sendGameInfo(clientList);
 			gameInitiated = true;
+		}
+		if(userWasConnected){
+			mensaje ventanaMsj;
+			ventanaMsj.height = parser->getAltoVentana();
+			ventanaMsj.width = parser->getAnchoVentana();
+			sendMsjInfo(socketConnection, sizeof(mensaje), &ventanaMsj);
+			sendMsjInfo(socketConnection, sizeof(mensaje), &escenarioMsj);
+			std::list<Client*>::iterator it;
+			for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
+				MessageBuilder().createInitialMessageForClient((*it), mensajeInicial);
+				sendMsjInfo((*it)->getSocketMessages(), sizeof(mensaje), mensajeInicial);
+			}
 		}
 	}
 	pthread_exit(NULL);
@@ -355,7 +371,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	objectsCount = maxNumberOfClients + escenario.getNumberElements();
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,
-			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor);
+			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario);
 
 	this->menuPresenter->presentMenu();
 
