@@ -308,7 +308,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 			std::list<Client*>::iterator it;
 			for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
 				MessageBuilder().createInitialMessageForClient((*it), mensajeInicial);
-				sendMsjInfo((*it)->getSocketMessages(), sizeof(mensaje), mensajeInicial);
+				sendMsjInfo(socketConnection, sizeof(mensaje), mensajeInicial);
 			}
 		}
 	}
