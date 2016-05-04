@@ -39,7 +39,6 @@ void Escenario::update(){
 	}
 
 	this->posYActual += scrollingStep;
-	cout<<"Posicion actual:  "<<this->posYActual<<endl;
 	this->posY = scrollingOffset;
 	list<DrawableObject*>::iterator it;
 	for (it = elements.begin(); it !=elements.end(); it++){
