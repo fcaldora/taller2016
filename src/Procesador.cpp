@@ -47,6 +47,8 @@ int Procesador::processMessage(clientMsj message) {
 		value = 2;
 	}else if(strcmp(message.value, "alive") == 0){
 		value = 3;
+	}else if(strcmp(message.value, "RES") == 0){
+		value = 4;
 	}
 	return value;
 }

@@ -22,6 +22,8 @@ Escenario::Escenario() {
 }
 
 void Escenario::addElement(DrawableObject* element){
+	element->setPosXInit(element->getPosX());
+	element->setPosYInit(element->getPosY());
 	elements.push_back(element);
 }
 
@@ -37,11 +39,14 @@ void Escenario::update(){
 	}
 
 	this->posYActual += scrollingStep;
+	cout<<"Posicion actual:  "<<this->posYActual<<endl;
 	this->posY = scrollingOffset;
 	list<DrawableObject*>::iterator it;
 	for (it = elements.begin(); it !=elements.end(); it++){
 		(*it)->setPosY((*it)->getPosY() + scrollingStep);
 	}
+	if(this->posYActual == this->heigth)
+		restart();
 }
 
 void Escenario::setWindowHeight(int height){
@@ -55,6 +60,7 @@ void Escenario::transformPositions(){
 	list<DrawableObject*>::iterator it;
 	for (it = elements.begin(); it !=elements.end(); it++){
 		(*it)->setPosY(-(*it)->getPosY() + windowHeight);
+		(*it)->setPosYInit(-(*it)->getPosYInit() + windowHeight);
 	}
 }
 
@@ -74,7 +80,18 @@ int Escenario::getNumberElements(){
 	return (elements.size());
 }
 
+void Escenario::restart(){
+	this->scrollingOffset = 0;
+	this->posYActual = 0;
+	list<DrawableObject*>::iterator it = elements.begin();
+	for(int i = 0; i < elements.size(); i++){
+		(*it)->setPosX((*it)->getPosXInit());
+		(*it)->setPosY((*it)->getPosYInit());
+		it++;
+	}
+}
+
 Escenario::~Escenario() {
-	// TODO Auto-generated destructor stub
+
 }
 

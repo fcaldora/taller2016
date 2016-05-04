@@ -24,6 +24,7 @@ public:
 	DrawableObject* getElement(int numElement);
 	int getNumberElements();
 	virtual ~Escenario();
+	void restart();
 
 private:
 	list<DrawableObject*> elements;

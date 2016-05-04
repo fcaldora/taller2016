@@ -85,6 +85,22 @@ public:
 		this->actualPhotogram = photogram;
 	}
 
+	void setPosXInit(int posXInit){
+		this->posXInit = posXInit;
+	}
+
+	void setPosYInit(int posYInit){
+		this->posYInit = posYInit;
+	}
+
+	int getPosXInit(){
+		return posXInit;
+	}
+
+	int getPosYInit(){
+		return posYInit;
+	}
+
 protected:
 	int id;
 	char imagePath[20];
@@ -92,6 +108,8 @@ protected:
 	int numberOfPhotograms;
 	int posX;
 	int posY;
+	int posXInit;
+	int posYInit;
 	int width;
 	int heigth;
 };

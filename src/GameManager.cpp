@@ -153,7 +153,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				broadcast(msj, clientList);
 			}
 		}
-		cout << "OBJECTS : " << objects.size() << endl;
+		//cout << "OBJECTS : " << objects.size() << endl;
 	}
 }
 
@@ -195,7 +195,7 @@ Object* createBullet(Client* client){
 	return bullet;
 }
 
-void *clientReader(int socketConnection, ClientList *clientList, Procesador *procesor) {
+void *clientReader(int socketConnection, ClientList *clientList, Procesador *procesor, Escenario* escenario) {
 	int res = 0, option;
 	bool clientHasDisconnected = false;
 	while (!appShouldTerminate && !clientHasDisconnected) {
@@ -227,6 +227,9 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 					break;
 				case 3:
 					//keep alive
+					break;
+				case 4:
+					escenario->restart();
 					break;
 			}
 			if(option != 3){
@@ -273,7 +276,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				message = MessageBuilder().createSuccessfullyConnectedMessage();
 
 				clientEntranceMessages[socketConnection] = std::thread(
-						clientReader, socketConnection, clientList, procesor);
+						clientReader, socketConnection, clientList, procesor, escenario);
 				MessageBuilder().createInitialMessageForClient(client, mensajeInicial);
 			}
 		} else {
@@ -287,7 +290,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				client->setConnected(true);
 				message = MessageBuilder().createSuccessfullyConnectedMessage();
 				escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
-				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList, procesor);
+				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList, procesor, escenario);
 				userWasConnected = true;
 			}
 		}
@@ -355,6 +358,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	ventanaMsj.width = parser->getAnchoVentana();
 	escenario.setScrollingStep(1);
 	escenario.setWindowHeight(ventanaMsj.height);
+	escenario.setHeigth(parser->getAltoEscenario());
 	escenarioMsj = MessageBuilder().createInitBackgroundMessage(&escenario);
 	drawableList.push_back(&ventanaMsj);
 	drawableList.push_back(&escenarioMsj);

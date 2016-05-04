@@ -60,6 +60,14 @@
 			<x>50</x>
 			<y>1000</y>
 		</elemento>
+		<elemento>
+			<path>inicio.png</path>
+			<id>6</id>
+			<ancho>320</ancho>
+			<alto>200</alto>
+			<x>100</x>
+			<y>1200</y>
+		</elemento>
 	</elementos>
 </escenario>
 <aviones>
