@@ -55,6 +55,7 @@ mensaje MessageBuilder::createPlaneMovementMessageForClient(Client *client) {
 	strncpy(message.action, "draw", kLongChar);
 	message.posX = client->plane->getPosX();
 	message.posY = client->plane->getPosY();
+	message.actualPhotogram = client->plane->getActualPhotogram();
 	return message;
 }
 
@@ -83,6 +84,7 @@ mensaje MessageBuilder::createBulletMessage(Object* bullet){
 	message.posX = bullet->getPosX();
 	message.posY = bullet->getPosY();
 	message.activeState = true;
+	message.actualPhotogram = bullet->getActualPhotogram();
 	return message;
 }
 
@@ -92,6 +94,7 @@ mensaje MessageBuilder::createBackgroundUpdateMessage(Escenario* escenario){
 	msg.id = escenario->getId();
 	msg.posY = escenario->getPosY();
 	msg.posX = escenario->getPosX();
+	msg.actualPhotogram = escenario->getActualPhotogram();
 	return msg;
 }
 
@@ -106,6 +109,7 @@ mensaje MessageBuilder::createBackgroundElementUpdateMessage(Escenario* escenari
 	strncpy(msg.imagePath, auxObject->getPath().c_str(), 20);
 	msg.height = auxObject->getHeigth();
 	msg.width = auxObject->getWidth();
+	msg.actualPhotogram = auxObject->getActualPhotogram();
 	msg.activeState = true;
 	return msg;
 }

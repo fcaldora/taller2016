@@ -24,11 +24,12 @@ public:
 	int getVelDisparo();
 	void moveVerical(int movement);
 	void moveHorizontal(int movement);
-
+	void setPhotogram();
 	void moveOneStepRight();
 	void moveOneStepLeft();
 	void moveOneStepUp();
 	void moveOneStepDown();
+	bool updatePhotogram();
 
 private:
 	int velDesplazamiento;

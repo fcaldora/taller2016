@@ -54,6 +54,25 @@ void Avion::moveOneStepDown() {
 	moveVerical(this->velDesplazamiento);
 }
 
+void Avion::setPhotogram(){
+	if(this->numberOfPhotograms > 1)
+		this->actualPhotogram++;
+}
+
+bool Avion::updatePhotogram(){
+	if(this->actualPhotogram == 1)
+		return false;
+	if(this->actualPhotogram < this->numberOfPhotograms){
+		this->actualPhotogram++;
+		return true;
+	}
+	if(this->actualPhotogram == this->numberOfPhotograms){
+		this->actualPhotogram = 1;
+		return true;
+	}
+	return false;
+}
+
 Avion::~Avion() {
 }
 

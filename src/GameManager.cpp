@@ -25,6 +25,7 @@
 #include "MessageBuilder.h"
 #include <chrono>
 #include "DrawableObject.h"
+#include <ctime>
 #include <unistd.h>
 
 #define kServerTestFile "serverTest.txt"
@@ -122,6 +123,7 @@ void broadcast(mensaje msg, ClientList* clientList){
 void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario) {
 	std::list<Client*>::iterator it;
 	std::list<Object*>::iterator objectIt;
+	int contador = 0;
 	while(!appShouldTerminate){
 		usleep(1000);
 		for(objectIt = objects.begin(); objectIt != objects.end(); objectIt++){
@@ -139,6 +141,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				msg.id = (*objectIt)->getId();
 				msg.posX = (*objectIt)->getPosX();
 				msg.posY = (*objectIt)->getPosY();
+				msg.actualPhotogram = (*objectIt)->getActualPhotogram();
 			}
 			broadcast(msg, clientList);
 		}
@@ -153,7 +156,21 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				broadcast(msj, clientList);
 			}
 		}
-		//cout << "OBJECTS : " << objects.size() << endl;
+		contador++;
+		if (contador == 20){
+			contador = 0;
+			for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
+				if((*it)->plane->updatePhotogram()){
+					mensaje photogramMsg;
+					strncpy(photogramMsg.action,"draw", kLongChar);
+					photogramMsg.actualPhotogram = (*it)->plane->getActualPhotogram();
+					photogramMsg.id = (*it)->plane->getId();
+					photogramMsg.posX = (*it)->plane->getPosX();
+					photogramMsg.posY = (*it)->plane->getPosY();
+					broadcast(photogramMsg, clientList);
+				}
+			}
+		}
 	}
 }
 
@@ -230,6 +247,10 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 					break;
 				case 4:
 					escenario->restart();
+					break;
+				case 5:
+					client->plane->setPhotogram();
+					respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
 					break;
 			}
 			if(option != 3){

@@ -8,7 +8,8 @@
 #include "Object.h"
 
 Object::Object() {
-	// TODO Auto-generated constructor stub
+	this->actualPhotogram = 1;
+	this->photograms = 1;
 
 }
 

@@ -73,11 +73,12 @@
 <aviones>
 	<avion>
 		<id>1</id>
-		<path>avionPrueba1.png</path>
-		<ancho>81</ancho>
-		<alto>81</alto>
+		<path>a.png</path>
+		<ancho>48</ancho>
+		<alto>48</alto>
 		<x>200</x>
 		<y>100</y>
+		<cantidad>39</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -92,6 +93,7 @@
 		<alto>81</alto>
 		<x>200</x>
 		<y>200</y>
+		<cantidad>1</cantidad>
 		<velocidadDesplazamiento>1</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
