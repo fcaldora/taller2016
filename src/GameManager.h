@@ -13,6 +13,7 @@
 #include "SocketManager.h"
 #include "ClientList.h"
 #include "Procesador.h"
+#include "BulletList.h"
 
 class MenuPresenter;
 

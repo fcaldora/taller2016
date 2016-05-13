@@ -10,22 +10,6 @@
 	<ancho>800</ancho>
 	<alto>600</alto>
 </ventana>
-<sprites>
-	<sprite>
-		<id>445</id>
-		<path>path/a/avion.png</path>
-		<cantidad>1</cantidad>
-		<ancho>10</ancho>
-		<alto>10</alto>
-	</sprite>
-	<sprite>
-		<id>3565</id>
-		<path>path/a/disparo.png</path>
-		<cantidad>1</cantidad>
-		<ancho>5</ancho>
-		<alto>5</alto>
-	</sprite>
-</sprites>
 <escenario>
 	<ancho>800</ancho>
 	<alto>10000</alto>
@@ -73,12 +57,12 @@
 <aviones>
 	<avion>
 		<id>1</id>
-		<path>a.png</path>
-		<ancho>48</ancho>
-		<alto>48</alto>
+		<path>Avion1.png</path>
+		<ancho>68</ancho>
+		<alto>68</alto>
 		<x>200</x>
 		<y>100</y>
-		<cantidad>39</cantidad>
+		<cantidad>9</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -88,12 +72,12 @@
 	
 	<avion>
 		<id>2</id>
-		<path>avionPrueba2.png</path>
-		<ancho>81</ancho>
-		<alto>81</alto>
+		<path>Avion2.png</path>
+		<ancho>68</ancho>
+		<alto>68</alto>
 		<x>200</x>
 		<y>200</y>
-		<cantidad>1</cantidad>
+		<cantidad>9</cantidad>
 		<velocidadDesplazamiento>1</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>

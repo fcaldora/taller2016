@@ -43,7 +43,7 @@ int Procesador::processMessage(clientMsj message) {
 		}
 		value = 1;
 	}else if(strcmp(message.value, "DIS") == 0){
-		cout << "LLego dis" << endl;
+		//cout << "LLego dis" << endl;
 		value = 2;
 	}else if(strcmp(message.value, "alive") == 0){
 		value = 3;
