@@ -222,38 +222,7 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 			broadcast(disconnection, clientList);
 
 		} else {
-			//cout << message.value << endl;
 			procesor->processMessage(message);
-//			option = procesor->processMessage(message);
-//			Client* client = clientList->getClientForName(message.id);
-//			mensaje respuesta;
-//			switch(option){
-//				case 1:
-//					if (!client->plane->isLooping) {
-//						respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
-//					}
-//					break;
-//				case 2:
-//					//cout << "BALA CREADA" << endl;
-//					if (!client->plane->isLooping)
-//						respuesta = MessageBuilder().createBulletMessage(createBullet(client));
-//					break;
-//				case 3:
-//					//keep alive
-//					break;
-//				case 4:
-//					escenario->restart();
-//					break;
-//				case 5:
-//					if (!client->plane->isLooping) {
-//						client->plane->setPhotogram();
-//						respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
-//					}
-//					break;
-//			}
-//			if(option != 3){
-//				broadcast(respuesta, clientList);
-//			}
 		}
 	}
 	pthread_exit(NULL);
