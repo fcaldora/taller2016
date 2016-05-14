@@ -12,6 +12,7 @@ Avion::Avion() :DrawableObject() {
 	this->actualPhotogram = 1;
 	velDisparo = 0;
 	velDesplazamiento = 0;
+	this->isLooping = false;
 }
 
 void Avion::setVelDesplazamiento(int velDesplazamiento){
@@ -60,14 +61,19 @@ void Avion::setPhotogram(){
 }
 
 bool Avion::updatePhotogram(){
-	if(this->actualPhotogram == 1)
+	if(this->actualPhotogram == 1) {
+		this->isLooping = false;
 		return false;
+	}
+
 	if(this->actualPhotogram < this->numberOfPhotograms){
 		this->actualPhotogram++;
+		this->isLooping = true;
 		return true;
 	}
 	if(this->actualPhotogram == this->numberOfPhotograms){
 		this->actualPhotogram = 1;
+		this->isLooping = false;
 		return true;
 	}
 	return false;

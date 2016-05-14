@@ -31,6 +31,8 @@ public:
 	void moveOneStepDown();
 	bool updatePhotogram();
 
+	bool isLooping;
+
 private:
 	int velDesplazamiento;
 	int velDisparo;

@@ -7,52 +7,102 @@
 
 #include "Procesador.h"
 
+#include "MessageBuilder.h"
+#include "GameManager.h"
+
 Procesador::Procesador() {
 	this->clientList = NULL;
 	this->screenWidth = 0;
 	this->screenHeight = 0;
+	this->gameManager = NULL;
 }
 
-Procesador::Procesador(ClientList *clientList, int screenWidth, int screenHeight) {
+Procesador::Procesador(ClientList *clientList, int screenWidth, int screenHeight, GameManager *gameManager) {
 	this->clientList = clientList;
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
+	this->gameManager = gameManager;
 }
 
-int Procesador::processMessage(clientMsj message) {
+void Procesador::processMessage(clientMsj message) {
+	if(strcmp(message.type, "movement") == 0) {
+		this->processMovementMessage(message);
+		return;
+	}
+
+	if(strcmp(message.type, "shoot") == 0){
+		this->processShootMessage(message);
+		return;
+	}
+
+	if(strcmp(message.type, "alive") == 0){
+		this->processKeepAliveMessage(message);
+		return;
+	}
+
+	if(strcmp(message.type, "reset") == 0){
+		this->processResetMessage(message);
+		return;
+	}
+
+	if(strcmp(message.type, "animation") == 0){
+		this->processAnimationMessage(message);
+		return;
+	}
+}
+
+void Procesador::processMovementMessage(clientMsj message) {
 	Client* client = this->clientList->getClientForName(message.id);
-	int value;
+	if (client->plane->isLooping)
+		return;
+
 	if(strcmp(message.value, "DER") == 0) {
 		if((client->plane->getPosX() + client -> getPlane()->getWidth()) < this->screenWidth){
 			client->plane->moveOneStepRight();
 		}
-		value = 1;
 	}else if(strcmp(message.value, "IZQ") == 0) {
 		if(client->plane->getPosX() > 0){
 			client->plane->moveOneStepLeft();
 		}
-		value = 1;
 	}else if(strcmp(message.value, "ABJ") == 0) {
 		if((client->plane->getPosY() + client -> getPlane()->getHeigth()) < this->screenHeight){
 			client->plane->moveOneStepDown();
 		}
-		value = 1;
 	}else if(strcmp(message.value, "ARR") == 0) {
 		if(client->plane->getPosY() > 0){
 			client->plane->moveOneStepUp();
 		}
-		value = 1;
-	}else if(strcmp(message.value, "DIS") == 0){
-		//cout << "LLego dis" << endl;
-		value = 2;
-	}else if(strcmp(message.value, "alive") == 0){
-		value = 3;
-	}else if(strcmp(message.value, "RES") == 0){
-		value = 4;
-	}else if(strcmp(message.value, "ANIMATE") == 0){
-		value = 5;
 	}
-	return value;
+	mensaje response = MessageBuilder().createPlaneMovementMessageForClient(client);
+	this->gameManager->broadcastMessage(response);
+}
+
+void Procesador::processShootMessage(clientMsj message) {
+	Client* client = this->clientList->getClientForName(message.id);
+	if (client->plane->isLooping)
+		return;
+
+	Object *bullet = this->gameManager->createBulletForClient(client);
+	mensaje response = MessageBuilder().createBulletMessage(bullet);
+	this->gameManager->broadcastMessage(response);
+}
+
+void Procesador::processKeepAliveMessage(clientMsj message) {
+
+}
+
+void Procesador::processResetMessage(clientMsj message) {
+	this->gameManager->restartGame();
+}
+
+void Procesador::processAnimationMessage(clientMsj message) {
+	Client* client = this->clientList->getClientForName(message.id);
+	if (client->plane->isLooping)
+		return;
+
+	client->plane->setPhotogram();
+	mensaje response = MessageBuilder().createPlaneMovementMessageForClient(client);
+	this->gameManager->broadcastMessage(response);
 }
 
 Procesador::~Procesador() {

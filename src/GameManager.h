@@ -26,6 +26,10 @@ public:
 
 	void userDidChooseExitoption();
 
+	void broadcastMessage(mensaje message);
+	void restartGame();
+	Object* createBulletForClient(Client* client);
+
 private:
 	bool appShouldTerminate;
 	MenuPresenter *menuPresenter;

@@ -13,13 +13,15 @@ using namespace std;
 
 #include "ClientList.h"
 
+class GameManager;
+
 class Procesador {
 public:
 	Procesador();
-	Procesador(ClientList *clientList, int screenWidth, int screenHeight);
+	Procesador(ClientList *clientList, int screenWidth, int screenHeight, GameManager *gameManager);
 	virtual ~Procesador();
 
-	int processMessage(clientMsj message);
+	void processMessage(clientMsj message);
 
 	int getScreenHeight() const {
 		return screenHeight;
@@ -37,10 +39,17 @@ public:
 		this->screenWidth = screenWidth;
 	}
 
+	GameManager *gameManager;
+
 private:
 	ClientList *clientList;
 	int screenWidth;
 	int screenHeight;
+	void processMovementMessage(clientMsj message);
+	void processShootMessage(clientMsj message);
+	void processKeepAliveMessage(clientMsj message);
+	void processResetMessage(clientMsj message);
+	void processAnimationMessage(clientMsj message);
 };
 
 #endif /* PROCESADOR_H_ */

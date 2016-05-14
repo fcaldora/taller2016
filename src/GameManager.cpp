@@ -204,19 +204,6 @@ void disconnectClientForSocketConnection(unsigned int socketConnection, ClientLi
 	}
 }
 
-Object* createBullet(Client* client){
-	Object* bullet = new Object();
-	bullet->setId(objects.getLastId() + 1);
-	bullet->setPath("bullet.png");
-	bullet->setPosX(client->plane->getPosX() + client->plane->getWidth()/2 - 15);
-	bullet->setPosY(client->plane->getPosY() + 1);
-	bullet->setWidth(30);
-	bullet->setHeigth(30);
-	bullet->setStatus(true);
-	objects.addElement(*bullet);
-	return bullet;
-}
-
 void *clientReader(int socketConnection, ClientList *clientList, Procesador *procesor, Escenario* escenario) {
 	int res = 0, option;
 	bool clientHasDisconnected = false;
@@ -236,31 +223,37 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 
 		} else {
 			//cout << message.value << endl;
-			option = procesor->processMessage(message);
-			Client* client = clientList->getClientForName(message.id);
-			mensaje respuesta;
-			switch(option){
-				case 1:
-					respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
-					break;
-				case 2:
-					//cout << "BALA CREADA" << endl;
-					respuesta = MessageBuilder().createBulletMessage(createBullet(client));
-					break;
-				case 3:
-					//keep alive
-					break;
-				case 4:
-					escenario->restart();
-					break;
-				case 5:
-					client->plane->setPhotogram();
-					respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
-					break;
-			}
-			if(option != 3){
-				broadcast(respuesta, clientList);
-			}
+			procesor->processMessage(message);
+//			option = procesor->processMessage(message);
+//			Client* client = clientList->getClientForName(message.id);
+//			mensaje respuesta;
+//			switch(option){
+//				case 1:
+//					if (!client->plane->isLooping) {
+//						respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
+//					}
+//					break;
+//				case 2:
+//					//cout << "BALA CREADA" << endl;
+//					if (!client->plane->isLooping)
+//						respuesta = MessageBuilder().createBulletMessage(createBullet(client));
+//					break;
+//				case 3:
+//					//keep alive
+//					break;
+//				case 4:
+//					escenario->restart();
+//					break;
+//				case 5:
+//					if (!client->plane->isLooping) {
+//						client->plane->setPhotogram();
+//						respuesta = MessageBuilder().createPlaneMovementMessageForClient(client);
+//					}
+//					break;
+//			}
+//			if(option != 3){
+//				broadcast(respuesta, clientList);
+//			}
 		}
 	}
 	pthread_exit(NULL);
@@ -368,7 +361,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	int screenHeight = this->parser->getAltoVentana();
 	int screenWidth = this->parser->getAnchoVentana();
 
-	this->procesor = new Procesador(this->clientList, screenWidth, screenHeight);
+	this->procesor = new Procesador(this->clientList, screenWidth, screenHeight, this);
 	gameInitiated = false;
 	int success = this->socketManager->createSocketConnection();
 	if (success == EXIT_FAILURE)
@@ -415,6 +408,27 @@ void GameManager::userDidChooseExitoption() {
 	logWriter->writeUserDidFinishTheApp();
 	this->appShouldTerminate = true;
 	appShouldTerminate = true;
+}
+
+void GameManager::broadcastMessage(mensaje message) {
+	broadcast(message, clientList);
+}
+
+void GameManager::restartGame() {
+	escenario->restart();
+}
+
+Object* GameManager::createBulletForClient(Client* client){
+	Object* bullet = new Object();
+	bullet->setId(objects.getLastId() + 1);
+	bullet->setPath("bullet.png");
+	bullet->setPosX(client->plane->getPosX() + client->plane->getWidth()/2 - 15);
+	bullet->setPosY(client->plane->getPosY() + 1);
+	bullet->setWidth(30);
+	bullet->setHeigth(30);
+	bullet->setStatus(true);
+	objects.addElement(*bullet);
+	return bullet;
 }
 
 void GameManager::detachClientMessagesThreads() {
