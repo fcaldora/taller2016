@@ -96,6 +96,10 @@ public:
 
 	bool notVisible(int width, int height);
 
+	void setStep(int step){
+		this->step = step;
+	}
+
 private:
 	int id;
 	string imagePath;
@@ -105,6 +109,7 @@ private:
 	int posY;
 	int width;
 	int heigth;
+	int step;
 	bool status;
 
 

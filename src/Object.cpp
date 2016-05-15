@@ -10,6 +10,7 @@
 Object::Object() {
 	this->actualPhotogram = 1;
 	this->photograms = 1;
+	this->step = 1;
 
 }
 
@@ -18,7 +19,7 @@ Object::~Object() {
 }
 
 void Object::move(){
-	this->posY -= 1;
+	this->posY -= step;
 }
 
 bool Object::notVisible(int width, int height){
