@@ -132,25 +132,6 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			if(strcmp(msg.action, "Bullet deleted") != 0)
 				broadcast(msg, clientList);
 		}
-		/*for(objectIt = objects.begin(); objectIt != objects.end(); objectIt++){
-			if((*objectIt).isStatic()){
-				(*objectIt).move();
-			}
-			mensaje msg;
-			if((*objectIt).notVisible(processor->getScreenWidth(), processor->getScreenHeight())){
-				strcpy(msg.action, "delete");
-				msg.id = (*objectIt).getId();
-				objects.deleteElement(objectIt);
-				//objectIt--;
-			}else{
-				strcpy(msg.action, "draw");
-				msg.id = (*objectIt).getId();
-				msg.posX = (*objectIt).getPosX();
-				msg.posY = (*objectIt).getPosY();
-				msg.actualPhotogram = (*objectIt).getActualPhotogram();
-			}
-			broadcast(msg, clientList);
-		}*/
 		mensaje msj;
 		if(gameInitiated){
 			usleep(1000);

@@ -4,7 +4,7 @@ all:
 	g++ -Wall CargadorXML.cpp -c
 	g++ -Wall XmlParser.cpp -c
 	g++ -Wall LogWriter.cpp -c	
-	g++ -Wall Procesador.cpp -c
+	g++ -Wall Procesador.cpp -c -std=c++11
 	g++ -Wall Avion.cpp -c
 	g++ -Wall Escenario.cpp -c
 	g++ -Wall Client.cpp -c
