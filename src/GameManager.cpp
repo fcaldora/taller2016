@@ -186,7 +186,7 @@ void disconnectClientForSocketConnection(unsigned int socketConnection, ClientLi
 }
 
 void *clientReader(int socketConnection, ClientList *clientList, Procesador *procesor, Escenario* escenario) {
-	int res = 0, option;
+	int res = 0;
 	bool clientHasDisconnected = false;
 	while (!appShouldTerminate && !clientHasDisconnected) {
 		clientMsj message;
@@ -200,6 +200,8 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 			strcpy(disconnection.action, "path");
 			disconnection.id = clientList->getClientForSocket(socketConnection)->plane->getId();
 			strcpy(disconnection.imagePath, "disconnected.png");
+			disconnection.height = 81;
+			disconnection.width = 81;
 			broadcast(disconnection, clientList);
 
 		} else {
@@ -253,6 +255,13 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				logWriter->writeUserNameAlreadyInUse(message.value);
 				message = MessageBuilder().createUserNameAlreadyInUseMessage();
 			} else {
+				mensaje reconnection;
+				strcpy(reconnection.action, "path");
+				reconnection.id = clientList->getClientForSocket(socketConnection)->plane->getId();
+				strcpy(reconnection.imagePath,client->plane->getPath().c_str());
+				reconnection.width = client->plane->getWidth();
+				reconnection.height = client->plane->getHeigth();
+				broadcast(reconnection, clientList);
 				logWriter->writeResumeGameForUserName(message.value);
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
@@ -279,6 +288,14 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 			for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
 				MessageBuilder().createInitialMessageForClient((*it), &mensajeObjeto);
 				sendMsjInfo(socketConnection, sizeof(mensaje), &mensajeObjeto);
+			}
+			for(int i = 0; i < parser->getNumberOfElements(); i++){
+				DrawableObject object;
+				mensaje elementMsg;
+				parser->getElement(object, i);
+				elementMsg = MessageBuilder().createBackgroundElementUpdateMessage(escenario, i);
+				strncpy(elementMsg.action, "create", 20);
+				sendMsjInfo(socketConnection, sizeof(mensaje), &elementMsg);
 			}
 		}
 	}
@@ -369,18 +386,18 @@ void GameManager::restartGame() {
 }
 
 Object* GameManager::createBulletForClient(Client* client){
-	Object* bullet = new Object();
-	bullet->setId(objects.getLastId() + 1);
-	bullet->setPath("bullet.png");
-	bullet->setPosX(client->plane->getPosX() + client->plane->getWidth()/2 - 15);
-	bullet->setPosY(client->plane->getPosY() + 1);
-	bullet->setWidth(30);
-	bullet->setHeigth(30);
-	bullet->setStatus(true);
+	Object bullet;
+	bullet.setId(objects.getLastId() + 1);
+	bullet.setPath("bullet.png");
+	bullet.setPosX(client->plane->getPosX() + client->plane->getWidth()/2 - 15);
+	bullet.setPosY(client->plane->getPosY() + 1);
+	bullet.setWidth(30);
+	bullet.setHeigth(30);
+	bullet.setStatus(true);
 	//La velocidad de disparo es relativa a la velocidad del avion.
-	bullet->setStep(client->plane->getVelDisparo() + client->plane->getVelDesplazamiento());
-	objects.addElement(*bullet);
-	return bullet;
+	bullet.setStep(client->plane->getVelDisparo() + client->plane->getVelDesplazamiento());
+	objects.addElement(bullet);
+	return &bullet;
 }
 
 void GameManager::detachClientMessagesThreads() {
