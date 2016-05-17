@@ -59,8 +59,19 @@ mensaje MessageBuilder::createPlaneMovementMessageForClient(Client *client) {
 	return message;
 }
 
+mensaje MessageBuilder::createWindowInitMessage(int screenHeight, int screenWidth) {
+	mensaje message;
+	memset(&message, 0, sizeof(mensaje));
+	message.height = screenHeight;
+	message.width = screenWidth;
+
+	return message;
+}
+
 mensaje MessageBuilder::createInitBackgroundMessage(Escenario *escenario){
 	mensaje message;
+	memset(&message, 0, sizeof(mensaje));
+
 	message.id = escenario->getId();
 	strncpy(message.action,"create", kLongChar);
 	strncpy(message.imagePath, escenario->getPath().c_str(), kLongChar);
@@ -71,6 +82,7 @@ mensaje MessageBuilder::createInitBackgroundMessage(Escenario *escenario){
 	message.posX = escenario->getPosX();
 	message.posY = escenario->getPosY();
 	message.activeState = true;
+
 	return message;
 }
 
@@ -98,22 +110,36 @@ mensaje MessageBuilder::createBackgroundUpdateMessage(Escenario* escenario){
 	return msg;
 }
 
-mensaje MessageBuilder::createBackgroundElementUpdateMessage(Escenario* escenario, int numElement){
-	mensaje msg;
-	DrawableObject* auxObject;
+mensaje MessageBuilder::createBackgroundElementUpdateMessageForElement(DrawableObject *element){
+	mensaje msg = this->createBackgroundElementBaseMessageForElement(element);
 	strncpy(msg.action, "draw", 20);
-	auxObject = escenario->getElement(numElement);
-	msg.id = auxObject->getId();
-	msg.posX = auxObject->getPosX();
-	msg.posY = auxObject->getPosY();
-	strncpy(msg.imagePath, auxObject->getPath().c_str(), 20);
-	msg.height = auxObject->getHeigth();
-	msg.width = auxObject->getWidth();
-	msg.actualPhotogram = auxObject->getActualPhotogram();
-	msg.activeState = true;
+
 	return msg;
 }
 
+mensaje MessageBuilder::createBackgroundElementCreationMessageForElement(DrawableObject *element){
+	mensaje msg;
+	memset(&msg, 0, sizeof(mensaje));
+
+	msg = this->createBackgroundElementBaseMessageForElement(element);
+	strncpy(msg.action, "create", 20);
+
+	return msg;
+}
+
+mensaje MessageBuilder::createBackgroundElementBaseMessageForElement(DrawableObject *element){
+	mensaje msg;
+	msg.id = element->getId();
+	msg.posX = element->getPosX();
+	msg.posY = element->getPosY();
+	strncpy(msg.imagePath, element->getPath().c_str(), 20);
+	msg.height = element->getHeigth();
+	msg.width = element->getWidth();
+	msg.actualPhotogram = element->getActualPhotogram();
+	msg.activeState = true;
+
+	return msg;
+}
 
 MessageBuilder::~MessageBuilder() {
 	// TODO Auto-generated destructor stub

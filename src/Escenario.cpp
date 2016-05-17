@@ -22,8 +22,6 @@ Escenario::Escenario() {
 }
 
 void Escenario::addElement(DrawableObject* element){
-	element->setPosXInit(element->getPosX());
-	element->setPosYInit(element->getPosY());
 	elements.push_back(element);
 }
 
@@ -80,7 +78,6 @@ int Escenario::getNumberElements(){
 }
 
 void Escenario::restart(){
-
 	this->scrollingOffset = 0;
 	this->posYActual = 0;
 	list<DrawableObject*>::iterator it = elements.begin();
@@ -89,7 +86,6 @@ void Escenario::restart(){
 		(*it)->setPosY((*it)->getPosYInit());
 		it++;
 	}
-
 }
 
 Escenario::~Escenario() {

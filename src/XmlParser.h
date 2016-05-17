@@ -8,6 +8,8 @@
 
 using namespace std;
 
+#include "Escenario.h"
+
 class XmlParser {
 public:
 	XmlParser(const char* filename);
@@ -22,9 +24,9 @@ public:
 	int getVelocidadDespAvion();
 	int getVelocidadDispAvion();
 	int getSprite(DrawableObject &object, int numSprite);
-	int getElement(DrawableObject &element, int elementNum);
+	DrawableObject* getElementAtIndex(int elementNum);
 	int getNumberOfElements();
-	int getFondoEscenario(DrawableObject &object);
+	Escenario* getFondoEscenario();
 	int getAvion(Avion* avion, int nroCliente);
 
 private:

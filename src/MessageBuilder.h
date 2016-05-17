@@ -26,7 +26,12 @@ public:
 	mensaje createInitBackgroundMessage(Escenario *escenario);
 	mensaje createBulletMessage(Object*);
 	mensaje createBackgroundUpdateMessage(Escenario *escenario);
-	mensaje createBackgroundElementUpdateMessage(Escenario *escenario, int numElement);
+	mensaje createBackgroundElementUpdateMessageForElement(DrawableObject *element);
+	mensaje createBackgroundElementCreationMessageForElement(DrawableObject *element);
+	mensaje createWindowInitMessage(int screenHeight, int screenWidth);
+
+private:
+	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);
 };
 
 #endif /* MESSAGEBUILDER_H_ */

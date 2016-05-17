@@ -205,17 +205,19 @@ int XmlParser::getNumberOfElements(){
 	return result;
 }
 
-int XmlParser::getElement(DrawableObject &element, int elementNum){
+DrawableObject* XmlParser::getElementAtIndex(int elementNum){
+	DrawableObject *element = new DrawableObject();
+
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
 	if(escenarioElem == NULL){
 		cout<<"Error al obtener el escenario"<<endl;
-		return -1;
+		return NULL;
 	}
 	TiXmlElement* elementosElem = escenarioElem->FirstChild(tagElementos)->ToElement();
 	if(elementosElem == NULL){
 		cout<<"Error al obtener los elementos"<<endl;
-		return -1;
+		return NULL;
 	}
 	TiXmlElement* elementoElem = elementosElem->FirstChild(tagElemento)->ToElement();
 
@@ -223,45 +225,57 @@ int XmlParser::getElement(DrawableObject &element, int elementNum){
 		elementoElem = elementoElem->NextSiblingElement(tagElemento);
 
 	if(elementoElem == NULL){
-		return -1;
+		return NULL;
 	}
 
 	TiXmlElement* idElem = elementoElem->FirstChildElement(tagId);
-	element.setId(atoi(idElem->GetText()));
+	element->setId(atoi(idElem->GetText()));
 	TiXmlElement* posxElem = elementoElem->FirstChildElement(tagPosX);
-	element.setPosX(atoi(posxElem->GetText()));
+	element->setPosX(atoi(posxElem->GetText()));
+	element->setPosXInit(atoi(posxElem->GetText()));
+
 	TiXmlElement* posyElem = elementoElem->FirstChildElement(tagPosY);
-	element.setPosY(atoi(posyElem->GetText()));
+	element->setPosY(atoi(posyElem->GetText()));
+	element->setPosYInit(atoi(posyElem->GetText()));
+
 	TiXmlElement* altoElem = elementoElem->FirstChildElement(tagAlto);
-	element.setHeigth(atoi(altoElem->GetText()));
+	element->setHeigth(atoi(altoElem->GetText()));
 	TiXmlElement* anchoElem = elementoElem->FirstChildElement(tagAncho);
-	element.setWidth(atoi(anchoElem->GetText()));
+	element->setWidth(atoi(anchoElem->GetText()));
 	TiXmlElement* pathElem = elementoElem->FirstChildElement(tagPath);
-	element.setPath(pathElem->GetText());
-	return 0;
+	element->setPath(pathElem->GetText());
+
+	return element;
 }
 
-int XmlParser::getFondoEscenario(DrawableObject &object){
+Escenario* XmlParser::getFondoEscenario(){
+	Escenario *object = new Escenario();
+
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
 	if(escenarioElem == NULL){
 		cout<<"Error al obtener el escenario"<<endl;
-		return -1;
+		return NULL;
 	}
 	TiXmlElement* fondoElem = escenarioElem->FirstChildElement(tagFondo)->ToElement();
 	if(fondoElem == NULL){
 		cout<<"Error al obtener el fondo del escenario"<<endl;
-		return -1;
+		return NULL;
 	}
 	TiXmlElement* idElem = fondoElem->FirstChildElement(tagSpriteId);
-	object.setId(atoi(idElem->GetText()));
+	object->setId(atoi(idElem->GetText()));
 	TiXmlElement* anchoElem = fondoElem->FirstChildElement(tagAncho);
-	object.setWidth(atoi(anchoElem->GetText()));
+	object->setWidth(atoi(anchoElem->GetText()));
 	TiXmlElement* altoElem = fondoElem->FirstChildElement(tagAlto);
-	object.setHeigth(atoi(altoElem->GetText()));
+	object->setHeigth(atoi(altoElem->GetText()));
 	TiXmlElement* pathElem = fondoElem->FirstChildElement(tagPath);
-	object.setPath(pathElem->GetText());
-	return 0;
+	object->setPath(pathElem->GetText());
+
+	object->setScrollingStep(1);
+	object->setHeigth(this->getAltoEscenario());
+	object->setWindowHeight(this->getAltoVentana());
+
+	return object;
 }
 
 int XmlParser::getAvion(Avion* avion, int nroCliente){

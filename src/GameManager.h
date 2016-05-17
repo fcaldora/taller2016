@@ -32,6 +32,7 @@ public:
 
 private:
 	bool appShouldTerminate;
+	int maxNumberOfClients;
 	MenuPresenter *menuPresenter;
 	XmlParser *parser;
 	XMLLoader *xmlLoader;
@@ -41,6 +42,7 @@ private:
 	Escenario* escenario;
 
 	void detachClientMessagesThreads();
+	void setUpGame();
 };
 
 #endif /* GAMEMANAGER_H_ */

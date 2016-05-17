@@ -119,7 +119,7 @@ void broadcast(mensaje msg, ClientList* clientList){
 	}
 }
 
-void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario) {
+void* broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario) {
 	std::list<Client*>::iterator it;
 	std::list<Object>::iterator objectIt;
 	int contador = 0;
@@ -139,7 +139,8 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			msj = MessageBuilder().createBackgroundUpdateMessage(escenario);
 			broadcast(msj, clientList);
 			for (int i = 0; i < escenario->getNumberElements(); i++){
-				msj = MessageBuilder().createBackgroundElementUpdateMessage(escenario, i);
+				DrawableObject* element = escenario->getElement(i);
+				msj = MessageBuilder().createBackgroundElementUpdateMessageForElement(element);
 				broadcast(msj, clientList);
 			}
 		}
@@ -159,6 +160,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			}
 		}
 	}
+	pthread_exit(NULL);
 }
 
 
@@ -290,11 +292,9 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				sendMsjInfo(socketConnection, sizeof(mensaje), &mensajeObjeto);
 			}
 			for(int i = 0; i < parser->getNumberOfElements(); i++){
-				DrawableObject object;
 				mensaje elementMsg;
-				parser->getElement(object, i);
-				elementMsg = MessageBuilder().createBackgroundElementUpdateMessage(escenario, i);
-				strncpy(elementMsg.action, "create", 20);
+				DrawableObject* element = parser->getElementAtIndex(i);
+				elementMsg = MessageBuilder().createBackgroundElementCreationMessageForElement(element);
 				sendMsjInfo(socketConnection, sizeof(mensaje), &elementMsg);
 			}
 		}
@@ -323,52 +323,47 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->parser = new XmlParser(fileName);
 	logWriter->setLogLevel(this->parser->getLogLevel());
 	this->socketManager = new SocketManager(logWriter, this->parser);
-
-	int maxNumberOfClients = this->parser->getMaxNumberOfClients();
-	int screenHeight = this->parser->getAltoVentana();
-	int screenWidth = this->parser->getAnchoVentana();
-
-	this->procesor = new Procesador(this->clientList, screenWidth, screenHeight, this);
-	gameInitiated = false;
 	int success = this->socketManager->createSocketConnection();
 	if (success == EXIT_FAILURE)
 		return EXIT_FAILURE;
 
-	mensaje ventanaMsj, escenarioMsj;
-	memset(&ventanaMsj, 0, sizeof(mensaje));
-	memset(&escenarioMsj, 0, sizeof(mensaje));
-	Escenario escenario;
-	parser->getFondoEscenario(escenario);
-	this->escenario = &escenario;
-	ventanaMsj.height = parser->getAltoVentana();;
-	ventanaMsj.width = parser->getAnchoVentana();
-	escenario.setScrollingStep(1);
-	escenario.setWindowHeight(ventanaMsj.height);
-	escenario.setHeigth(parser->getAltoEscenario());
-	escenarioMsj = MessageBuilder().createInitBackgroundMessage(&escenario);
-	drawableList.push_back(ventanaMsj);
-	drawableList.push_back(escenarioMsj);
-	for(int i = 0; i < parser->getNumberOfElements(); i++){
-		DrawableObject* object = new DrawableObject();
-		mensaje elementMsg;
-		memset(&elementMsg, 0, sizeof(mensaje));
-		parser->getElement(*object, i);
-		escenario.addElement(object);
-		elementMsg = MessageBuilder().createBackgroundElementUpdateMessage(&escenario, i);
-		strncpy(elementMsg.action, "create", 20);
-		drawableList.push_back(elementMsg);
-	}
-	escenario.transformPositions();
-	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements());
-	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
+	this->setUpGame();
+
+	std::thread broadcastThread(broadcastMsj,this->clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,
-			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario);
+			this->maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario);
 
 	this->menuPresenter->presentMenu();
 
 	clientConnectionWaiter.detach();
 	broadcastThread.detach();
 	return EXIT_SUCCESS;
+}
+
+void GameManager::setUpGame() {
+	this->maxNumberOfClients = this->parser->getMaxNumberOfClients();
+	int screenHeight = this->parser->getAltoVentana();
+	int screenWidth = this->parser->getAnchoVentana();
+
+	this->procesor = new Procesador(this->clientList, screenWidth, screenHeight, this);
+	gameInitiated = false;
+
+	mensaje ventanaMsj = MessageBuilder().createWindowInitMessage(screenHeight, screenWidth);
+	drawableList.push_back(ventanaMsj);
+
+	this->escenario = this->parser->getFondoEscenario();
+	mensaje escenarioMsj = MessageBuilder().createInitBackgroundMessage(this->escenario);
+	drawableList.push_back(escenarioMsj);
+
+	for(int i = 0; i < this->parser->getNumberOfElements(); i++){
+		DrawableObject* element = this->parser->getElementAtIndex(i);
+		this->escenario->addElement(element);
+		mensaje elementMsg = MessageBuilder().createBackgroundElementCreationMessageForElement(element);
+		drawableList.push_back(elementMsg);
+	}
+
+	this->escenario->transformPositions();
+	objects.setIdOfFirstBullet(this->maxNumberOfClients + this->escenario->getNumberElements());
 }
 
 void GameManager::userDidChooseExitoption() {
