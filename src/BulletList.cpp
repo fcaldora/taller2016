@@ -23,6 +23,10 @@ int BulletList::getLastId(){
 	return this->lastBulletId;
 }
 
+void BulletList::removeAllBullets() {
+	this->objectList.clear();
+}
+
 void BulletList::deleteElement(int id){
 	list<Object>::iterator it = this->begin();
 	bool encontrado = false;

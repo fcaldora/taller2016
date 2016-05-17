@@ -92,7 +92,9 @@ void Procesador::processKeepAliveMessage(clientMsj message) {
 }
 
 void Procesador::processResetMessage(clientMsj message) {
-	this->gameManager->restartGame();
+	mensaje response = MessageBuilder().createResetGameMessage();
+
+	this->gameManager->restartGame(response);
 }
 
 void Procesador::processAnimationMessage(clientMsj message) {

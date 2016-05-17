@@ -114,6 +114,13 @@ mensaje MessageBuilder::createBackgroundUpdateMessage(Escenario* escenario){
 	return msg;
 }
 
+mensaje MessageBuilder::createResetGameMessage() {
+	mensaje message;
+	strncpy(message.action, "reset_game", 20);
+
+	return message;
+}
+
 mensaje MessageBuilder::createBackgroundElementUpdateMessageForElement(DrawableObject *element){
 	mensaje msg = this->createBackgroundElementBaseMessageForElement(element);
 	strncpy(msg.action, "draw", 20);

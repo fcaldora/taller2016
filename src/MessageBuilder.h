@@ -29,6 +29,7 @@ public:
 	mensaje createBackgroundElementUpdateMessageForElement(DrawableObject *element);
 	mensaje createBackgroundElementCreationMessageForElement(DrawableObject *element);
 	mensaje createWindowInitMessage(int screenHeight, int screenWidth);
+	mensaje createResetGameMessage();
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

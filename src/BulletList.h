@@ -28,6 +28,8 @@ public:
 	void bulletMessage(int bulletNumber, mensaje &msg, int ScreenWidth, int ScreenHeight);
 	list<Object>::iterator begin();
 	list<Object>::iterator end();
+	void removeAllBullets();
+
 	virtual ~BulletList();
 
 private:

@@ -25,6 +25,10 @@ void Escenario::addElement(DrawableObject* element){
 	elements.push_back(element);
 }
 
+void Escenario::removeAllElements() {
+	elements.clear();
+}
+
 void Escenario::setScrollingStep(double step){
 	this->scrollingStep = step;
 }

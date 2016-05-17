@@ -38,7 +38,7 @@ BulletList objects;
 bool appShouldTerminate, gameInitiated, userWasConnected;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
-//list<mensaje> messageList;
+bool gameHasBeenReseted;
 list<mensaje> drawableList; //lista que guarda todos los mensajes iniciales para levantar el juego :
 							//datos de la ventana, escenario, aviones, elementos del escenario.
 
@@ -125,37 +125,44 @@ void* broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* es
 	int contador = 0;
 	while(!appShouldTerminate){
 		usleep(1000);
-		objects.moveBullets();
-		for(int i = 0; i < objects.bulletQuantity(); i++){
-			mensaje msg;
-			objects.bulletMessage(i, msg, processor->getScreenWidth(), processor->getScreenHeight());
-			if(strcmp(msg.action, "Bullet deleted") != 0)
-				broadcast(msg, clientList);
-		}
-		mensaje msj;
-		if(gameInitiated){
-			usleep(1000);
-			escenario->update();
-			msj = MessageBuilder().createBackgroundUpdateMessage(escenario);
-			broadcast(msj, clientList);
-			for (int i = 0; i < escenario->getNumberElements(); i++){
-				DrawableObject* element = escenario->getElement(i);
-				msj = MessageBuilder().createBackgroundElementUpdateMessageForElement(element);
-				broadcast(msj, clientList);
+		if (!gameHasBeenReseted) {
+			objects.moveBullets();
+			for(int i = 0; i < objects.bulletQuantity(); i++){
+				mensaje msg;
+				objects.bulletMessage(i, msg, processor->getScreenWidth(), processor->getScreenHeight());
+				if(strcmp(msg.action, "Bullet deleted") != 0)
+					broadcast(msg, clientList);
 			}
 		}
+
+		if(gameInitiated){
+			if (!gameHasBeenReseted) {
+				usleep(1000);
+				escenario->update();
+				mensaje msj = MessageBuilder().createBackgroundUpdateMessage(escenario);
+				broadcast(msj, clientList);
+				for (int i = 0; i < escenario->getNumberElements(); i++){
+					DrawableObject* element = escenario->getElement(i);
+					msj = MessageBuilder().createBackgroundElementUpdateMessageForElement(element);
+					broadcast(msj, clientList);
+				}
+			}
+		}
+
 		contador++;
 		if (contador == 30){
 			contador = 0;
-			for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
-				if((*it)->plane->updatePhotogram()){
-					mensaje photogramMsg;
-					strncpy(photogramMsg.action,"draw", kLongChar);
-					photogramMsg.actualPhotogram = (*it)->plane->getActualPhotogram();
-					photogramMsg.id = (*it)->plane->getId();
-					photogramMsg.posX = (*it)->plane->getPosX();
-					photogramMsg.posY = (*it)->plane->getPosY();
-					broadcast(photogramMsg, clientList);
+			if (!gameHasBeenReseted) {
+				for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
+					if((*it)->plane->updatePhotogram()){
+						mensaje photogramMsg;
+						strncpy(photogramMsg.action,"draw", kLongChar);
+						photogramMsg.actualPhotogram = (*it)->plane->getActualPhotogram();
+						photogramMsg.id = (*it)->plane->getId();
+						photogramMsg.posX = (*it)->plane->getPosX();
+						photogramMsg.posY = (*it)->plane->getPosY();
+						broadcast(photogramMsg, clientList);
+					}
 				}
 			}
 		}
@@ -302,6 +309,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 }
 
 int GameManager::initGameWithArguments(int argc, char* argv[]) {
+	gameHasBeenReseted = false;
 	this->menuPresenter = new MenuPresenter(this->appShouldTerminate, this);
 	this->clientList = new ClientList();
 
@@ -375,8 +383,30 @@ void GameManager::broadcastMessage(mensaje message) {
 	broadcast(message, clientList);
 }
 
-void GameManager::restartGame() {
-	escenario->restart();
+void GameManager::restartGame(mensaje message) {
+	//escenario->restart();
+	gameHasBeenReseted = !gameHasBeenReseted;
+	broadcast(message, clientList);
+	this->escenario->removeAllElements();
+	objects.removeAllBullets();
+	drawableList.clear();
+
+	this->escenario = this->parser->getFondoEscenario();
+	mensaje escenarioMsj = MessageBuilder().createInitBackgroundMessage(this->escenario);
+	drawableList.push_back(escenarioMsj);
+	for(int i = 0; i < this->parser->getNumberOfElements(); i++){
+		DrawableObject* element = this->parser->getElementAtIndex(i);
+		this->escenario->addElement(element);
+		mensaje elementMsg = MessageBuilder().createBackgroundElementCreationMessageForElement(element);
+		drawableList.push_back(elementMsg);
+	}
+
+	this->escenario->transformPositions();
+	objects.setIdOfFirstBullet(this->maxNumberOfClients + this->escenario->getNumberElements());
+
+	sendGameInfo(clientList);
+
+	gameHasBeenReseted = false;
 }
 
 Object* GameManager::createBulletForClient(Client* client){

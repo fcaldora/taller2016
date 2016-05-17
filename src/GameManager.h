@@ -27,7 +27,7 @@ public:
 	void userDidChooseExitoption();
 
 	void broadcastMessage(mensaje message);
-	void restartGame();
+	void restartGame(mensaje message);
 	Object* createBulletForClient(Client* client);
 
 private:
