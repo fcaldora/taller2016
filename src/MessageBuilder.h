@@ -21,7 +21,7 @@ public:
 	clientMsj createSuccessfullyConnectedMessage();
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
-	void createInitialMessageForClient(Client *client, mensaje* message);
+	mensaje createInitialMessageForClient(Client *client);
 	mensaje createPlaneMovementMessageForClient(Client *client);
 	mensaje createInitBackgroundMessage(Escenario *escenario);
 	mensaje createBulletMessage(Object*);

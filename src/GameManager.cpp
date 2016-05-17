@@ -38,7 +38,7 @@ BulletList objects;
 bool appShouldTerminate, gameInitiated, userWasConnected;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
-list<mensaje> messageList;
+//list<mensaje> messageList;
 list<mensaje> drawableList; //lista que guarda todos los mensajes iniciales para levantar el juego :
 							//datos de la ventana, escenario, aviones, elementos del escenario.
 
@@ -229,17 +229,16 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		//Leo el mensaje de conexion
 		readMsj(socketConnection, sizeof(message), &message);
 		userWasConnected = false;
-		if (clientList->checkIfUserNameIsAlreadyInUse(message.value)) {
+		if (!clientList->checkIfUserNameIsAlreadyInUse(message.value)) {
 
 			if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
 				message = MessageBuilder().createServerFullMessage();
 			} else {
-				mensaje mensajeAvion;
 				numberOfCurrentAcceptedClients++;
 				//Creo el cliente con el nombre del mensaje y lo agrego a la lista
 				string name(message.value);
-				Avion *clientPlane = new Avion();
-				parser->getAvion(clientPlane, numberOfCurrentAcceptedClients);
+
+				Avion *clientPlane = parser->getAvion(numberOfCurrentAcceptedClients);
 				Client* client = new Client(name, socketConnection, 0, clientPlane);
 
 				clientList->addClient(client);
@@ -248,7 +247,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, socketConnection, clientList, procesor, escenario);
-				MessageBuilder().createInitialMessageForClient(client, &mensajeAvion);
+				mensaje mensajeAvion = MessageBuilder().createInitialMessageForClient(client);
 				drawableList.push_back(mensajeAvion);
 			}
 		} else {
@@ -281,14 +280,14 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 			gameInitiated = true;
 		}
 		if(userWasConnected){
-			mensaje ventanaMsj, mensajeObjeto;
+			mensaje ventanaMsj;
 			ventanaMsj.height = parser->getAltoVentana();
 			ventanaMsj.width = parser->getAnchoVentana();
 			sendMsjInfo(socketConnection, sizeof(mensaje), &ventanaMsj);
 			sendMsjInfo(socketConnection, sizeof(mensaje), &escenarioMsj);
 			std::list<Client*>::iterator it;
 			for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
-				MessageBuilder().createInitialMessageForClient((*it), &mensajeObjeto);
+				mensaje mensajeObjeto = MessageBuilder().createInitialMessageForClient((*it));
 				sendMsjInfo(socketConnection, sizeof(mensaje), &mensajeObjeto);
 			}
 			for(int i = 0; i < parser->getNumberOfElements(); i++){

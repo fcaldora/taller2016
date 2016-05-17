@@ -278,17 +278,20 @@ Escenario* XmlParser::getFondoEscenario(){
 	return object;
 }
 
-int XmlParser::getAvion(Avion* avion, int nroCliente){
+Avion* XmlParser::getAvion(int nroCliente){
+	Avion *avion = new Avion();
+
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* avionesElem = docHandle.FirstChild(tagAviones).ToElement();
 	if(avionesElem == NULL){
 		cout<<"Error al obtener los aviones"<<endl;
-		return -1;
+		return NULL;
 	}
 	TiXmlElement* avionElem = avionesElem->FirstChildElement(tagAvion);
 	for(int i = 1; i < nroCliente; i++){
 		avionElem = avionElem->NextSiblingElement(tagAvion);
 	}
+
 	TiXmlElement* pathElem = avionElem->FirstChildElement(tagPath);
 	avion->setPath(pathElem->GetText());
 	TiXmlElement* posXElem = avionElem->FirstChildElement(tagPosX);
@@ -307,7 +310,8 @@ int XmlParser::getAvion(Avion* avion, int nroCliente){
 	avion->setVelDesplazamiento(atoi(velDesplElem->GetText()));
 	TiXmlElement* cantElem = avionElem->FirstChildElement(tagCantidad);
 	avion->setPhotograms(atoi(cantElem->GetText()));
-	return 0;
+
+	return avion;
 }
 
 XmlParser::~XmlParser() {

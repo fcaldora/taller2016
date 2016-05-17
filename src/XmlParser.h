@@ -27,7 +27,7 @@ public:
 	DrawableObject* getElementAtIndex(int elementNum);
 	int getNumberOfElements();
 	Escenario* getFondoEscenario();
-	int getAvion(Avion* avion, int nroCliente);
+	Avion* getAvion(int nroCliente);
 
 private:
 	TiXmlDocument doc;

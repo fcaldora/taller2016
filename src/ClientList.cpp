@@ -19,10 +19,11 @@ bool ClientList::checkIfUserNameIsAlreadyInUse(char value[]) {
 	std::list<Client*>::iterator it;
 	for (it = this->clients.begin(); it != this->clients.end(); ++it) {
 		if (strcmp((*it)->getName().c_str(), value) == 0) {
-			return false;
+			cout << (*it)->getName().c_str() << " " << value << endl;
+			return true;
 		}
 	}
-	return true;
+	return false;
 }
 
 Client* ClientList::getClientForName(char name[]) {
