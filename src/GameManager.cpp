@@ -200,8 +200,8 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 			strcpy(disconnection.action, "path");
 			disconnection.id = clientList->getClientForSocket(socketConnection)->plane->getId();
 			strcpy(disconnection.imagePath, "disconnected.png");
-			disconnection.height = 81;
-			disconnection.width = 81;
+			disconnection.height = 68;
+			disconnection.width = 68;
 			broadcast(disconnection, clientList);
 
 		} else {
