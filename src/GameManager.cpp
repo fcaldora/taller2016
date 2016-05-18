@@ -392,21 +392,6 @@ void GameManager::restartGame(mensaje message) {
 		index++;
 	}
 
-	cout << this->maxNumberOfClients << endl;
-
-//	this->escenario = this->parser->getFondoEscenario();
-//	mensaje escenarioMsj = MessageBuilder().createInitBackgroundMessage(this->escenario);
-//	drawableList.push_back(escenarioMsj);
-//	for(int i = 0; i < this->parser->getNumberOfElements(); i++){
-//		DrawableObject* element = this->parser->getElementAtIndex(i);
-//		this->escenario->addElement(element);
-//		mensaje elementMsg = MessageBuilder().createBackgroundElementCreationMessageForElement(element);
-//		drawableList.push_back(elementMsg);
-//	}
-//
-//	this->escenario->transformPositions();
-//	objects.setIdOfFirstBullet(this->maxNumberOfClients + this->escenario->getNumberElements());
-
 	sendGameInfo(this->clientList);
 
 	gameHasBeenReseted = false;
