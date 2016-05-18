@@ -60,11 +60,13 @@ void GameManager::reloadGameFromXml(){
 	memset(&ventanaMsj, 0, sizeof(mensaje));
 	memset(&escenarioMsj, 0, sizeof(mensaje));
 	parser->getFondoEscenario(*escenario);
-	ventanaMsj.height = parser->getAltoVentana();;
+	ventanaMsj.height = parser->getAltoVentana();
 	ventanaMsj.width = parser->getAnchoVentana();
 	escenario->setScrollingStep(1);
 	escenario->setWindowHeight(ventanaMsj.height);
 	escenario->setHeigth(parser->getAltoEscenario());
+	this->procesor->setScreenHeight(parser->getAltoVentana());
+	this->procesor->setScreenWidth(parser->getAnchoVentana());
 	escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
 	strcpy(ventanaMsj.action,"windowSize");
 	this->broadcastMessage(ventanaMsj);
