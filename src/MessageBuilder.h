@@ -30,6 +30,9 @@ public:
 	mensaje createBackgroundElementCreationMessageForElement(DrawableObject *element);
 	mensaje createWindowInitMessage(int screenHeight, int screenWidth);
 	mensaje createResetGameMessage();
+	mensaje createReconnectionMessageForClient(Client* client);
+	mensaje createDisconnectionMessageForClient(Client* client);
+	mensaje createUpdatePhotogramMessageForPlane(Avion* plane);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

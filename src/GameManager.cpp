@@ -155,12 +155,7 @@ void* broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* es
 			if (!gameHasBeenReseted) {
 				for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
 					if((*it)->plane->updatePhotogram()){
-						mensaje photogramMsg;
-						strncpy(photogramMsg.action,"draw", kLongChar);
-						photogramMsg.actualPhotogram = (*it)->plane->getActualPhotogram();
-						photogramMsg.id = (*it)->plane->getId();
-						photogramMsg.posX = (*it)->plane->getPosX();
-						photogramMsg.posY = (*it)->plane->getPosY();
+						mensaje photogramMsg = MessageBuilder().createUpdatePhotogramMessageForPlane((*it)->plane);
 						broadcast(photogramMsg, clientList);
 					}
 				}
@@ -205,14 +200,9 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 			shutdown(socketConnection, SHUT_RDWR);
 			clientHasDisconnected = true;
 			disconnectClientForSocketConnection(socketConnection, clientList);
-			mensaje disconnection;
-			strcpy(disconnection.action, "path");
-			disconnection.id = clientList->getClientForSocket(socketConnection)->plane->getId();
-			strcpy(disconnection.imagePath, "disconnected.png");
-			disconnection.height = 68;
-			disconnection.width = 68;
+			Client *client = clientList->getClientForSocket(socketConnection);
+			mensaje disconnection = MessageBuilder().createDisconnectionMessageForClient(client);
 			broadcast(disconnection, clientList);
-
 		} else {
 			procesor->processMessage(message);
 		}
@@ -263,16 +253,13 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				logWriter->writeUserNameAlreadyInUse(message.value);
 				message = MessageBuilder().createUserNameAlreadyInUseMessage();
 			} else {
-				mensaje reconnection;
-				strcpy(reconnection.action, "path");
-				reconnection.id = clientList->getClientForSocket(socketConnection)->plane->getId();
-				strcpy(reconnection.imagePath,client->plane->getPath().c_str());
-				reconnection.width = client->plane->getWidth();
-				reconnection.height = client->plane->getHeigth();
+				mensaje reconnection = MessageBuilder().createReconnectionMessageForClient(client);
 				broadcast(reconnection, clientList);
+
 				logWriter->writeResumeGameForUserName(message.value);
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
+
 				message = MessageBuilder().createSuccessfullyConnectedMessage();
 				escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
 				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList, procesor, escenario);

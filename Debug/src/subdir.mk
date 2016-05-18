@@ -25,22 +25,6 @@ CPP_SRCS += \
 ../src/tinyxmlerror.cpp \
 ../src/tinyxmlparser.cpp 
 
-O_SRCS += \
-../src/Avion.o \
-../src/CargadorXML.o \
-../src/Client.o \
-../src/ClientList.o \
-../src/DrawableObject.o \
-../src/Escenario.o \
-../src/GameManager.o \
-../src/LogWriter.o \
-../src/MenuPresenter.o \
-../src/MessageBuilder.o \
-../src/Object.o \
-../src/Procesador.o \
-../src/SocketManager.o \
-../src/XmlParser.o 
-
 OBJS += \
 ./src/Avion.o \
 ./src/BulletList.o \
@@ -90,7 +74,7 @@ CPP_DEPS += \
 src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross G++ Compiler'
-	g++ -O0 -g3 -Wall -c -fmessage-length=0 -std=c++11 -pthread -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	g++ -O0 -g3 -Wall -c -fmessage-length=0 -std=c++11 -pthread -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
