@@ -29,6 +29,9 @@ public:
 	mensaje createBackgroundElementUpdateMessageForElement(DrawableObject *element);
 	mensaje createBackgroundElementCreationMessageForElement(DrawableObject *element);
 	mensaje createWindowInitMessage(int screenHeight, int screenWidth);
+	mensaje createReconnectionMessageForClient(Client* client);
+	mensaje createDisconnectionMessageForClient(Client* client);
+	mensaje createUpdatePhotogramMessageForPlane(Avion* plane);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

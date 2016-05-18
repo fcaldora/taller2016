@@ -145,6 +145,41 @@ mensaje MessageBuilder::createBackgroundElementBaseMessageForElement(DrawableObj
 	return msg;
 }
 
+mensaje MessageBuilder::createReconnectionMessageForClient(Client* client) {
+	mensaje reconnection;
+	strcpy(reconnection.action, "path");
+	reconnection.id = client->plane->getId();
+	strcpy(reconnection.imagePath, client->plane->getPath().c_str());
+	reconnection.width = client->plane->getWidth();
+	reconnection.height = client->plane->getHeigth();
+
+	return reconnection;
+}
+
+mensaje MessageBuilder::createDisconnectionMessageForClient(Client* client) {
+	mensaje disconnection;
+
+	strcpy(disconnection.action, "path");
+	disconnection.id = client->plane->getId();
+	strcpy(disconnection.imagePath, "disconnected.png");
+	disconnection.height = 68;
+	disconnection.width = 68;
+
+	return disconnection;
+}
+
+mensaje MessageBuilder::createUpdatePhotogramMessageForPlane(Avion* plane) {
+	mensaje photogramMsg;
+
+	strncpy(photogramMsg.action,"draw", kLongChar);
+	photogramMsg.actualPhotogram = plane->getActualPhotogram();
+	photogramMsg.id = plane->getId();
+	photogramMsg.posX = plane->getPosX();
+	photogramMsg.posY = plane->getPosY();
+
+	return photogramMsg;
+}
+
 MessageBuilder::~MessageBuilder() {
 	// TODO Auto-generated destructor stub
 }
