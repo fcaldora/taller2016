@@ -41,6 +41,8 @@ private:
 	Procesador *procesor;
 	Escenario* escenario;
 
+	const char* xmlFileName;
+
 	void detachClientMessagesThreads();
 	void setUpGame();
 };

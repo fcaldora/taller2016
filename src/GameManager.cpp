@@ -314,6 +314,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		}
 	}
 
+	this->xmlFileName = fileName;
 	this->parser = new XmlParser(fileName);
 	logWriter->setLogLevel(this->parser->getLogLevel());
 	this->socketManager = new SocketManager(logWriter, this->parser);
@@ -378,20 +379,35 @@ void GameManager::restartGame(mensaje message) {
 	objects.removeAllBullets();
 	drawableList.clear();
 
-	this->escenario = this->parser->getFondoEscenario();
-	mensaje escenarioMsj = MessageBuilder().createInitBackgroundMessage(this->escenario);
-	drawableList.push_back(escenarioMsj);
-	for(int i = 0; i < this->parser->getNumberOfElements(); i++){
-		DrawableObject* element = this->parser->getElementAtIndex(i);
-		this->escenario->addElement(element);
-		mensaje elementMsg = MessageBuilder().createBackgroundElementCreationMessageForElement(element);
-		drawableList.push_back(elementMsg);
+	this->parser = new XmlParser(this->xmlFileName);
+	this->setUpGame();
+
+	int index = 0;
+	for(Client *client : this->clientList->clients) {
+		Avion *clientPlane = this->parser->getAvion(index);
+		client->plane = clientPlane;
+
+		mensaje mensajeAvion = MessageBuilder().createInitialMessageForClient(client);
+		drawableList.push_back(mensajeAvion);
+		index++;
 	}
 
-	this->escenario->transformPositions();
-	objects.setIdOfFirstBullet(this->maxNumberOfClients + this->escenario->getNumberElements());
+	cout << this->maxNumberOfClients << endl;
 
-	sendGameInfo(clientList);
+//	this->escenario = this->parser->getFondoEscenario();
+//	mensaje escenarioMsj = MessageBuilder().createInitBackgroundMessage(this->escenario);
+//	drawableList.push_back(escenarioMsj);
+//	for(int i = 0; i < this->parser->getNumberOfElements(); i++){
+//		DrawableObject* element = this->parser->getElementAtIndex(i);
+//		this->escenario->addElement(element);
+//		mensaje elementMsg = MessageBuilder().createBackgroundElementCreationMessageForElement(element);
+//		drawableList.push_back(elementMsg);
+//	}
+//
+//	this->escenario->transformPositions();
+//	objects.setIdOfFirstBullet(this->maxNumberOfClients + this->escenario->getNumberElements());
+
+	sendGameInfo(this->clientList);
 
 	gameHasBeenReseted = false;
 }
