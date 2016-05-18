@@ -4,6 +4,7 @@ XmlParser::XmlParser(const char* filename) {
 	TiXmlDocument file;
 	if(file.LoadFile(filename)){
 		this->doc = file;
+		this->fileName = string(filename);
 	}
 	else cout<<"El archivo no existe"<<endl;
 }
@@ -264,12 +265,13 @@ int XmlParser::getFondoEscenario(DrawableObject &object){
 	return 0;
 }
 
-int XmlParser::getAvion(Avion* avion, int nroCliente){
+Avion* XmlParser::getAvion(int nroCliente){
+	Avion *avion = new Avion();
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* avionesElem = docHandle.FirstChild(tagAviones).ToElement();
 	if(avionesElem == NULL){
 		cout<<"Error al obtener los aviones"<<endl;
-		return -1;
+		return NULL;
 	}
 	TiXmlElement* avionElem = avionesElem->FirstChildElement(tagAvion);
 	for(int i = 1; i < nroCliente; i++){
@@ -293,7 +295,13 @@ int XmlParser::getAvion(Avion* avion, int nroCliente){
 	avion->setVelDesplazamiento(atoi(velDesplElem->GetText()));
 	TiXmlElement* cantElem = avionElem->FirstChildElement(tagCantidad);
 	avion->setPhotograms(atoi(cantElem->GetText()));
-	return 0;
+	return avion;
+}
+
+void XmlParser::reloadDoc(){
+	if(!this->doc.LoadFile(this->fileName.c_str())){
+		cout<<"Error al recargar el archivo.Archivo inexistente"<<endl;
+	}
 }
 
 XmlParser::~XmlParser() {

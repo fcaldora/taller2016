@@ -80,6 +80,7 @@ int Escenario::getNumberElements(){
 }
 
 void Escenario::restart(){
+
 	this->scrollingOffset = 0;
 	this->posYActual = 0;
 	list<DrawableObject*>::iterator it = elements.begin();
@@ -88,6 +89,11 @@ void Escenario::restart(){
 		(*it)->setPosY((*it)->getPosYInit());
 		it++;
 	}
+
+}
+
+void Escenario::deleteElements(){
+	this->elements.clear();
 }
 
 Escenario::~Escenario() {

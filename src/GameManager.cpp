@@ -52,6 +52,48 @@ GameManager::GameManager() {
 	this->escenario = NULL;
 }
 
+void GameManager::reloadGameFromXml(){
+	drawableList.clear();
+	parser->reloadDoc();
+	escenario->deleteElements();
+	mensaje ventanaMsj, escenarioMsj;
+	memset(&ventanaMsj, 0, sizeof(mensaje));
+	memset(&escenarioMsj, 0, sizeof(mensaje));
+	parser->getFondoEscenario(*escenario);
+	ventanaMsj.height = parser->getAltoVentana();;
+	ventanaMsj.width = parser->getAnchoVentana();
+	escenario->setScrollingStep(1);
+	escenario->setWindowHeight(ventanaMsj.height);
+	escenario->setHeigth(parser->getAltoEscenario());
+	escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
+	strcpy(ventanaMsj.action,"windowSize");
+	this->broadcastMessage(ventanaMsj);
+	this->broadcastMessage(escenarioMsj);
+	drawableList.push_back(escenarioMsj);
+	for(int i = 0; i < parser->getNumberOfElements(); i++){
+		DrawableObject* object = new DrawableObject();
+		mensaje elementMsg;
+		memset(&elementMsg, 0, sizeof(mensaje));
+		parser->getElement(*object, i);
+		escenario->addElement(object);
+		elementMsg = MessageBuilder().createBackgroundElementUpdateMessageForElement(object);
+		strncpy(elementMsg.action, "create", 20);
+		drawableList.push_back(elementMsg);
+		this->broadcastMessage(elementMsg);
+	}
+	escenario->transformPositions();
+	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements());
+	mensaje avionMsj;
+	int i = 1;
+	list<Client*>::iterator it = clientList->clients.begin();
+	for (; it != clientList->clients.end(); it++){
+		(*it)->plane = parser->getAvion(i);
+		avionMsj = MessageBuilder().createInitialMessageForClient((*it));
+		this->broadcastMessage(avionMsj);
+		i++;
+	}
+}
+
 
 int sendMsj(int socket, int bytesAEnviar, clientMsj* mensaje) {
 	int enviados = 0;
@@ -139,7 +181,8 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			msj = MessageBuilder().createBackgroundUpdateMessage(escenario);
 			broadcast(msj, clientList);
 			for (int i = 0; i < escenario->getNumberElements(); i++){
-				msj = MessageBuilder().createBackgroundElementUpdateMessage(escenario, i);
+				DrawableObject* element = escenario->getElement(i);
+				msj = MessageBuilder().createBackgroundElementUpdateMessageForElement(element);
 				broadcast(msj, clientList);
 			}
 		}
@@ -148,12 +191,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			contador = 0;
 			for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
 				if((*it)->plane->updatePhotogram()){
-					mensaje photogramMsg;
-					strncpy(photogramMsg.action,"draw", kLongChar);
-					photogramMsg.actualPhotogram = (*it)->plane->getActualPhotogram();
-					photogramMsg.id = (*it)->plane->getId();
-					photogramMsg.posX = (*it)->plane->getPosX();
-					photogramMsg.posY = (*it)->plane->getPosY();
+					mensaje photogramMsg = MessageBuilder().createUpdatePhotogramMessageForPlane((*it)->plane);
 					broadcast(photogramMsg, clientList);
 				}
 			}
@@ -192,18 +230,12 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 		clientMsj message;
 		res = readMsj(socketConnection, sizeof(message), &message);
 		if (res < 0) {
-
 			shutdown(socketConnection, SHUT_RDWR);
 			clientHasDisconnected = true;
 			disconnectClientForSocketConnection(socketConnection, clientList);
-			mensaje disconnection;
-			strcpy(disconnection.action, "path");
-			disconnection.id = clientList->getClientForSocket(socketConnection)->plane->getId();
-			strcpy(disconnection.imagePath, "disconnected.png");
-			disconnection.height = 81;
-			disconnection.width = 81;
+			Client *client = clientList->getClientForSocket(socketConnection);
+			mensaje disconnection = MessageBuilder().createDisconnectionMessageForClient(client);
 			broadcast(disconnection, clientList);
-
 		} else {
 			procesor->processMessage(message);
 		}
@@ -232,12 +264,10 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 			if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
 				message = MessageBuilder().createServerFullMessage();
 			} else {
-				mensaje mensajeAvion;
 				numberOfCurrentAcceptedClients++;
 				//Creo el cliente con el nombre del mensaje y lo agrego a la lista
 				string name(message.value);
-				Avion *clientPlane = new Avion();
-				parser->getAvion(clientPlane, numberOfCurrentAcceptedClients);
+				Avion *clientPlane = parser->getAvion(numberOfCurrentAcceptedClients);
 				Client* client = new Client(name, socketConnection, 0, clientPlane);
 
 				clientList->addClient(client);
@@ -246,7 +276,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, socketConnection, clientList, procesor, escenario);
-				MessageBuilder().createInitialMessageForClient(client, &mensajeAvion);
+				mensaje mensajeAvion = MessageBuilder().createInitialMessageForClient(client);
 				drawableList.push_back(mensajeAvion);
 			}
 		} else {
@@ -255,16 +285,13 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				logWriter->writeUserNameAlreadyInUse(message.value);
 				message = MessageBuilder().createUserNameAlreadyInUseMessage();
 			} else {
-				mensaje reconnection;
-				strcpy(reconnection.action, "path");
-				reconnection.id = clientList->getClientForSocket(socketConnection)->plane->getId();
-				strcpy(reconnection.imagePath,client->plane->getPath().c_str());
-				reconnection.width = client->plane->getWidth();
-				reconnection.height = client->plane->getHeigth();
+				mensaje reconnection = MessageBuilder().createReconnectionMessageForClient(client);
 				broadcast(reconnection, clientList);
+
 				logWriter->writeResumeGameForUserName(message.value);
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
+
 				message = MessageBuilder().createSuccessfullyConnectedMessage();
 				escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
 				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList, procesor, escenario);
@@ -286,14 +313,14 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 			sendMsjInfo(socketConnection, sizeof(mensaje), &escenarioMsj);
 			std::list<Client*>::iterator it;
 			for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
-				MessageBuilder().createInitialMessageForClient((*it), &mensajeObjeto);
+				mensajeObjeto = MessageBuilder().createInitialMessageForClient((*it));
 				sendMsjInfo(socketConnection, sizeof(mensaje), &mensajeObjeto);
 			}
 			for(int i = 0; i < parser->getNumberOfElements(); i++){
 				DrawableObject object;
 				mensaje elementMsg;
 				parser->getElement(object, i);
-				elementMsg = MessageBuilder().createBackgroundElementUpdateMessage(escenario, i);
+				elementMsg = MessageBuilder().createBackgroundElementUpdateMessageForElement(&object);
 				strncpy(elementMsg.action, "create", 20);
 				sendMsjInfo(socketConnection, sizeof(mensaje), &elementMsg);
 			}
@@ -354,7 +381,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		memset(&elementMsg, 0, sizeof(mensaje));
 		parser->getElement(*object, i);
 		escenario.addElement(object);
-		elementMsg = MessageBuilder().createBackgroundElementUpdateMessage(&escenario, i);
+		elementMsg = MessageBuilder().createBackgroundElementUpdateMessageForElement(object);
 		strncpy(elementMsg.action, "create", 20);
 		drawableList.push_back(elementMsg);
 	}

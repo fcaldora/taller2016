@@ -6,6 +6,7 @@
  */
 #include <string>
 #include "Constants.h"
+#include <string.h>
 #ifndef PROCESADOR_H_
 #define PROCESADOR_H_
 
@@ -50,6 +51,7 @@ private:
 	void processKeepAliveMessage(clientMsj message);
 	void processResetMessage(clientMsj message);
 	void processAnimationMessage(clientMsj message);
+	void processExitMessage(clientMsj message);
 };
 
 #endif /* PROCESADOR_H_ */

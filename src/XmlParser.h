@@ -25,10 +25,12 @@ public:
 	int getElement(DrawableObject &element, int elementNum);
 	int getNumberOfElements();
 	int getFondoEscenario(DrawableObject &object);
-	int getAvion(Avion* avion, int nroCliente);
+	Avion* getAvion(int nroCliente);
+	void reloadDoc();
 
 private:
 	TiXmlDocument doc;
+	string fileName;
 };
 
 #endif /* XMLPARSER_H_ */

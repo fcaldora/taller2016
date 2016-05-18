@@ -49,6 +49,11 @@ void Procesador::processMessage(clientMsj message) {
 		this->processAnimationMessage(message);
 		return;
 	}
+
+	if(strcmp(message.type, "close") == 0){
+		this->processExitMessage(message);
+		return;
+	}
 }
 
 void Procesador::processMovementMessage(clientMsj message) {
@@ -93,6 +98,11 @@ void Procesador::processKeepAliveMessage(clientMsj message) {
 
 void Procesador::processResetMessage(clientMsj message) {
 	this->gameManager->restartGame();
+	mensaje msjReset;
+	memset(&msjReset, 0, sizeof(mensaje));
+	strcpy(msjReset.action, "reset");
+	this->gameManager->broadcastMessage(msjReset);
+	this->gameManager->reloadGameFromXml();
 }
 
 void Procesador::processAnimationMessage(clientMsj message) {
@@ -103,6 +113,13 @@ void Procesador::processAnimationMessage(clientMsj message) {
 	client->plane->setPhotogram();
 	mensaje response = MessageBuilder().createPlaneMovementMessageForClient(client);
 	this->gameManager->broadcastMessage(response);
+}
+
+void Procesador::processExitMessage(clientMsj message){
+	mensaje closeMsj;
+	memset(&closeMsj, 0, sizeof(mensaje));
+	strcpy(closeMsj.action, "close");
+	this->gameManager->broadcastMessage(closeMsj);
 }
 
 Procesador::~Procesador() {
