@@ -7,8 +7,8 @@
 </Servidor>
 
 <ventana>
-	<ancho>800</ancho>
-	<alto>600</alto>
+	<ancho>500</ancho>
+	<alto>500</alto>
 </ventana>
 <escenario>
 	<ancho>800</ancho>
@@ -60,9 +60,9 @@
 		<path>Avion1.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
-		<x>200</x>
+		<x>100</x>
 		<y>100</y>
-		<cantidad>9</cantidad>
+		<cantidad>8</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -76,8 +76,36 @@
 		<ancho>68</ancho>
 		<alto>68</alto>
 		<x>200</x>
-		<y>200</y>
-		<cantidad>9</cantidad>
+		<y>100</y>
+		<cantidad>8</cantidad>
+		<velocidadDesplazamiento>1</velocidadDesplazamiento>
+		<velocidadDisparos>6</velocidadDisparos>
+		<avionSpriteId>avion</avionSpriteId>
+		<vueltaSpriteId>disparo</vueltaSpriteId>
+		<disparosSpriteId>vuelta</disparosSpriteId>
+	</avion>
+	<avion>
+		<id>7</id>
+		<path>Avion3.png</path>
+		<ancho>68</ancho>
+		<alto>68</alto>
+		<x>300</x>
+		<y>100</y>
+		<cantidad>8</cantidad>
+		<velocidadDesplazamiento>1</velocidadDesplazamiento>
+		<velocidadDisparos>6</velocidadDisparos>
+		<avionSpriteId>avion</avionSpriteId>
+		<vueltaSpriteId>disparo</vueltaSpriteId>
+		<disparosSpriteId>vuelta</disparosSpriteId>
+	</avion>
+	<avion>
+		<id>8</id>
+		<path>Avion4.png</path>
+		<ancho>68</ancho>
+		<alto>68</alto>
+		<x>400</x>
+		<y>100</y>
+		<cantidad>8</cantidad>
 		<velocidadDesplazamiento>1</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
