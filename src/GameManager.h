@@ -25,7 +25,7 @@ public:
 	int initGameWithArguments(int argc, char* argv[]);
 
 	void userDidChooseExitoption();
-
+	void restartGamefromXml();
 	void broadcastMessage(mensaje message);
 	void restartGame();
 	Object* createBulletForClient(Client* client);

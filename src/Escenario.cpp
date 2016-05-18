@@ -80,12 +80,14 @@ int Escenario::getNumberElements(){
 void Escenario::restart(){
 	this->scrollingOffset = 0;
 	this->posYActual = 0;
-	list<DrawableObject*>::iterator it = elements.begin();
-	for(int i = 0; i < elements.size(); i++){
-		(*it)->setPosX((*it)->getPosXInit());
-		(*it)->setPosY((*it)->getPosYInit());
-		it++;
-	}
+	//falta liberar memoria
+	elements.clear();
+//	list<DrawableObject*>::iterator it = elements.begin();
+//	for(int i = 0; i < elements.size(); i++){
+//		(*it)->setPosX((*it)->getPosXInit());
+//		(*it)->setPosY((*it)->getPosYInit());
+//		it++;
+//	}
 }
 
 Escenario::~Escenario() {

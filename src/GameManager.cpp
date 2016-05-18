@@ -36,6 +36,7 @@ map<unsigned int, thread> clientEntranceMessages;
 map<unsigned int, thread> keepAliveThreads;
 BulletList objects;
 bool appShouldTerminate, gameInitiated, userWasConnected;
+const char* fileName;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
 //list<mensaje> messageList;
@@ -305,10 +306,10 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->menuPresenter = new MenuPresenter(this->appShouldTerminate, this);
 	this->clientList = new ClientList();
 
-	const char* fileName;
+	numberOfCurrentAcceptedClients = 0;
+	//const char* fileName;
 	logWriter = new LogWriter;
 	this->xmlLoader = new XMLLoader(logWriter);
-	numberOfCurrentAcceptedClients = 0;
 	if (argc != 2) {
 		fileName = kServerTestFile;
 		logWriter->writeUserDidnotEnterFileName();
@@ -338,6 +339,41 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	broadcastThread.detach();
 	return EXIT_SUCCESS;
 }
+
+// start wip
+
+
+void GameManager::restartGamefromXml() {
+	logWriter = new LogWriter;
+	this->xmlLoader = new XMLLoader(logWriter);
+	if (!this->xmlLoader->serverXMLIsValid(fileName)) {
+		fileName = kServerTestFile;
+	}
+	this->parser = new XmlParser(fileName);
+	logWriter->setLogLevel(this->parser->getLogLevel());
+
+//	mensaje ventanaMsj = MessageBuilder().createWindowInitMessage(screenHeight, screenWidth);
+//	drawableList.push_back(ventanaMsj);
+
+	//this->escenario = this->parser->getFondoEscenario();
+	//mensaje escenarioMsj = MessageBuilder().createInitBackgroundMessage(this->escenario);
+	//drawableList.push_back(escenarioMsj);
+
+	for(int i = 0; i < this->parser->getNumberOfElements(); i++){
+		DrawableObject* element = this->parser->getElementAtIndex(i);
+		this->escenario->addElement(element);
+		mensaje elementMsg = MessageBuilder().createBackgroundElementCreationMessageForElement(element);
+		drawableList.push_back(elementMsg);
+	}
+
+	this->escenario->transformPositions();
+	objects.setIdOfFirstBullet(this->maxNumberOfClients + this->escenario->getNumberElements());
+}
+
+
+/// end wip
+
+
 
 void GameManager::setUpGame() {
 	this->maxNumberOfClients = this->parser->getMaxNumberOfClients();
@@ -377,6 +413,7 @@ void GameManager::broadcastMessage(mensaje message) {
 
 void GameManager::restartGame() {
 	escenario->restart();
+	this->restartGamefromXml();
 }
 
 Object* GameManager::createBulletForClient(Client* client){
