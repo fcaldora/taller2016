@@ -63,7 +63,7 @@ void Escenario::transformPositions(){
 	}
 }
 
-DrawableObject* Escenario::getElement(int numElement){
+DrawableObject* Escenario::getElement(unsigned int numElement){
 	if(this->elements.size() < numElement){
 		cout<<"Numero incorrecto de elemento"<<endl;
 		return NULL;
@@ -84,7 +84,7 @@ void Escenario::restart(){
 	this->scrollingOffset = 0;
 	this->posYActual = 0;
 	list<DrawableObject*>::iterator it = elements.begin();
-	for(int i = 0; i < elements.size(); i++){
+	for(unsigned int i = 0; i < elements.size(); i++){
 		(*it)->setPosX((*it)->getPosXInit());
 		(*it)->setPosY((*it)->getPosYInit());
 		it++;

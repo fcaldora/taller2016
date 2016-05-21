@@ -53,10 +53,9 @@ mensaje MessageBuilder::createInitialMessageForClient(Client *client) {
 	return message;
 }
 
-mensaje MessageBuilder::createPlaneMovementMessageForClient(Client *client) {
-	mensaje message;
+updateMsj MessageBuilder::createPlaneMovementMessageForClient(Client *client) {
+	updateMsj message;
 	message.id = client->plane->getId();
-	strncpy(message.action, "draw", kLongChar);
 	message.posX = client->plane->getPosX();
 	message.posY = client->plane->getPosY();
 	message.actualPhotogram = client->plane->getActualPhotogram();
@@ -92,9 +91,8 @@ mensaje MessageBuilder::createBulletMessage(Object* bullet){
 	return message;
 }
 
-mensaje MessageBuilder::createBackgroundUpdateMessage(Escenario* escenario){
-	mensaje msg;
-	strncpy(msg.action, "draw", 20);
+updateMsj MessageBuilder::createBackgroundUpdateMessage(Escenario* escenario){
+	updateMsj msg;
 	msg.id = escenario->getId();
 	msg.posY = escenario->getPosY();
 	msg.posX = escenario->getPosX();
@@ -102,26 +100,12 @@ mensaje MessageBuilder::createBackgroundUpdateMessage(Escenario* escenario){
 	return msg;
 }
 
-/*mensaje MessageBuilder::createBackgroundElementUpdateMessageForElement(Escenario* escenario, int numElement){
-	mensaje msg;
-	DrawableObject* auxObject;
-	strncpy(msg.action, "draw", 20);
-	auxObject = escenario->getElement(numElement);
-	msg.id = auxObject->getId();
-	msg.posX = auxObject->getPosX();
-	msg.posY = auxObject->getPosY();
-	strncpy(msg.imagePath, auxObject->getPath().c_str(), 20);
-	msg.height = auxObject->getHeigth();
-	msg.width = auxObject->getWidth();
-	msg.actualPhotogram = auxObject->getActualPhotogram();
-	msg.activeState = true;
-	return msg;
-}*/
-
-mensaje MessageBuilder::createBackgroundElementUpdateMessageForElement(DrawableObject *element){
-	mensaje msg = this->createBackgroundElementBaseMessageForElement(element);
-	strncpy(msg.action, "draw", 20);
-
+updateMsj MessageBuilder::createBackgroundElementUpdateMessageForElement(DrawableObject *element){
+	updateMsj msg;
+	msg.actualPhotogram = element->getActualPhotogram();
+	msg.posX = element->getPosX();
+	msg.posY = element->getPosY();
+	msg.id = element->getId();
 	return msg;
 }
 
@@ -137,6 +121,7 @@ mensaje MessageBuilder::createBackgroundElementCreationMessageForElement(Drawabl
 
 mensaje MessageBuilder::createBackgroundElementBaseMessageForElement(DrawableObject *element){
 	mensaje msg;
+	strncpy(msg.action, "create", kLongChar);
 	msg.id = element->getId();
 	msg.posX = element->getPosX();
 	msg.posY = element->getPosY();
@@ -172,10 +157,9 @@ mensaje MessageBuilder::createDisconnectionMessageForClient(Client* client) {
 	return disconnection;
 }
 
-mensaje MessageBuilder::createUpdatePhotogramMessageForPlane(Avion* plane) {
-	mensaje photogramMsg;
+updateMsj MessageBuilder::createUpdatePhotogramMessageForPlane(Avion* plane) {
+	updateMsj photogramMsg;
 
-	strncpy(photogramMsg.action,"draw", kLongChar);
 	photogramMsg.actualPhotogram = plane->getActualPhotogram();
 	photogramMsg.id = plane->getId();
 	photogramMsg.posX = plane->getPosX();

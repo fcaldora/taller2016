@@ -21,7 +21,7 @@ public:
 	void setScrollingStep(double step);
 	void transformPositions();
 	void setWindowHeight(int windowHeight);
-	DrawableObject* getElement(int numElement);
+	DrawableObject* getElement(unsigned int numElement);
 	int getNumberElements();
 	virtual ~Escenario();
 	void restart();

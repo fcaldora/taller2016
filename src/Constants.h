@@ -51,34 +51,25 @@ using namespace std;
 #define tagDisparosSpriteId "disparosSpriteId"
 #define tagAviones "aviones"
 
-struct sprite{
-	char id[LONG_ID];
-	char path[LONG_PATH];
-	int cantidad;
-	int alto;
-	int ancho;
-};
-struct elemento{
-	int id;
-	int x;
-	int y;
-};
-struct fondoEscenario{
-	char id[LONG_ID];
-	int ancho;
-	int alto;
-};
-struct escenario{
-	int ancho;
-	int algo;
-	struct fondoEscenario fondo;
-	list<struct elemento> elementos;
-};
-
 struct clientMsj {
 	char id[kLongChar];
 	char type[kLongChar];
 	char value[kLongChar];
+};
+
+struct actionMsj{
+	char action[kLongChar];
+};
+
+struct updateMsj{
+	int id;
+	int posX;
+	int posY;
+	int actualPhotogram;
+};
+
+struct deleteMsj{
+	int id;
 };
 
 struct mensaje {

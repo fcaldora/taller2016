@@ -24,8 +24,10 @@ public:
 	int bulletQuantity();
 	int getLastId();
 	int getFirstId();
+	bool bulletDeleteMessage(int bulletNumber, deleteMsj &msg, int screenWidth, int screenHeight);
+	bool bulletDrawMessage(int bulletNumber, updateMsj &msg, int screenWidth, int screenHeight);
 	void moveBullets();
-	void bulletMessage(int bulletNumber, mensaje &msg, int ScreenWidth, int ScreenHeight);
+	void bulletMessage(int bulletNumber,actionMsj action, mensaje &msg, int ScreenWidth, int ScreenHeight);
 	list<Object>::iterator begin();
 	list<Object>::iterator end();
 	virtual ~BulletList();

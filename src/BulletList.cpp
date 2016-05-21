@@ -73,23 +73,45 @@ void BulletList::moveBullets(){
 	}
 }
 
-void BulletList::bulletMessage(int bulletNumber, mensaje &msg, int width, int height){
-//HARDCODADO EL BULLETID + 7. MODIFICAR!
+void BulletList::bulletMessage(int bulletNumber,actionMsj action, mensaje &msg, int width, int height){
 	Object object = this->getObject(bulletNumber);
 	if(object.notVisible(width, height) && object.isStatic()){
-		strcpy(msg.action, "delete");
+		strcpy(action.action, "delete");
 		msg.id = object.getId();
 		object.setStatus(false);
 		this->deleteElement(object.getId());
 	}else if(object.isStatic()){
-		strcpy(msg.action, "draw");
+		strcpy(action.action, "draw");
 		msg.id = object.getId();
 		msg.posX = object.getPosX();
 		msg.posY = object.getPosY();
 		msg.actualPhotogram = object.getActualPhotogram();
 	}else{//object is not static
-		strncpy(msg.action, "Bullet deleted", 20);
+		strncpy(action.action, "Bullet deleted", 20);
 	}
+}
+
+bool BulletList::bulletDeleteMessage(int bulletNumber, deleteMsj &msg, int width, int height){
+	Object object = this->getObject(bulletNumber);
+	if(object.notVisible(width, height) && object.isStatic()){
+		msg.id = object.getId();
+		object.setStatus(false);
+		this->deleteElement(object.getId());
+		return true;
+	}
+	return false;
+}
+
+bool BulletList::bulletDrawMessage(int bulletNumber, updateMsj &msg, int width, int height){
+	Object object = this->getObject(bulletNumber);
+	if(object.isStatic()){
+		msg.id = object.getId();
+		msg.posX = object.getPosX();
+		msg.posY = object.getPosY();
+		msg.actualPhotogram = object.getActualPhotogram();
+		return true;
+	}
+	return false;
 }
 
 list<Object>::iterator BulletList::begin(){

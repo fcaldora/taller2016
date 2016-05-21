@@ -7,7 +7,7 @@
 
 #ifndef SOCKETMANAGER_H_
 #define SOCKETMANAGER_H_
-
+#include "Constants.h"
 #include "XmlParser.h"
 #include "LogWriter.h"
 
@@ -15,7 +15,6 @@ class SocketManager {
 public:
 	SocketManager(LogWriter *logWriter, XmlParser *parser);
 	virtual ~SocketManager();
-
 	int createSocketConnection();
 
 	int socketHandle;

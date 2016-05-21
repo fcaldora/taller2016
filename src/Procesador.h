@@ -7,6 +7,7 @@
 #include <string>
 #include "Constants.h"
 #include <string.h>
+#include <mutex>
 #ifndef PROCESADOR_H_
 #define PROCESADOR_H_
 
@@ -19,7 +20,7 @@ class GameManager;
 class Procesador {
 public:
 	Procesador();
-	Procesador(ClientList *clientList, int screenWidth, int screenHeight, GameManager *gameManager);
+	Procesador(ClientList *clientList, int screenWidth, int screenHeight, GameManager *gameManager, std::mutex* mutex);
 	virtual ~Procesador();
 
 	void processMessage(clientMsj message);
@@ -46,6 +47,7 @@ private:
 	ClientList *clientList;
 	int screenWidth;
 	int screenHeight;
+	std::mutex* mutexColaMensajes;
 	void processMovementMessage(clientMsj message);
 	void processShootMessage(clientMsj message);
 	void processKeepAliveMessage(clientMsj message);

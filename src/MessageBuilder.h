@@ -22,20 +22,19 @@ public:
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
 	mensaje createInitialMessageForClient(Client *client);
-	mensaje createPlaneMovementMessageForClient(Client *client);
+	updateMsj createPlaneMovementMessageForClient(Client *client);
 	mensaje createInitBackgroundMessage(Escenario *escenario);
 	mensaje createBulletMessage(Object*);
-	mensaje createBackgroundUpdateMessage(Escenario *escenario);
-	mensaje createBackgroundElementUpdateMessageForElement(DrawableObject *element);
+	updateMsj createBackgroundUpdateMessage(Escenario *escenario);
+	updateMsj createBackgroundElementUpdateMessageForElement(DrawableObject *element);
 	mensaje createBackgroundElementCreationMessageForElement(DrawableObject *element);
 	mensaje createWindowInitMessage(int screenHeight, int screenWidth);
 	mensaje createResetGameMessage();
 	mensaje createReconnectionMessageForClient(Client* client);
 	mensaje createDisconnectionMessageForClient(Client* client);
-	mensaje createUpdatePhotogramMessageForPlane(Avion* plane);
-
-private:
+	updateMsj createUpdatePhotogramMessageForPlane(Avion* plane);
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);
+
 };
 
 #endif /* MESSAGEBUILDER_H_ */

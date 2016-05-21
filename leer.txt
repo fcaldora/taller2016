@@ -1,0 +1,14 @@
+Me di cuenta de que estabamos mandando muchos bytes al pedo. Sobretodo en el update y en el delete de objetos.
+Por ejemplo, para el delete, lo unico que se necesita enviar es el id del objeto. EL cliente recibe el id y borra el objeto con ese id. Nosotros estabamos mandando todo el msj, con el path, las posiciones, los fotogramas, etc.
+En el update tambien. Necesitamos solo las posiciones, el id, el fotograma actual, y nada mas.
+Lo que hice entonces fue crear distintos tipos de mensajes, y enviar solo lo que se necesita.
+Para eso tuve que cambiar la forma de mandar mensajes.
+Ahora primero se manda un actionMsj, que contiene "create" o "draw" o "delete" o las otras formas. Y luego se manda el msj que corresponda.
+Antes de hacer los cambios, conté cuantos bytes se enviaban en 10 segundos, sin tocar nada. Me dio que se mandaban 2200000 bytes aprox. Despues de los cambios, bajó a 1200000, osea, casi la mitad.
+
+Por ahi con eso se soluciona el tema del tp2 que tenemos que volver a mostrar.
+Ademas, ibamos a tener que solucionar eso de alguna manera, porque para el tp3 aparecen enemigos, los puntajes, etc. Vamos a tener que mandar mas mensajes todavia, y ahi si o si se iba a saturar.
+
+Lo de la bala tambien lo solucione,a ojo, dividi por 5 en el server el setStep del createBulletForClient, y probe con velocidad de desplazamiento = 2 y velocidad de disparo = 4 en el xml, y masomenos funciona al doble (a ojo).
+
+Perdon por crear otro branch, pasa que no sabia si ustedes estaban de acuerdo o no, porque es un cambio groso. Ademas no queria romper nada.

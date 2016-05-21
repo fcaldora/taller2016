@@ -6,7 +6,7 @@
  */
 
 #include "Procesador.h"
-
+#include "Messenger.h"
 #include "MessageBuilder.h"
 #include "GameManager.h"
 
@@ -17,11 +17,12 @@ Procesador::Procesador() {
 	this->gameManager = NULL;
 }
 
-Procesador::Procesador(ClientList *clientList, int screenWidth, int screenHeight, GameManager *gameManager) {
+Procesador::Procesador(ClientList *clientList, int screenWidth, int screenHeight, GameManager *gameManager, std::mutex* mutex) {
 	this->clientList = clientList;
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
 	this->gameManager = gameManager;
+	this->mutexColaMensajes = mutex;
 }
 
 void Procesador::processMessage(clientMsj message) {
@@ -78,8 +79,13 @@ void Procesador::processMovementMessage(clientMsj message) {
 			client->plane->moveOneStepUp();
 		}
 	}
-	mensaje response = MessageBuilder().createPlaneMovementMessageForClient(client);
-	this->gameManager->broadcastMessage(response);
+	actionMsj action;
+	strncpy(action.action, "draw", kLongChar);
+	mutexColaMensajes->lock();
+	Messenger().broadcastActionMsj(action, clientList);
+	updateMsj response = MessageBuilder().createPlaneMovementMessageForClient(client);
+	Messenger().broadcastUpdateMsj(response, clientList);
+	mutexColaMensajes->unlock();
 }
 
 void Procesador::processShootMessage(clientMsj message) {
@@ -87,9 +93,14 @@ void Procesador::processShootMessage(clientMsj message) {
 	if (client->plane->isLooping)
 		return;
 
-	Object *bullet = this->gameManager->createBulletForClient(client);
-	mensaje response = MessageBuilder().createBulletMessage(bullet);
+	Object bullet = this->gameManager->createBulletForClient(client);
+	actionMsj action;
+	strncpy(action.action,"create", kLongChar);
+	mutexColaMensajes->lock();
+	Messenger().broadcastActionMsj(action, clientList);
+	mensaje response = MessageBuilder().createBulletMessage(&bullet);
 	this->gameManager->broadcastMessage(response);
+	mutexColaMensajes->unlock();
 }
 
 void Procesador::processKeepAliveMessage(clientMsj message) {
@@ -98,10 +109,9 @@ void Procesador::processKeepAliveMessage(clientMsj message) {
 
 void Procesador::processResetMessage(clientMsj message) {
 	this->gameManager->restartGame();
-	mensaje msjReset;
-	memset(&msjReset, 0, sizeof(mensaje));
+	actionMsj msjReset;
 	strcpy(msjReset.action, "reset");
-	this->gameManager->broadcastMessage(msjReset);
+	Messenger().broadcastActionMsj(msjReset, this->clientList);
 	this->gameManager->reloadGameFromXml();
 }
 
@@ -111,15 +121,19 @@ void Procesador::processAnimationMessage(clientMsj message) {
 		return;
 
 	client->plane->setPhotogram();
-	mensaje response = MessageBuilder().createPlaneMovementMessageForClient(client);
-	this->gameManager->broadcastMessage(response);
+	actionMsj action;
+	strncpy(action.action, "draw", kLongChar);
+	mutexColaMensajes->lock();
+	Messenger().broadcastActionMsj(action, clientList);
+	updateMsj response = MessageBuilder().createPlaneMovementMessageForClient(client);
+	Messenger().broadcastUpdateMsj(response, clientList);
+	mutexColaMensajes->unlock();
 }
 
 void Procesador::processExitMessage(clientMsj message){
-	mensaje closeMsj;
-	memset(&closeMsj, 0, sizeof(mensaje));
-	strcpy(closeMsj.action, "close");
-	this->gameManager->broadcastMessage(closeMsj);
+	actionMsj msj;
+	strcpy(msj.action, "close");
+	Messenger().broadcastActionMsj(msj, this->clientList);
 }
 
 Procesador::~Procesador() {

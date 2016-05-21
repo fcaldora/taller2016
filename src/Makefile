@@ -1,6 +1,7 @@
 XmlLibrary = tinyxml.cpp tinystr.cpp tinyxmlerror.cpp tinyxmlparser.cpp
 
 all:
+	g++ -Wall Messenger.cpp -c
 	g++ -Wall CargadorXML.cpp -c
 	g++ -Wall XmlParser.cpp -c
 	g++ -Wall LogWriter.cpp -c	
@@ -18,4 +19,4 @@ all:
 	g++ -Wall BulletList.cpp -c -std=c++11
 	
 
-	g++ -Wall -g taller2016Server.cpp  BulletList.o CargadorXML.o XmlParser.o Procesador.o LogWriter.o Avion.o Escenario.o Client.o GameManager.o ClientList.o DrawableObject.o MenuPresenter.o MessageBuilder.o Object.o SocketManager.o $(XmlLibrary) -o server -lpthread -std=c++11
+	g++ -Wall -g taller2016Server.cpp  BulletList.o CargadorXML.o XmlParser.o Procesador.o Messenger.o LogWriter.o Avion.o Escenario.o Client.o GameManager.o ClientList.o DrawableObject.o MenuPresenter.o MessageBuilder.o Object.o SocketManager.o $(XmlLibrary) -o server -lpthread -std=c++11
