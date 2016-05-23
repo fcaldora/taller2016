@@ -250,6 +250,10 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
 		logWriter->writeClientConnectionReceived();
+		mensaje ventanaMsj;
+		ventanaMsj.height = parser->getAltoVentana();
+		ventanaMsj.width = parser->getAnchoVentana();
+		sendMsjInfo(socketConnection, sizeof(mensaje), &ventanaMsj);
 
 		struct timeval timeOut;
 		timeOut.tv_sec = 100;
@@ -308,10 +312,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 			gameInitiated = true;
 		}
 		if(userWasConnected){
-			mensaje ventanaMsj, mensajeObjeto;
-			ventanaMsj.height = parser->getAltoVentana();
-			ventanaMsj.width = parser->getAnchoVentana();
-			sendMsjInfo(socketConnection, sizeof(mensaje), &ventanaMsj);
+			mensaje mensajeObjeto;
 			sendMsjInfo(socketConnection, sizeof(mensaje), &escenarioMsj);
 			std::list<Client*>::iterator it;
 			for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
@@ -363,19 +364,16 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	if (success == EXIT_FAILURE)
 		return EXIT_FAILURE;
 
-	mensaje ventanaMsj, escenarioMsj;
-	memset(&ventanaMsj, 0, sizeof(mensaje));
+	mensaje escenarioMsj;
 	memset(&escenarioMsj, 0, sizeof(mensaje));
 	Escenario escenario;
 	parser->getFondoEscenario(escenario);
 	this->escenario = &escenario;
-	ventanaMsj.height = parser->getAltoVentana();;
-	ventanaMsj.width = parser->getAnchoVentana();
+
 	escenario.setScrollingStep(1);
-	escenario.setWindowHeight(ventanaMsj.height);
+	escenario.setWindowHeight(parser->getAnchoVentana());
 	escenario.setHeigth(parser->getAltoEscenario());
 	escenarioMsj = MessageBuilder().createInitBackgroundMessage(&escenario);
-	drawableList.push_back(ventanaMsj);
 	drawableList.push_back(escenarioMsj);
 	for(int i = 0; i < parser->getNumberOfElements(); i++){
 		DrawableObject* object = new DrawableObject();
@@ -423,8 +421,7 @@ Object* GameManager::createBulletForClient(Client* client){
 	bullet.setWidth(30);
 	bullet.setHeigth(30);
 	bullet.setStatus(true);
-	//La velocidad de disparo es relativa a la velocidad del avion.
-	bullet.setStep(client->plane->getVelDisparo() + client->plane->getVelDesplazamiento());
+	bullet.setStep((client->plane->getVelDisparo() + client->plane->getVelDesplazamiento())/5);
 	objects.addElement(bullet);
 	return &bullet;
 }
