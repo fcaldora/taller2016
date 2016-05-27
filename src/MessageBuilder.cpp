@@ -102,22 +102,6 @@ mensaje MessageBuilder::createBackgroundUpdateMessage(Escenario* escenario){
 	return msg;
 }
 
-/*mensaje MessageBuilder::createBackgroundElementUpdateMessageForElement(Escenario* escenario, int numElement){
-	mensaje msg;
-	DrawableObject* auxObject;
-	strncpy(msg.action, "draw", 20);
-	auxObject = escenario->getElement(numElement);
-	msg.id = auxObject->getId();
-	msg.posX = auxObject->getPosX();
-	msg.posY = auxObject->getPosY();
-	strncpy(msg.imagePath, auxObject->getPath().c_str(), 20);
-	msg.height = auxObject->getHeigth();
-	msg.width = auxObject->getWidth();
-	msg.actualPhotogram = auxObject->getActualPhotogram();
-	msg.activeState = true;
-	return msg;
-}*/
-
 mensaje MessageBuilder::createBackgroundElementUpdateMessageForElement(DrawableObject *element){
 	mensaje msg = this->createBackgroundElementBaseMessageForElement(element);
 	strncpy(msg.action, "draw", 20);

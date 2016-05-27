@@ -2,6 +2,7 @@
 #include "Constants.h"
 #include "DrawableObject.h"
 #include "Avion.h"
+#include "PowerUp.h"
 #include <iostream>
 #ifndef XMLPARSER_H_
 #define XMLPARSER_H_
@@ -23,6 +24,8 @@ public:
 	int getVelocidadDispAvion();
 	int getSprite(DrawableObject &object, int numSprite);
 	int getElement(DrawableObject &element, int elementNum);
+	void getPowerUp(PowerUp& powerUp, int powerUpNum);
+	int getNumberOfPowerUp();
 	int getNumberOfElements();
 	int getFondoEscenario(DrawableObject &object);
 	Avion* getAvion(int nroCliente);

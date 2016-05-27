@@ -25,6 +25,7 @@
 #include "MessageBuilder.h"
 #include <chrono>
 #include "DrawableObject.h"
+#include "PowerUp.h"
 #include <ctime>
 #include <unistd.h>
 
@@ -38,7 +39,6 @@ BulletList objects;
 bool appShouldTerminate, gameInitiated, userWasConnected;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
-list<mensaje> messageList;
 list<mensaje> drawableList; //lista que guarda todos los mensajes iniciales para levantar el juego :
 							//datos de la ventana, escenario, aviones, elementos del escenario.
 
@@ -50,6 +50,7 @@ GameManager::GameManager() {
 	this->socketManager = NULL;
 	this->xmlLoader = NULL;
 	this->escenario = NULL;
+	this->procesor = NULL;
 }
 
 void GameManager::reloadGameFromXml(){
@@ -186,6 +187,22 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				DrawableObject* element = escenario->getElement(i);
 				msj = MessageBuilder().createBackgroundElementUpdateMessageForElement(element);
 				broadcast(msj, clientList);
+			}
+			for(int i = 0; i < escenario->getNumberOfPowerUps(); i++){
+				msj = MessageBuilder().createBackgroundElementUpdateMessageForElement(escenario->getPowerUp(i));
+				broadcast(msj, clientList);
+				for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
+					if (escenario->getPowerUp(i) != NULL){
+						if(escenario->getPowerUp(i)->haveCollision((*it)->getPlane())){
+							escenario->getPowerUp(i)->applyPowerUp((*it)->getPlane());
+							mensaje deletePowerUp;
+							strncpy(deletePowerUp.action,"delete",20);
+							deletePowerUp.id = escenario->getPowerUp(i)->getId();
+							escenario->deletePowerUp(escenario->getPowerUp(i)->getId());
+							broadcast(deletePowerUp, clientList);
+						}
+					}
+				}
 			}
 		}
 		contador++;
@@ -381,12 +398,18 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		memset(&elementMsg, 0, sizeof(mensaje));
 		parser->getElement(*object, i);
 		escenario.addElement(object);
-		elementMsg = MessageBuilder().createBackgroundElementUpdateMessageForElement(object);
-		strncpy(elementMsg.action, "create", 20);
+		elementMsg = MessageBuilder().createBackgroundElementCreationMessageForElement(object);
 		drawableList.push_back(elementMsg);
 	}
+	for(int i = 0; i < parser->getNumberOfPowerUp(); i++){
+		PowerUp powerUp;
+		parser->getPowerUp(powerUp, i);
+		escenario.addPowerUp(&powerUp);
+		mensaje powerUpMsj = MessageBuilder().createBackgroundElementCreationMessageForElement(&powerUp);
+		drawableList.push_back(powerUpMsj);
+	}
 	escenario.transformPositions();
-	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements());
+	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements() + parser->getNumberOfPowerUp());
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario);
@@ -412,18 +435,20 @@ void GameManager::restartGame() {
 	escenario->restart();
 }
 
-Object* GameManager::createBulletForClient(Client* client){
+Object GameManager::createBulletForClient(Client* client, int posX){
+	//Aca hay que setear. Si el cliente tiene disparo doble, se crean dos balas.
 	Object bullet;
 	bullet.setId(objects.getLastId() + 1);
 	bullet.setPath("bullet.png");
-	bullet.setPosX(client->plane->getPosX() + client->plane->getWidth()/2 - 15);
+	//bullet.setPosX(client->plane->getPosX() + client->plane->getWidth()/2 - 15);
+	bullet.setPosX(posX);
 	bullet.setPosY(client->plane->getPosY() + 1);
 	bullet.setWidth(30);
 	bullet.setHeigth(30);
 	bullet.setStatus(true);
 	bullet.setStep((client->plane->getVelDisparo() + client->plane->getVelDesplazamiento())/5);
 	objects.addElement(bullet);
-	return &bullet;
+	return bullet;
 }
 
 void GameManager::detachClientMessagesThreads() {

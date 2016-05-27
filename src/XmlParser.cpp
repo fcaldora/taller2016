@@ -304,6 +304,49 @@ void XmlParser::reloadDoc(){
 	}
 }
 
+void XmlParser::getPowerUp(PowerUp& powerUp, int powerUpNum){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* powerUpsElement = docHandle.FirstChild(tagPowerUps).ToElement();
+	TiXmlElement* powerUpElement = powerUpsElement->FirstChildElement(tagPowerUp);
+	for (int i = 0; i < powerUpNum ; i++){
+		powerUpElement = powerUpElement->NextSiblingElement(tagPowerUp);
+	}
+	if ( powerUpElement == NULL){
+		cout<<"Error al cargar el powerUp desde archivo"<<endl;
+		return;
+	}
+	TiXmlElement* typeElement = powerUpElement->FirstChildElement(tagType);
+	powerUp.setType(atoi(typeElement->GetText()));
+	if (powerUp.getType() == ADDINGPOINTS){
+		TiXmlElement* pointsElement = powerUpElement->FirstChildElement(tagPointsToAdd);
+		powerUp.setPointsToAdd(atoi(pointsElement->GetText()));
+	}
+	TiXmlElement* idElement = powerUpElement->FirstChildElement(tagId);
+	powerUp.setId(atoi(idElement->GetText()));
+	TiXmlElement* altoElement = powerUpElement->FirstChildElement(tagAlto);
+	powerUp.setHeigth(atoi(altoElement->GetText()));
+	TiXmlElement* anchoElement = powerUpElement->FirstChildElement(tagAncho);
+	powerUp.setWidth(atoi(anchoElement->GetText()));
+	TiXmlElement* xElement = powerUpElement->FirstChildElement(tagPosX);
+	powerUp.setPosX(atoi(xElement->GetText()));
+	TiXmlElement* yElement = powerUpElement->FirstChildElement(tagPosY);
+	powerUp.setPosY(atoi(yElement->GetText()));
+	TiXmlElement* pathElement = powerUpElement->FirstChildElement(tagPath);
+	powerUp.setPath(pathElement->GetText());
+}
+
+int XmlParser::getNumberOfPowerUp(){
+	int quantity = 0;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* powerUpsElement = docHandle.FirstChild(tagPowerUps).ToElement();
+	TiXmlElement* powerUpElement = powerUpsElement->FirstChildElement(tagPowerUp);
+	while(powerUpElement != NULL){
+		quantity++;
+		powerUpElement = powerUpElement->NextSiblingElement(tagPowerUp);
+	}
+	return quantity;
+}
+
 XmlParser::~XmlParser() {
 	// TODO Auto-generated destructor stub
 }

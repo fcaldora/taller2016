@@ -13,10 +13,19 @@ Avion::Avion() :DrawableObject() {
 	velDisparo = 0;
 	velDesplazamiento = 0;
 	this->isLooping = false;
+	this->hasDoubleShooting = false;
 }
 
 void Avion::setVelDesplazamiento(int velDesplazamiento){
 	this->velDesplazamiento = velDesplazamiento;
+}
+
+bool Avion::doubleShooting(){
+	return this->hasDoubleShooting;
+}
+
+void Avion::setDoubleShooting(bool hasDoubleShooting){
+	this->hasDoubleShooting = hasDoubleShooting;
 }
 
 int Avion::getVelDesplazamiento(){

@@ -80,16 +80,28 @@ void Procesador::processMovementMessage(clientMsj message) {
 	}
 	mensaje response = MessageBuilder().createPlaneMovementMessageForClient(client);
 	this->gameManager->broadcastMessage(response);
+	//CHEQUEAR ACA SI HAY COLISION CON UN POWERUP
 }
 
 void Procesador::processShootMessage(clientMsj message) {
 	Client* client = this->clientList->getClientForName(message.id);
 	if (client->plane->isLooping)
 		return;
-
-	Object *bullet = this->gameManager->createBulletForClient(client);
-	mensaje response = MessageBuilder().createBulletMessage(bullet);
-	this->gameManager->broadcastMessage(response);
+	if(client->plane->doubleShooting()){
+		int leftPlane = client->plane->getPosX();
+		int rightPlane = client->plane->getPosX() + client->plane->getWidth()/2;
+		Object bulletLeft = this->gameManager->createBulletForClient(client, leftPlane);
+		Object bulletRight = this->gameManager->createBulletForClient(client, rightPlane);
+		mensaje responseLeft = MessageBuilder().createBulletMessage(&bulletLeft);
+		mensaje responseRight = MessageBuilder().createBulletMessage(&bulletRight);
+		this->gameManager->broadcastMessage(responseLeft);
+		this->gameManager->broadcastMessage(responseRight);
+	}else{
+		int middlePlane = client->plane->getPosX() + client->plane->getWidth()/2 - 15;
+		Object bullet = this->gameManager->createBulletForClient(client, middlePlane);
+		mensaje response = MessageBuilder().createBulletMessage(&bullet);
+		this->gameManager->broadcastMessage(response);
+	}
 }
 
 void Procesador::processKeepAliveMessage(clientMsj message) {

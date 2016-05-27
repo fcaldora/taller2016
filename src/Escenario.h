@@ -8,6 +8,8 @@
 #include "Constants.h"
 #include <list>
 #include "DrawableObject.h"
+#include "PowerUpList.h"
+#include "PowerUp.h"
 #ifndef ESCENARIO_H_
 #define ESCENARIO_H_
 
@@ -23,11 +25,19 @@ public:
 	void setWindowHeight(int windowHeight);
 	DrawableObject* getElement(int numElement);
 	int getNumberElements();
+	void deleteElement(int elementId);
+
+	void addPowerUp(PowerUp* powerUp);
+	void deletePowerUp(int powerUpId);
+	PowerUp* getPowerUp(int numPowerUp);
+	int getNumberOfPowerUps();
+
 	virtual ~Escenario();
 	void restart();
 	void deleteElements();
 private:
 	list<DrawableObject*> elements;
+	PowerUpList powerUps;
 	int posYActual;
 	int scrollingStep;
 	int scrollingOffset;

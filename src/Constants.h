@@ -50,6 +50,13 @@ using namespace std;
 #define tagVueltaSpriteID "vueltaSpriteId"
 #define tagDisparosSpriteId "disparosSpriteId"
 #define tagAviones "aviones"
+#define tagPowerUps "powerUps"
+#define tagPowerUp "powerUp"
+#define tagPointsToAdd "points"
+#define tagType "type"
+#define DOUBLESHOOTING 1
+#define KILLENEMIES 2
+#define ADDINGPOINTS 3
 
 struct sprite{
 	char id[LONG_ID];

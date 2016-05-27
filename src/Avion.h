@@ -30,12 +30,14 @@ public:
 	void moveOneStepUp();
 	void moveOneStepDown();
 	bool updatePhotogram();
-
+	bool doubleShooting();
+	void setDoubleShooting(bool);
 	bool isLooping;
 
 private:
 	int velDesplazamiento;
 	int velDisparo;
+	bool hasDoubleShooting;
 };
 
 #endif /* AVION_H_ */

@@ -54,6 +54,17 @@
 		</elemento>
 	</elementos>
 </escenario>
+<powerUps>
+	<powerUp>
+		<path>x2.png</path>
+		<id>7</id>
+		<x>300</x>
+		<y>2500</y>
+		<ancho>32</ancho>
+		<alto>32</alto>
+		<type>1</type>
+	</powerUp>
+</powerUps>
 <aviones>
 	<avion>
 		<id>1</id>

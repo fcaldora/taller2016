@@ -28,7 +28,7 @@ public:
 
 	void broadcastMessage(mensaje message);
 	void restartGame();
-	Object* createBulletForClient(Client* client);
+	Object createBulletForClient(Client* client, int posX);
 	void reloadGameFromXml();
 
 private:

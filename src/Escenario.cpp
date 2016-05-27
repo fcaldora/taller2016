@@ -44,8 +44,39 @@ void Escenario::update(){
 	for (it = elements.begin(); it !=elements.end(); it++){
 		(*it)->setPosY((*it)->getPosY() + scrollingStep);
 	}
+	for(int i = 0; i < powerUps.numberOfPowerUps(); i++){
+		powerUps.getPowerUp(i)->setPosY(powerUps.getPowerUp(i)->getPosY() + scrollingStep);
+	}
 	if(this->posYActual == this->heigth)
 		restart();
+}
+
+void Escenario::deleteElement(int elementId){
+	list<DrawableObject*>::iterator it = elements.begin();
+	bool found = false;
+	while(!found && it != elements.end()){
+		if((*it)->getId() == elementId){
+			found = true;
+			elements.erase(it);
+		}else
+			it++;
+	}
+}
+
+void Escenario::addPowerUp(PowerUp* powerUp){
+	powerUps.addPowerUp(powerUp);
+}
+
+void Escenario::deletePowerUp(int powerUpId){
+	powerUps.deletePowerUp(powerUpId);
+}
+
+PowerUp* Escenario::getPowerUp(int numPowerUp){
+	return(powerUps.getPowerUp(numPowerUp));
+}
+
+int Escenario::getNumberOfPowerUps(){
+	return (powerUps.numberOfPowerUps());
 }
 
 void Escenario::setWindowHeight(int height){
@@ -61,6 +92,11 @@ void Escenario::transformPositions(){
 		(*it)->setPosY(-(*it)->getPosY() + windowHeight);
 		(*it)->setPosYInit(-(*it)->getPosYInit() + windowHeight);
 	}
+	for(int i = 0; i < powerUps.numberOfPowerUps(); i++){
+		powerUps.getPowerUp(i)->setPosY(-powerUps.getPowerUp(i)->getPosY() + windowHeight);
+		powerUps.getPowerUp(i)->setPosYInit(-powerUps.getPowerUp(i)->getPosYInit() + windowHeight);
+	}
+
 }
 
 DrawableObject* Escenario::getElement(int numElement){
@@ -80,16 +116,18 @@ int Escenario::getNumberElements(){
 }
 
 void Escenario::restart(){
-
 	this->scrollingOffset = 0;
 	this->posYActual = 0;
 	list<DrawableObject*>::iterator it = elements.begin();
-	for(int i = 0; i < elements.size(); i++){
+	for(unsigned int i = 0; i < elements.size(); i++){
 		(*it)->setPosX((*it)->getPosXInit());
 		(*it)->setPosY((*it)->getPosYInit());
 		it++;
 	}
-
+	for(int i = 0; i < powerUps.numberOfPowerUps(); i++){
+		powerUps.getPowerUp(i)->setPosX(powerUps.getPowerUp(i)->getPosXInit());
+		powerUps.getPowerUp(i)->setPosY(powerUps.getPowerUp(i)->getPosYInit());
+	}
 }
 
 void Escenario::deleteElements(){
