@@ -10,6 +10,8 @@
 
 #include <strings.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <thread>
@@ -28,14 +30,17 @@
 #include "PowerUp.h"
 #include <ctime>
 #include <unistd.h>
+#include "EnemyPlane.h"
 
 #define kServerTestFile "serverTest.txt"
 
 std::mutex mutexColaMensajes;
 std::mutex writingInLogFileMutex;
+std::mutex enemiesMutex;
 map<unsigned int, thread> clientEntranceMessages;
 map<unsigned int, thread> keepAliveThreads;
 BulletList objects;
+list<EnemyPlane*> enemyPlanes;
 bool appShouldTerminate, gameInitiated, userWasConnected;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
@@ -167,6 +172,7 @@ void broadcast(mensaje msg, ClientList* clientList){
 void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario) {
 	std::list<Client*>::iterator it;
 	std::list<Object>::iterator objectIt;
+	std::list<EnemyPlane*>::iterator enemyPlanesIt;
 	int contador = 0;
 	while(!appShouldTerminate){
 		usleep(1000);
@@ -203,6 +209,32 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 						}
 					}
 				}
+			}
+			for(enemyPlanesIt = enemyPlanes.begin(); enemyPlanesIt != enemyPlanes.end(); enemyPlanesIt++){
+				mensaje msj;
+				(*enemyPlanesIt)->move();
+				int clientId = (*enemyPlanesIt)->collideWithClient(clientList);
+				if(clientId != -1){
+					strcpy(msj.action, "delete");
+					msj.id = clientId;
+					broadcast(msj, clientList);
+				}
+				if((*enemyPlanesIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())){
+					strcpy(msj.action, "delete");
+					msj.id = (*enemyPlanesIt)->getId();
+					enemiesMutex.lock();
+					enemyPlanes.erase(enemyPlanesIt);
+					enemiesMutex.unlock();
+					enemyPlanesIt--;
+				}else{
+					strcpy(msj.action, "draw");
+					msj.id = (*enemyPlanesIt)->getId();
+					msj.actualPhotogram = (*enemyPlanesIt)->getActualPhotogram();
+					msj.posX = (*enemyPlanesIt)->getPosX();
+					msj.posY = (*enemyPlanesIt)->getPosY();
+				}
+
+				broadcast(msj, clientList);
 			}
 		}
 		contador++;
@@ -349,6 +381,48 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 	pthread_exit(NULL);
 }
 
+void* createEnemyPlanes(int maxNumberOfClients, Procesador* procesor, ClientList* clientList){
+	int posX, moment;
+	int createdEnemyPlanes = 0;
+	mensaje msj;
+	while(!appShouldTerminate){
+		if( clientList->clients.size() == maxNumberOfClients){
+			usleep(9000);
+			moment = rand()%500;
+			if(moment == 17){
+				EnemyPlane* enemyPlane = new EnemyPlane();
+				enemyPlane->setActualPhotogram(1);
+				enemyPlane->setPosX((rand()%procesor->getScreenWidth()));
+				enemyPlane->setPosY(1);
+				enemyPlane->setPhotograms(8);
+				enemyPlane->setFacingDirection("SOUTH");
+				enemyPlane->setFormation(NULL);
+				enemyPlane->setCrazyMoves(false);
+				enemyPlane->setSpeedFactor(0);
+				enemyPlane->setId( 5000 + createdEnemyPlanes);
+				enemyPlane->setWidth(34);
+				enemyPlane->setHeigth(34);
+				enemyPlane->setPath("enemyplane1.png");
+				enemyPlane->setTimesFacingOneDirection(1);
+				enemiesMutex.lock();
+				enemyPlanes.push_back(enemyPlane);
+				enemiesMutex.unlock();
+				msj.id =  5000 + createdEnemyPlanes;
+				strcpy(msj.action, "create");
+				msj.posX = enemyPlane->getPosX();
+				msj.posY = 0;
+				strcpy(msj.imagePath, "enemyplane1.png");
+				msj.photograms = 8;
+				msj.height = 34;
+				msj.width = 34;
+				msj.actualPhotogram = 1;
+				createdEnemyPlanes++;
+				broadcast(msj, clientList);
+			}
+		}
+	}
+}
+
 int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->menuPresenter = new MenuPresenter(this->appShouldTerminate, this);
 	this->clientList = new ClientList();
@@ -413,11 +487,12 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario);
-
+	std::thread enemyPlanesThread(createEnemyPlanes,maxNumberOfClients,this->procesor, this->clientList);
 	this->menuPresenter->presentMenu();
 
 	clientConnectionWaiter.detach();
 	broadcastThread.detach();
+	enemyPlanesThread.detach();
 	return EXIT_SUCCESS;
 }
 
