@@ -92,6 +92,12 @@ mensaje MessageBuilder::createBulletMessage(Object* bullet){
 	return message;
 }
 
+mensaje MessageBuilder::createBulletSoundMessage() {
+	mensaje message;
+	strcpy(message.action,"bulletSound");
+	return message;
+}
+
 mensaje MessageBuilder::createBackgroundUpdateMessage(Escenario* escenario){
 	mensaje msg;
 	strncpy(msg.action, "draw", 20);
