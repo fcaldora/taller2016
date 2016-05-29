@@ -7,8 +7,8 @@
 </Servidor>
 
 <ventana>
-	<ancho>500</ancho>
-	<alto>500</alto>
+	<ancho>800</ancho>
+	<alto>600</alto>
 </ventana>
 <escenario>
 	<ancho>800</ancho>

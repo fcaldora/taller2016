@@ -402,10 +402,10 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		drawableList.push_back(elementMsg);
 	}
 	for(int i = 0; i < parser->getNumberOfPowerUp(); i++){
-		PowerUp powerUp;
-		parser->getPowerUp(powerUp, i);
-		escenario.addPowerUp(&powerUp);
-		mensaje powerUpMsj = MessageBuilder().createBackgroundElementCreationMessageForElement(&powerUp);
+		PowerUp* powerUp = new PowerUp();
+		parser->getPowerUp(*powerUp, i);
+		escenario.addPowerUp(powerUp);
+		mensaje powerUpMsj = MessageBuilder().createBackgroundElementCreationMessageForElement(powerUp);
 		drawableList.push_back(powerUpMsj);
 	}
 	escenario.transformPositions();
