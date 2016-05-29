@@ -95,6 +95,9 @@ void GameManager::reloadGameFromXml(){
 		this->broadcastMessage(avionMsj);
 		i++;
 	}
+	mensaje sortPlaneMsg;
+	strncpy(sortPlaneMsg.action, "sortPlane", kLongChar);
+	this->broadcastMessage(sortPlaneMsg);
 }
 
 
@@ -224,6 +227,9 @@ void sendGameInfo(ClientList* clientList){
 	for (it = drawableList.begin(); it != drawableList.end(); it++){
 		broadcast((*it), clientList);
 	}
+	mensaje sortPlaneMsg;
+	strncpy(sortPlaneMsg.action, "sortPlane", kLongChar);
+	broadcast(sortPlaneMsg, clientList);
 }
 
 void disconnectClientForSocketConnection(unsigned int socketConnection, ClientList *clientList) {
@@ -295,7 +301,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 
 				clientList->addClient(client);
 
-				message = MessageBuilder().createSuccessfullyConnectedMessage();
+				message = MessageBuilder().createSuccessfullyConnectedMessage(clientPlane->getId());
 
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, socketConnection, clientList, procesor, escenario);
@@ -315,7 +321,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
 
-				message = MessageBuilder().createSuccessfullyConnectedMessage();
+				message = MessageBuilder().createSuccessfullyConnectedMessage(client->plane->getId());
 				escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
 				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList, procesor, escenario);
 				userWasConnected = true;
@@ -344,6 +350,9 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				strncpy(elementMsg.action, "create", 20);
 				sendMsjInfo(socketConnection, sizeof(mensaje), &elementMsg);
 			}
+			mensaje sortPlaneMsg;
+			strncpy(sortPlaneMsg.action, "sortPlane", kLongChar);
+			sendMsjInfo(socketConnection, sizeof(mensaje), &sortPlaneMsg);
 		}
 	}
 	pthread_exit(NULL);
