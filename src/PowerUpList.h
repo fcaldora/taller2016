@@ -17,11 +17,12 @@ public:
 	PowerUpList();
 	void deletePowerUp(int powerUpId);
 	void addPowerUp(PowerUp* powerUp);
-	PowerUp* getPowerUp(int numberOfPowerUp);
+	PowerUp* getPowerUp(unsigned int numberOfPowerUp);
 	void movePowerUps();
 	void setScrollingStep(int step);
 	void setScenaryHeight(int height);
 	int numberOfPowerUps();
+	void deletePowerUps();
 	virtual ~PowerUpList();
 
 private:

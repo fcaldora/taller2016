@@ -57,6 +57,7 @@ void GameManager::reloadGameFromXml(){
 	drawableList.clear();
 	parser->reloadDoc();
 	escenario->deleteElements();
+	escenario->deletePowerUps();
 	mensaje ventanaMsj, escenarioMsj;
 	memset(&ventanaMsj, 0, sizeof(mensaje));
 	memset(&escenarioMsj, 0, sizeof(mensaje));
@@ -84,8 +85,16 @@ void GameManager::reloadGameFromXml(){
 		drawableList.push_back(elementMsg);
 		this->broadcastMessage(elementMsg);
 	}
+	for(int i = 0; i < parser->getNumberOfPowerUp(); i++){
+		PowerUp* powerUp = new PowerUp();
+		parser->getPowerUp(*powerUp, i);
+		escenario->addPowerUp(powerUp);
+		mensaje powerUpMsj = MessageBuilder().createBackgroundElementCreationMessageForElement(powerUp);
+		drawableList.push_back(powerUpMsj);
+		this->broadcastMessage(powerUpMsj);
+	}
 	escenario->transformPositions();
-	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements());
+	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements() + parser->getNumberOfPowerUp());
 	mensaje avionMsj;
 	int i = 1;
 	list<Client*>::iterator it = clientList->clients.begin();
@@ -349,6 +358,13 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				elementMsg = MessageBuilder().createBackgroundElementUpdateMessageForElement(&object);
 				strncpy(elementMsg.action, "create", 20);
 				sendMsjInfo(socketConnection, sizeof(mensaje), &elementMsg);
+			}
+			for (int i = 0; i < parser->getNumberOfPowerUp(); i++){
+				PowerUp powerUp;
+				mensaje powerUpMsg;
+				parser->getPowerUp(powerUp, i);
+				powerUpMsg = MessageBuilder().createBackgroundElementCreationMessageForElement(&powerUp);
+				sendMsjInfo(socketConnection, sizeof(mensaje), &powerUpMsg);
 			}
 			mensaje sortPlaneMsg;
 			strncpy(sortPlaneMsg.action, "sortPlane", kLongChar);

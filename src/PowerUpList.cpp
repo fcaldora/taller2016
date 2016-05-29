@@ -31,13 +31,13 @@ void PowerUpList::deletePowerUp(int powerUpId){
 	}
 }
 
-PowerUp* PowerUpList::getPowerUp(int numberOfPowerUp){
+PowerUp* PowerUpList::getPowerUp(unsigned int numberOfPowerUp){
 	if(numberOfPowerUp > powerUpsList.size()){
 		cout<<"Numero incorrecto de power Up"<<endl;
 		return NULL;
 	}
 	list<PowerUp*>::iterator it = powerUpsList.begin();
-	for(int i = 0; i < numberOfPowerUp; i++){
+	for(unsigned int i = 0; i < numberOfPowerUp; i++){
 		it++;
 	}
 	return (*it);
@@ -68,6 +68,10 @@ void PowerUpList::setScenaryHeight(int height){
 
 int PowerUpList::numberOfPowerUps(){
 	return powerUpsList.size();
+}
+
+void PowerUpList::deletePowerUps(){
+	powerUpsList.clear();
 }
 
 PowerUpList::~PowerUpList() {

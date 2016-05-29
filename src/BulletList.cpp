@@ -59,7 +59,7 @@ Object BulletList::getObject(unsigned int number){
 		return obj;
 	}
 	list<Object>::iterator it = this->objectList.begin();
-	for(int i = 0; i < number; i++)
+	for(unsigned int i = 0; i < number; i++)
 		it++;
 	return (*it);
 }

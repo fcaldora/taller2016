@@ -99,13 +99,13 @@ void Escenario::transformPositions(){
 
 }
 
-DrawableObject* Escenario::getElement(int numElement){
+DrawableObject* Escenario::getElement(unsigned int numElement){
 	if(this->elements.size() < numElement){
 		cout<<"Numero incorrecto de elemento"<<endl;
 		return NULL;
 	}
 	list<DrawableObject*>::iterator it = elements.begin();
-	for(int i = 0; i < numElement; i++){
+	for(unsigned int i = 0; i < numElement; i++){
 		it++;
 	}
 	return (*it);
@@ -132,6 +132,10 @@ void Escenario::restart(){
 
 void Escenario::deleteElements(){
 	this->elements.clear();
+}
+
+void Escenario::deletePowerUps(){
+	this->powerUps.deletePowerUps();
 }
 
 Escenario::~Escenario() {

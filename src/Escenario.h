@@ -23,7 +23,7 @@ public:
 	void setScrollingStep(double step);
 	void transformPositions();
 	void setWindowHeight(int windowHeight);
-	DrawableObject* getElement(int numElement);
+	DrawableObject* getElement(unsigned int numElement);
 	int getNumberElements();
 	void deleteElement(int elementId);
 
@@ -31,7 +31,7 @@ public:
 	void deletePowerUp(int powerUpId);
 	PowerUp* getPowerUp(int numPowerUp);
 	int getNumberOfPowerUps();
-
+	void deletePowerUps();
 	virtual ~Escenario();
 	void restart();
 	void deleteElements();
