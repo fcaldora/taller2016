@@ -73,10 +73,11 @@ void BulletList::moveBullets(){
 	}
 }
 
-void BulletList::bulletMessage(int bulletNumber, mensaje &msg, int width, int height){
+int BulletList::bulletMessage(int bulletNumber, mensaje &msg, int width, int height, list<EnemyPlane*> enemyPlanes){
 //HARDCODADO EL BULLETID + 7. MODIFICAR!
 	Object object = this->getObject(bulletNumber);
-	if(object.notVisible(width, height) && object.isStatic()){
+	int id = object.crashedWithPlane(enemyPlanes);
+	if((object.notVisible(width, height) || id != -1) && object.isStatic()){
 		strcpy(msg.action, "delete");
 		msg.id = object.getId();
 		object.setStatus(false);
@@ -90,6 +91,7 @@ void BulletList::bulletMessage(int bulletNumber, mensaje &msg, int width, int he
 	}else{//object is not static
 		strncpy(msg.action, "Bullet deleted", 20);
 	}
+	return id;
 }
 
 list<Object>::iterator BulletList::begin(){

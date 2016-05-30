@@ -12,6 +12,7 @@
 #include "Client.h"
 #include "Object.h"
 #include "Escenario.h"
+#include "Explosion.h"
 
 class MessageBuilder {
 public:
@@ -33,7 +34,7 @@ public:
 	mensaje createReconnectionMessageForClient(Client* client);
 	mensaje createDisconnectionMessageForClient(Client* client);
 	mensaje createUpdatePhotogramMessageForPlane(Avion* plane);
-
+	mensaje createExplosionMessage(Explosion* explosion);
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);
 };

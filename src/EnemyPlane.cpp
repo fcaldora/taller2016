@@ -86,7 +86,7 @@ void EnemyPlane::move(){
 }
 
 bool EnemyPlane::notVisible(int width, int height){
-	return(this->posX > (width + 5) || this->posY > (height+5) || this->posX < -5 || this->posY < -5);
+	return(this->posX > (width + 50) || this->posY > (height+50) || this->posX < -200 || this->posY < -200);
 }
 
 int EnemyPlane::collideWithClient(ClientList* clientList){
@@ -94,7 +94,7 @@ int EnemyPlane::collideWithClient(ClientList* clientList){
 	bool xCollision = false;
 	bool yCollision = false;
 	for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
-		if((*it)->getConnnectionState()){
+		if((*it)->getConnnectionState() && (*it)->isAlive()){
 
 			int leftPlaneX = (*it)->getPlane()->getPosX();
 			int rightPlaneX = (*it)->getPlane()->getPosX() + (*it)->getPlane()->getWidth();

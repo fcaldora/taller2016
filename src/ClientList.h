@@ -22,6 +22,7 @@ public:
 	bool checkIfUserNameIsAlreadyInUse(char value[]);
 	Client* getClientForName(char name[]);
 	Client* getClientForSocket(int socket);
+	Client* getClientForPlaneId(int id);
 };
 
 #endif /* CLIENTLIST_H_ */

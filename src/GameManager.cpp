@@ -31,6 +31,7 @@
 #include <ctime>
 #include <unistd.h>
 #include "EnemyPlane.h"
+#include "Explosion.h"
 
 #define kServerTestFile "serverTest.txt"
 
@@ -41,6 +42,7 @@ map<unsigned int, thread> clientEntranceMessages;
 map<unsigned int, thread> keepAliveThreads;
 BulletList objects;
 list<EnemyPlane*> enemyPlanes;
+list<Explosion*> explosions;
 bool appShouldTerminate, gameInitiated, userWasConnected;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
@@ -96,6 +98,7 @@ void GameManager::reloadGameFromXml(){
 	list<Client*>::iterator it = clientList->clients.begin();
 	for (; it != clientList->clients.end(); it++){
 		(*it)->plane = parser->getAvion(i);
+		(*it)->setAlive(true);
 		avionMsj = MessageBuilder().createInitialMessageForClient((*it));
 		this->broadcastMessage(avionMsj);
 		i++;
@@ -173,13 +176,15 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 	std::list<Client*>::iterator it;
 	std::list<Object>::iterator objectIt;
 	std::list<EnemyPlane*>::iterator enemyPlanesIt;
+	std::list<Explosion*>::iterator explosionsIt;
 	int contador = 0;
+	int hit = -1;
 	while(!appShouldTerminate){
 		usleep(1000);
 		objects.moveBullets();
 		for(int i = 0; i < objects.bulletQuantity(); i++){
 			mensaje msg;
-			objects.bulletMessage(i, msg, processor->getScreenWidth(), processor->getScreenHeight());
+			hit = objects.bulletMessage(i, msg, processor->getScreenWidth(), processor->getScreenHeight(), enemyPlanes);
 			if(strcmp(msg.action, "Bullet deleted") != 0)
 				broadcast(msg, clientList);
 		}
@@ -215,14 +220,26 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				(*enemyPlanesIt)->move();
 				int clientId = (*enemyPlanesIt)->collideWithClient(clientList);
 				if(clientId != -1){
+					//Aviso a los clientes que borren al avion-
+					Client* client = clientList->getClientForPlaneId(clientId);
+					//Explosion* explosion = new Explosion(client->getPlane()->getPosX(), client->getPlane()->getPosY(), true, 15000 + explosions.size());
+					//msj = MessageBuilder().createExplosionMessage(explosion);
+					//broadcast(msj, clientList);
+					client->setAlive(false);
 					strcpy(msj.action, "delete");
 					msj.id = clientId;
 					broadcast(msj, clientList);
 				}
-				if((*enemyPlanesIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())){
+				if((*enemyPlanesIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())
+						|| hit == (*enemyPlanesIt)->getId() || clientId != -1){
+					//Aviso a los clientes que borren al avion enemigo y creo explosion
+					Explosion* explosion = new Explosion((*enemyPlanesIt)->getPosX(), (*enemyPlanesIt)->getPosY(), false, 15000 + explosions.size());
+					msj = MessageBuilder().createExplosionMessage(explosion);
+					broadcast(msj, clientList);
+					enemiesMutex.lock();
+					explosions.push_back(explosion);
 					strcpy(msj.action, "delete");
 					msj.id = (*enemyPlanesIt)->getId();
-					enemiesMutex.lock();
 					enemyPlanes.erase(enemyPlanesIt);
 					enemiesMutex.unlock();
 					enemyPlanesIt--;
@@ -235,6 +252,25 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				}
 
 				broadcast(msj, clientList);
+			}
+			if(contador == 29){
+				for(explosionsIt = explosions.begin(); explosionsIt != explosions.end(); explosionsIt++){
+					if(!(*explosionsIt)->isFinished()){
+						strcpy(msj.action, "draw");
+						msj.id = (*explosionsIt)->getId();
+						msj.actualPhotogram = (*explosionsIt)->getActualPhotogram();
+						msj.posX = (*explosionsIt)->getPosX();
+						msj.posY = (*explosionsIt)->getPosY();
+						(*explosionsIt)->updateFrame();
+					}else{
+						strcpy(msj.action, "delete");
+						msj.id = (*explosionsIt)->getId();
+						explosions.erase(explosionsIt);
+						explosionsIt--;
+					}
+
+					broadcast(msj, clientList);
+				}
 			}
 		}
 		contador++;
@@ -385,11 +421,13 @@ void* createEnemyPlanes(int maxNumberOfClients, Procesador* procesor, ClientList
 	int posX, moment;
 	int createdEnemyPlanes = 0;
 	mensaje msj;
+	bool alreadyRunning = false;
 	while(!appShouldTerminate){
-		if( clientList->clients.size() == maxNumberOfClients){
+		if( clientList->clients.size() == maxNumberOfClients || alreadyRunning){
+			alreadyRunning = true;
 			usleep(9000);
 			moment = rand()%500;
-			if(moment == 17){
+			if(moment < 2){
 				EnemyPlane* enemyPlane = new EnemyPlane();
 				enemyPlane->setActualPhotogram(1);
 				enemyPlane->setPosX((rand()%procesor->getScreenWidth()));
@@ -399,6 +437,7 @@ void* createEnemyPlanes(int maxNumberOfClients, Procesador* procesor, ClientList
 				enemyPlane->setFormation(NULL);
 				enemyPlane->setCrazyMoves(false);
 				enemyPlane->setSpeedFactor(0);
+				enemyPlane->setLifes(1);
 				enemyPlane->setId( 5000 + createdEnemyPlanes);
 				enemyPlane->setWidth(34);
 				enemyPlane->setHeigth(34);
@@ -415,6 +454,76 @@ void* createEnemyPlanes(int maxNumberOfClients, Procesador* procesor, ClientList
 				msj.photograms = 8;
 				msj.height = 34;
 				msj.width = 34;
+				msj.actualPhotogram = 1;
+				createdEnemyPlanes++;
+				broadcast(msj, clientList);
+			}else if(moment == 75){
+				Formation* formation = new Formation();
+				formation->setExtraPoints(true);
+				formation->setId(5000 + createdEnemyPlanes);
+				formation->setQuantity(5);
+				for(int i=0; i<5; i++){
+					EnemyPlane* enemyPlane = new EnemyPlane();
+					enemyPlane->setActualPhotogram(2);
+					enemyPlane->setPosX(25 - i*34);
+					enemyPlane->setPosY(30 - i*34);
+					enemyPlane->setPhotograms(8);
+					enemyPlane->setFacingDirection("SOUTHEAST");
+					enemyPlane->setFormation(formation);
+					enemyPlane->setLifes(1);
+					enemyPlane->setCrazyMoves(false);
+					enemyPlane->setSpeedFactor(0);
+					enemyPlane->setId( 5000 + createdEnemyPlanes);
+					enemyPlane->setWidth(34);
+					enemyPlane->setHeigth(34);
+					enemyPlane->setPath("enemyplane2.png");
+					enemyPlane->setTimesFacingOneDirection(1);
+					enemiesMutex.lock();
+					enemyPlanes.push_back(enemyPlane);
+					enemiesMutex.unlock();
+					msj.id =  5000 + createdEnemyPlanes;
+					strcpy(msj.action, "create");
+					msj.posX = enemyPlane->getPosX();
+					msj.posY = enemyPlane->getPosY();
+					strcpy(msj.imagePath, "enemyplane2.png");
+					msj.photograms = 8;
+					msj.height = 34;
+					msj.width = 34;
+					msj.actualPhotogram = 2;
+					createdEnemyPlanes++;
+					broadcast(msj, clientList);
+				}
+			}else if(moment == 36){
+				Formation* formation = new Formation();
+				formation->setExtraPoints(true);
+				formation->setId(5000 + createdEnemyPlanes);
+				formation->setQuantity(5);
+				EnemyPlane* enemyPlane = new EnemyPlane();
+				enemyPlane->setActualPhotogram(1);
+				enemyPlane->setPosX(250);
+				enemyPlane->setPosY(0);
+				enemyPlane->setPhotograms(1);
+				enemyPlane->setFacingDirection("SOUTH");
+				enemyPlane->setFormation(formation);
+				enemyPlane->setLifes(5);
+				enemyPlane->setCrazyMoves(false);
+				enemyPlane->setSpeedFactor(0);
+				enemyPlane->setId( 5000 + createdEnemyPlanes);
+				enemyPlane->setWidth(81);
+				enemyPlane->setHeigth(81);
+				enemyPlane->setPath("enemyplane3.png");
+				enemyPlane->setTimesFacingOneDirection(1);
+				enemiesMutex.lock();
+				enemyPlanes.push_back(enemyPlane);
+				enemiesMutex.unlock();
+				msj.id =  5000 + createdEnemyPlanes;
+				strcpy(msj.action, "create");
+				msj.posX = enemyPlane->getPosX();
+				msj.posY = enemyPlane->getPosY();
+				strcpy(msj.imagePath, "enemyplane3.png");
+				msj.photograms = 8;
+				msj.height = 81;
+				msj.width = 81;
 				msj.actualPhotogram = 1;
 				createdEnemyPlanes++;
 				broadcast(msj, clientList);

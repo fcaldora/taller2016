@@ -53,8 +53,18 @@ public:
 		this->socketMessages = socketMessages;
 	}
 
+
+
 	 Avion* getPlane()  {
 		return plane;
+	}
+
+	bool isAlive() const {
+		return alive;
+	}
+
+	void setAlive(bool alive) {
+		this->alive = alive;
 	}
 
 	Avion* plane;
@@ -62,6 +72,7 @@ public:
 private:
 	string name;
 	bool connected;
+	bool alive;
 	int socketMessages;
 	int socketKeepAlive;
 };

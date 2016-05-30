@@ -13,6 +13,7 @@ Client::Client(string name, int socketM, int socketKA, Avion* plane) {
 	this->socketKeepAlive = socketKA;
 	this->socketMessages = socketM;
 	this->plane = plane;
+	this->alive = true;
 }
 
 Client::~Client() {

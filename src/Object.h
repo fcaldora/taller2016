@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
+#include "EnemyPlane.h"
 
 using namespace std;
 
@@ -95,7 +96,8 @@ public:
 	void move();
 
 	bool notVisible(int width, int height);
-
+	bool haveCollision(EnemyPlane* plane);
+	int crashedWithPlane(list<EnemyPlane*> enemyPlanes);
 	void setStep(int step){
 		this->step = step;
 	}

@@ -47,6 +47,18 @@ Client* ClientList::getClientForSocket(int socket) {
 	return response;
 }
 
+Client* ClientList::getClientForPlaneId(int id) {
+	std::list<Client*>::iterator it;
+	Client* response;
+	for (it = this->clients.begin(); it != this->clients.end(); ++it) {
+		if (id == (*it)->getPlane()->getId()) {
+			response = (*it);
+		}
+	}
+	return response;
+}
+
+
 ClientList::~ClientList() {
 	for (Client *client : this->clients) {
 		delete client;

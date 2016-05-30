@@ -8,6 +8,7 @@
 #include <list>
 #include "Object.h"
 #include "Constants.h"
+#include "EnemyPlane.h"
 #ifndef BULLETLIST_H_
 #define BULLETLIST_H_
 
@@ -25,7 +26,7 @@ public:
 	int getLastId();
 	int getFirstId();
 	void moveBullets();
-	void bulletMessage(int bulletNumber, mensaje &msg, int ScreenWidth, int ScreenHeight);
+	int bulletMessage(int bulletNumber, mensaje &msg, int ScreenWidth, int ScreenHeight, list<EnemyPlane*> enemyPlanes);
 	list<Object>::iterator begin();
 	list<Object>::iterator end();
 	virtual ~BulletList();

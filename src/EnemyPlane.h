@@ -19,7 +19,7 @@ public:
 	EnemyPlane();
 	virtual ~EnemyPlane();
 
-	const Formation* getFormation() {
+	Formation* getFormation() {
 		return formation;
 	}
 
@@ -27,7 +27,7 @@ public:
 		this->formation = formation;
 	}
 
-	int getLifes() const {
+	int getLifes() {
 		return lifes;
 	}
 
@@ -35,7 +35,7 @@ public:
 		this->lifes = lifes;
 	}
 
-	int getScore() const {
+	int getScore() {
 		return score;
 	}
 
@@ -57,7 +57,7 @@ public:
 		this->facingDirection = facingDirection;
 	}
 
-	int getTimesFacingOneDirection() const {
+	int getTimesFacingOneDirection()  {
 		return timesFacingOneDirection;
 	}
 
@@ -66,7 +66,7 @@ public:
 	}
 	bool notVisible(int width, int height);
 
-	bool isCrazyMoves() const {
+	bool isCrazyMoves()  {
 		return crazyMoves;
 	}
 
@@ -74,7 +74,7 @@ public:
 		this->crazyMoves = crazyMoves;
 	}
 
-	int getSpeedFactor() const {
+	int getSpeedFactor()  {
 		return speedFactor;
 	}
 

@@ -168,6 +168,21 @@ mensaje MessageBuilder::createUpdatePhotogramMessageForPlane(Avion* plane) {
 	return photogramMsg;
 }
 
+mensaje MessageBuilder::createExplosionMessage(Explosion* explosion){
+	mensaje message;
+	message.id = explosion->getId();
+	strcpy(message.action,"create");
+	strcpy(message.imagePath, explosion->getPath().c_str());
+	message.height = explosion->getHeigth();
+	message.width = explosion->getWidth();
+	message.posX = explosion->getPosX();
+	message.posY = explosion->getPosY();
+	message.activeState = true;
+	message.actualPhotogram = explosion->getActualPhotogram();
+
+	return message;
+}
+
 MessageBuilder::~MessageBuilder() {
 	// TODO Auto-generated destructor stub
 }
