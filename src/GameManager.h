@@ -14,6 +14,7 @@
 #include "ClientList.h"
 #include "Procesador.h"
 #include "BulletList.h"
+#include "Team.h"
 
 class MenuPresenter;
 
@@ -40,6 +41,8 @@ private:
 	ClientList *clientList;
 	Procesador *procesor;
 	Escenario* escenario;
+	Team *firstTeam;
+	Team *secondTeam;
 
 	void detachClientMessagesThreads();
 };

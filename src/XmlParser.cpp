@@ -33,6 +33,18 @@ int XmlParser::getMaxNumberOfClients(){
 	}
 }
 
+int XmlParser::getMaxNumberOfPlayerPerTeam() {
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* maxElem = docHandle.FirstChild("Servidor").FirstChild(kMaxNumberOfPlayersPerTeamTag).ToElement();
+
+	if (maxElem)
+		return atoi(maxElem->GetText());
+	else {
+		cout<<"Error al obtener el numero maximo de clientes";
+		return 0;
+	}
+}
+
 LogLevelType XmlParser::getLogLevel() {
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement *configurationElement = docHandle.FirstChild(kServerTag).FirstChild(kConfigurationTag).ToElement();

@@ -18,7 +18,7 @@ public:
 	MessageBuilder();
 	virtual ~MessageBuilder();
 
-	clientMsj createSuccessfullyConnectedMessage();
+	clientMsj createSuccessfullyConnectedMessageForClient(Client *client);
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
 	mensaje createInitialMessageForClient(Client *client);

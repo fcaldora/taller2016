@@ -27,6 +27,7 @@ public:
 	int getFondoEscenario(DrawableObject &object);
 	Avion* getAvion(int nroCliente);
 	void reloadDoc();
+	int getMaxNumberOfPlayerPerTeam();
 
 private:
 	TiXmlDocument doc;

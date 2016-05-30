@@ -11,11 +11,12 @@ MessageBuilder::MessageBuilder() {
 	// TODO Auto-generated constructor stub
 }
 
-clientMsj MessageBuilder::createSuccessfullyConnectedMessage() {
+clientMsj MessageBuilder::createSuccessfullyConnectedMessageForClient(Client *client) {
 	clientMsj message;
 	strncpy(message.id, "0", kLongChar);
 	strncpy(message.type, "connection_ok", kLongChar);
 	strncpy(message.value, "Client connected", kLongChar);
+	message.clientID = client->clientID;
 	return message;
 }
 
@@ -24,6 +25,8 @@ clientMsj MessageBuilder::createServerFullMessage() {
 	strncpy(message.id, "0", 20);
 	strncpy(message.type, "server_full", 20);
 	strncpy(message.value, "Try again later", 20);
+	message.clientID = 0;
+
 	return message;
 }
 
@@ -32,6 +35,8 @@ clientMsj MessageBuilder::createUserNameAlreadyInUseMessage() {
 	strncpy(message.id, "0", 20);
 	strncpy(message.type, "error", 20);
 	strncpy(message.value, "Name already used", 20);
+	message.clientID = 0;
+
 	return message;
 }
 

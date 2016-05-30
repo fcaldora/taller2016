@@ -245,7 +245,15 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 	pthread_exit(NULL);
 }
 
-void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor, Escenario* escenario) {
+void addClientToCorrectTeam(Client *client, Team *firstTeam, Team *secondTeam, int numberOfCurrentAcceptedClients) {
+	if (numberOfCurrentAcceptedClients % 2 == 0) {
+		firstTeam->clients.push_back(client);
+	} else {
+		secondTeam->clients.push_back(client);
+	}
+}
+
+void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor, Escenario* escenario, Team *firstTeam, Team *secondTeam) {
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
@@ -263,7 +271,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		userWasConnected = false;
 		if (clientList->checkIfUserNameIsAlreadyInUse(message.value)) {
 
-			if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
+			if (firstTeam->isFull() && secondTeam->isFull()) {
 				message = MessageBuilder().createServerFullMessage();
 			} else {
 				numberOfCurrentAcceptedClients++;
@@ -273,8 +281,9 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				Client* client = new Client(name, socketConnection, 0, clientPlane);
 
 				clientList->addClient(client);
+				addClientToCorrectTeam(client, firstTeam, secondTeam, numberOfCurrentAcceptedClients);
 
-				message = MessageBuilder().createSuccessfullyConnectedMessage();
+				message = MessageBuilder().createSuccessfullyConnectedMessageForClient(client);
 
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, socketConnection, clientList, procesor, escenario);
@@ -294,7 +303,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
 
-				message = MessageBuilder().createSuccessfullyConnectedMessage();
+				message = MessageBuilder().createSuccessfullyConnectedMessageForClient(client);
 				escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
 				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList, procesor, escenario);
 				userWasConnected = true;
@@ -303,7 +312,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 
 		sendMsj(socketConnection, sizeof(message), &(message));
 		//Se envia la info para levantar el juego recien cuando todos se conectaron.
-		if(numberOfCurrentAcceptedClients == maxNumberOfClients && !gameInitiated){
+		if(firstTeam->isFull() && secondTeam->isFull() && !gameInitiated){
 			sendGameInfo(clientList);
 			gameInitiated = true;
 		}
@@ -389,9 +398,15 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	}
 	escenario.transformPositions();
 	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements());
+	int maxNumberOfPlayersPerTeam = this->parser->getMaxNumberOfPlayerPerTeam();
+	this->firstTeam = new Team();
+	this->firstTeam->maxNumberOfPlayers = maxNumberOfPlayersPerTeam;
+	this->secondTeam = new Team();
+	this->secondTeam->maxNumberOfPlayers = maxNumberOfPlayersPerTeam;
+
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,
-			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario);
+			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario, this->firstTeam, this->secondTeam);
 
 	this->menuPresenter->presentMenu();
 
@@ -453,6 +468,8 @@ GameManager::~GameManager() {
 	delete this->xmlLoader;
 	delete this->socketManager;
 	delete this->escenario;
+	delete this->firstTeam;
+	delete this->secondTeam;
 	delete logWriter;
 }
 

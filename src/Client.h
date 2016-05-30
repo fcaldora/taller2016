@@ -58,6 +58,8 @@ public:
 	}
 
 	Avion* plane;
+	int clientID;
+	int earnedPoints;
 
 private:
 	string name;

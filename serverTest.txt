@@ -3,12 +3,13 @@
 		<nivelDeLog>2</nivelDeLog>
 	</configuracion>
     <CantidadMaximaClientes>2</CantidadMaximaClientes>
+    <CantidadDeJugadoresPorEquipo>1</CantidadDeJugadoresPorEquipo>
     <Puerto>8080</Puerto>
 </Servidor>
 
 <ventana>
-	<ancho>500</ancho>
-	<alto>500</alto>
+	<ancho>700</ancho>
+	<alto>700</alto>
 </ventana>
 <escenario>
 	<ancho>800</ancho>

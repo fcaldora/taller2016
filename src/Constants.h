@@ -50,6 +50,7 @@ using namespace std;
 #define tagVueltaSpriteID "vueltaSpriteId"
 #define tagDisparosSpriteId "disparosSpriteId"
 #define tagAviones "aviones"
+#define kMaxNumberOfPlayersPerTeamTag "CantidadDeJugadoresPorEquipo"
 
 struct sprite{
 	char id[LONG_ID];
@@ -79,6 +80,7 @@ struct clientMsj {
 	char id[kLongChar];
 	char type[kLongChar];
 	char value[kLongChar];
+	int clientID; //Token
 };
 
 struct mensaje {
