@@ -1,5 +1,7 @@
 #include "XmlParser.h"
 
+#define kNumberOfTeams 2
+
 XmlParser::XmlParser(const char* filename) {
 	TiXmlDocument file;
 	if(file.LoadFile(filename)){
@@ -23,10 +25,10 @@ int XmlParser::getServerPort(){
 
 int XmlParser::getMaxNumberOfClients(){
 	TiXmlHandle docHandle(&this->doc);
-	TiXmlElement* maxElem = docHandle.FirstChild("Servidor").FirstChild("CantidadMaximaClientes").ToElement();
+	TiXmlElement* maxElem = docHandle.FirstChild("Servidor").FirstChild(kMaxNumberOfPlayersPerTeamTag).ToElement();
 
 	if (maxElem)
-		return atoi(maxElem->GetText());
+		return atoi(maxElem->GetText()) * kNumberOfTeams;
 	else {
 		cout<<"Error al obtener el numero maximo de clientes";
 		return 0;

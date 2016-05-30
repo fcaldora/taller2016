@@ -31,6 +31,8 @@ public:
 	void restartGame();
 	Object* createBulletForClient(Client* client);
 	void reloadGameFromXml();
+	void addClientToTeamWithName(Client *client, string teamName);
+	void createTeamWithNameForClient(string teamName, Client *client);
 
 private:
 	bool appShouldTerminate;
@@ -44,6 +46,7 @@ private:
 	Team *firstTeam;
 	Team *secondTeam;
 
+	void sendInitialGameInfo();
 	void detachClientMessagesThreads();
 };
 

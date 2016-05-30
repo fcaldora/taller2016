@@ -24,6 +24,15 @@ Procesador::Procesador(ClientList *clientList, int screenWidth, int screenHeight
 	this->gameManager = gameManager;
 }
 
+void Procesador::processMenuMessageForClient(menuRequestMessage message, Client *client) {
+	if (strcmp(message.type, "join_team") == 0) {
+		this->gameManager->addClientToTeamWithName(client, message.teamName);
+	}
+	if (strcmp(message.type, "create_team") == 0) {
+		this->gameManager->createTeamWithNameForClient(message.teamName, client);
+	}
+}
+
 void Procesador::processMessage(clientMsj message) {
 	if(strcmp(message.type, "movement") == 0) {
 		this->processMovementMessage(message);
@@ -123,6 +132,5 @@ void Procesador::processExitMessage(clientMsj message){
 }
 
 Procesador::~Procesador() {
-	// TODO Auto-generated destructor stub
 }
 

@@ -12,6 +12,12 @@ Team::Team() {
 	this->teamID = 0;
 }
 
+Team::Team(int teamID, string teamName, int maxNumberOfPlayers) {
+	this->maxNumberOfPlayers = maxNumberOfPlayers;
+	this->teamID = teamID;
+	this->teamName = teamName;
+}
+
 bool Team::isFull() {
 	return (this->maxNumberOfPlayers <= this->clients.size());
 }

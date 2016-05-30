@@ -18,7 +18,6 @@ Client::Client(string name, int socketM, int socketKA, Avion* plane) {
 }
 
 Client::~Client() {
-	// TODO Auto-generated destructor stub
 }
 
 

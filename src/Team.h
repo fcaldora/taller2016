@@ -14,6 +14,7 @@
 class Team {
 public:
 	Team();
+	Team(int teamID, string teamName, int maxNumberOfPlayers);
 	virtual ~Team();
 
 	bool isFull();

@@ -189,7 +189,39 @@ mensaje MessageBuilder::createUpdatePhotogramMessageForPlane(Avion* plane) {
 	return photogramMsg;
 }
 
+menuResponseMessage MessageBuilder::createMenuMessage(Team *firstTeam, Team *secondTeam) {
+	menuResponseMessage message;
+
+	message.id = 0;
+
+	if (firstTeam == NULL) {
+		message.secondTeamIsAvailableToJoin = false;
+		message.userCanCreateATeam = true;
+		strncpy(message.secondTeamName , "", kLongChar);
+		if (secondTeam == NULL) {
+			message.firstTeamIsAvailableToJoin = false;
+			strncpy(message.firstTeamName , "", kLongChar);
+		} else {
+			strncpy(message.firstTeamName , secondTeam->teamName.c_str(), kLongChar);
+			message.firstTeamIsAvailableToJoin = !secondTeam->isFull();
+		}
+	} else {
+		strncpy(message.firstTeamName , firstTeam->teamName.c_str(), kLongChar);
+		message.firstTeamIsAvailableToJoin = !firstTeam->isFull();
+		if (secondTeam == NULL) {
+			message.secondTeamIsAvailableToJoin = false;
+			strncpy(message.secondTeamName , "", kLongChar);
+			message.userCanCreateATeam = true;
+		} else {
+			strncpy(message.secondTeamName , secondTeam->teamName.c_str(), kLongChar);
+			message.secondTeamIsAvailableToJoin = !secondTeam->isFull();
+			message.userCanCreateATeam = false;
+		}
+	}
+
+	return message;
+}
+
 MessageBuilder::~MessageBuilder() {
-	// TODO Auto-generated destructor stub
 }
 
