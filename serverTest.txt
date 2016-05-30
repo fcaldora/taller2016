@@ -13,6 +13,8 @@
 <escenario>
 	<ancho>800</ancho>
 	<alto>10000</alto>
+	<portaAvionesX>300</portaAvionesX>
+	<portaAvionesY>9000</portaAvionesY>
 	<fondo>
 		<spriteId>0</spriteId>
 		<ancho>1024</ancho>
@@ -45,12 +47,12 @@
 			<y>1000</y>
 		</elemento>
 		<elemento>
-			<path>inicio.png</path>
+			<path>pAviones.png</path>
 			<id>6</id>
-			<ancho>320</ancho>
-			<alto>200</alto>
-			<x>100</x>
-			<y>1200</y>
+			<ancho>256</ancho>
+			<alto>244</alto>
+			<x>300</x>
+			<y>9000</y>
 		</elemento>
 	</elementos>
 </escenario>

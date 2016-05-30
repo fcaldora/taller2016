@@ -27,6 +27,8 @@ public:
 	void getPowerUp(PowerUp& powerUp, int powerUpNum);
 	int getNumberOfPowerUp();
 	int getNumberOfElements();
+	int getPosXPortaAviones();
+	int getPosYPortaAviones();
 	int getFondoEscenario(DrawableObject &object);
 	Avion* getAvion(int nroCliente);
 	void reloadDoc();

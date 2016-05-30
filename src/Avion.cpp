@@ -69,6 +69,14 @@ void Avion::setPhotogram(){
 		this->actualPhotogram++;
 }
 
+void Avion::aterrizar(int finishX){
+	if(this->posX - finishX > 0){
+		this->moveOneStepLeft();
+	}else if(this->posX - finishX < 0){
+		this->moveOneStepRight();
+	}
+}
+
 bool Avion::updatePhotogram(){
 	if(this->actualPhotogram == 1) {
 		this->isLooping = false;

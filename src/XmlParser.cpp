@@ -347,6 +347,28 @@ int XmlParser::getNumberOfPowerUp(){
 	return quantity;
 }
 
+int XmlParser::getPosXPortaAviones(){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
+	if(escenarioElem == NULL){
+		cout<<"Error al obtener el escenario para obtener posicion de porta aviones"<<endl;
+		return -1;
+	}
+	TiXmlElement* posX = escenarioElem->FirstChildElement("portaAvionesX");
+	return (atoi(posX->GetText()));
+}
+
+int XmlParser::getPosYPortaAviones(){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
+	if(escenarioElem == NULL){
+		cout<<"Error al obtener el escenario para obtener posicion de porta aviones"<<endl;
+		return -1;
+	}
+	TiXmlElement* posY = escenarioElem->FirstChildElement("portaAvionesY");
+	return (atoi(posY->GetText()));
+}
+
 XmlParser::~XmlParser() {
 	// TODO Auto-generated destructor stub
 }

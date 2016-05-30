@@ -80,7 +80,6 @@ void Procesador::processMovementMessage(clientMsj message) {
 	}
 	mensaje response = MessageBuilder().createPlaneMovementMessageForClient(client);
 	this->gameManager->broadcastMessage(response);
-	//CHEQUEAR ACA SI HAY COLISION CON UN POWERUP
 }
 
 void Procesador::processShootMessage(clientMsj message) {

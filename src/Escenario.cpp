@@ -19,6 +19,8 @@ Escenario::Escenario() {
 	this->scrollingStep = 0.1;
 	this->scrollingOffset = 0;
 	this->windowHeight = 0;
+	this->portaAvionesY = 0;
+	this->portaAvionesX = 0;
 }
 
 void Escenario::addElement(DrawableObject* element){
@@ -132,6 +134,26 @@ void Escenario::restart(){
 
 void Escenario::deleteElements(){
 	this->elements.clear();
+}
+
+bool Escenario::hayQueAterrizar(){
+	if(portaAvionesY < scrollingOffset + windowHeight ){
+		return true;
+	}
+	return false;
+}
+
+void Escenario::setPosPortaAviones(int posX, int posY){
+	this->portaAvionesX = posX;
+	this->portaAvionesY = posY;
+}
+
+int Escenario::getPortaAvionesX(){
+	return portaAvionesX;
+}
+
+int Escenario::getPortaAvionesY(){
+	return portaAvionesY;
 }
 
 void Escenario::deletePowerUps(){

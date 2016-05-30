@@ -29,10 +29,14 @@ public:
 
 	void addPowerUp(PowerUp* powerUp);
 	void deletePowerUp(int powerUpId);
+	void setPosPortaAviones(int posX, int posY);
+	int getPortaAvionesX();
+	int getPortaAvionesY();
 	PowerUp* getPowerUp(int numPowerUp);
 	int getNumberOfPowerUps();
 	void deletePowerUps();
 	virtual ~Escenario();
+	bool hayQueAterrizar();
 	void restart();
 	void deleteElements();
 private:
@@ -42,6 +46,8 @@ private:
 	int scrollingStep;
 	int scrollingOffset;
 	int windowHeight;
+	int portaAvionesY;
+	int portaAvionesX;
 };
 
 #endif /* ESCENARIO_H_ */
