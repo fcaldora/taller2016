@@ -60,6 +60,7 @@ public:
 	Avion* plane;
 	int clientID;
 	int earnedPoints;
+	bool isFirstTimeLogin;
 
 private:
 	string name;

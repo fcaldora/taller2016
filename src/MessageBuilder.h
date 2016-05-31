@@ -20,6 +20,7 @@ public:
 	virtual ~MessageBuilder();
 
 	clientMsj createSuccessfullyConnectedMessageForClient(Client *client);
+	clientMsj createSuccessfullyReconnectedMessageForClient(Client *client);
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
 	mensaje createInitialMessageForClient(Client *client);
@@ -34,7 +35,7 @@ public:
 	mensaje createReconnectionMessageForClient(Client* client);
 	mensaje createDisconnectionMessageForClient(Client* client);
 	mensaje createUpdatePhotogramMessageForPlane(Avion* plane);
-	menuResponseMessage createMenuMessage(Team *firstTeam, Team *secondTeam);
+	menuResponseMessage createMenuMessage(vector<Team *> *teams);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

@@ -2,8 +2,7 @@
 	<configuracion>
 		<nivelDeLog>2</nivelDeLog>
 	</configuracion>
-    <CantidadMaximaClientes>2</CantidadMaximaClientes>
-    <CantidadDeJugadoresPorEquipo>1</CantidadDeJugadoresPorEquipo>
+    <CantidadDeJugadoresPorEquipo>2</CantidadDeJugadoresPorEquipo>
     <Puerto>8080</Puerto>
 </Servidor>
 

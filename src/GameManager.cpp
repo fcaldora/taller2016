@@ -50,10 +50,11 @@ GameManager::GameManager() {
 	this->socketManager = NULL;
 	this->xmlLoader = NULL;
 	this->escenario = NULL;
+	vector<Team *> *teams = new vector<Team *>;
+	this->teams = teams;
 }
 
 void GameManager::reloadGameFromXml(){
-	cout << this->firstTeam->clients.size() << " " << this->secondTeam->clients.size() << endl;
 	drawableList.clear();
 	parser->reloadDoc();
 	escenario->deleteElements();
@@ -260,8 +261,8 @@ void disconnectClientForSocketConnection(unsigned int socketConnection, ClientLi
 	}
 }
 
-void sendClientMenuMessage (int socketConnection, Team *firstTeam, Team *secondTeam) {
-	menuResponseMessage message = MessageBuilder().createMenuMessage(firstTeam, secondTeam);
+void sendClientMenuMessage (int socketConnection, vector<Team *> *teams ) {
+	menuResponseMessage message = MessageBuilder().createMenuMessage(teams);
 	sendMenuMessage(socketConnection, sizeof(message), &message);
 }
 
@@ -271,10 +272,11 @@ void receiveClientMenuMessage (Client *client, Procesador *procesor) {
 	procesor->processMenuMessageForClient(message, client);
 }
 
-void *clientReader(Client *client, ClientList *clientList, Procesador *procesor, Escenario* escenario, XmlParser *parser, Team *firstTeam, Team *secondTeam) {
+void *clientReader(Client *client, ClientList *clientList, Procesador *procesor, Escenario* escenario, XmlParser *parser, vector<Team *> *teams) {
 	int res = 0;
 	bool clientHasDisconnected = false;
-	receiveClientMenuMessage(client, procesor);
+	if (client->isFirstTimeLogin)
+		receiveClientMenuMessage(client, procesor);
 
 	while (!appShouldTerminate && !clientHasDisconnected) {
 		clientMsj message;
@@ -292,7 +294,7 @@ void *clientReader(Client *client, ClientList *clientList, Procesador *procesor,
 	pthread_exit(NULL);
 }
 
-void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor, Escenario* escenario, Team *firstTeam, Team *secondTeam) {
+void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor, Escenario* escenario, vector<Team *> *teams) {
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
@@ -320,17 +322,18 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				string name(message.value);
 				Avion *clientPlane = parser->getAvion(numberOfCurrentAcceptedClients);
 				Client* client = new Client(name, socketConnection, 0, clientPlane);
+				client->isFirstTimeLogin = true;
 
 				clientList->addClient(client);
 
 				message = MessageBuilder().createSuccessfullyConnectedMessageForClient(client);
 
 				clientEntranceMessages[socketConnection] = std::thread(
-						clientReader, client, clientList, procesor, escenario, parser, firstTeam, secondTeam);
+						clientReader, client, clientList, procesor, escenario, parser, teams);
 				mensaje mensajeAvion = MessageBuilder().createInitialMessageForClient(client);
 				drawableList.push_back(mensajeAvion);
 				sendMsj(socketConnection, sizeof(message), &(message));
-				sendClientMenuMessage(socketConnection, firstTeam, secondTeam);
+				sendClientMenuMessage(socketConnection, teams);
 
 			}
 		} else {
@@ -347,10 +350,11 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				logWriter->writeResumeGameForUserName(message.value);
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
+				client->isFirstTimeLogin = false;
 
-				message = MessageBuilder().createSuccessfullyConnectedMessageForClient(client);
+				message = MessageBuilder().createSuccessfullyReconnectedMessageForClient(client);
 				escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
-				clientEntranceMessages[socketConnection] = std::thread(clientReader, client, clientList, procesor, escenario, parser, firstTeam, secondTeam);
+				clientEntranceMessages[socketConnection] = std::thread(clientReader, client, clientList, procesor, escenario, parser, teams);
 				userWasConnected = true;
 				sendMsj(socketConnection, sizeof(message), &(message));
 
@@ -442,7 +446,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,
-			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario, this->firstTeam, this->secondTeam);
+			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario, this->teams);
 
 	this->menuPresenter->presentMenu();
 
@@ -474,25 +478,24 @@ void GameManager::sendInitialGameInfo() {
 }
 
 void GameManager::addClientToTeamWithName(Client *client, string teamName) {
-	if (strcmp(this->firstTeam->teamName.c_str(), teamName.c_str()) == 0) {
-		this->firstTeam->clients.push_back(client);
+	for (unsigned int i = 0; i < this->teams->size(); i++) {
+		if (strcmp((*this->teams)[i]->teamName.c_str(), teamName.c_str()) == 0) {
+			(*this->teams)[i]->clients.push_back(client);
+		}
 	}
-	if (strcmp(this->secondTeam->teamName.c_str(), teamName.c_str()) == 0) {
-		this->secondTeam->clients.push_back(client);
-		this->sendInitialGameInfo();
-	}
+
+	this->sendInitialGameInfo();
 }
 
 void GameManager::createTeamWithNameForClient(string teamName, Client *client) {
 	int maxNumberOfPlayersPerTeam = this->parser->getMaxNumberOfPlayerPerTeam();
-	if (!this->firstTeam) {
-		this->firstTeam = new Team(1, teamName,maxNumberOfPlayersPerTeam );
-		this->firstTeam->clients.push_back(client);
-	} else {
-		this->secondTeam = new Team(2, teamName,maxNumberOfPlayersPerTeam );
-		this->secondTeam->clients.push_back(client);
-		this->sendInitialGameInfo();
-	}
+	Team *newTeam = new Team(this->teams->size(), teamName, maxNumberOfPlayersPerTeam);
+	newTeam->clients.push_back(client);
+	this->teams->push_back(newTeam);
+
+	cout << this->teams->size() << endl;
+
+	this->sendInitialGameInfo();
 }
 
 Object* GameManager::createBulletForClient(Client* client){
@@ -534,8 +537,10 @@ GameManager::~GameManager() {
 	delete this->xmlLoader;
 	delete this->socketManager;
 	delete this->escenario;
-	delete this->firstTeam;
-	delete this->secondTeam;
+	for(unsigned int i = 0; i < this->teams->size(); i++) {
+	    delete (*this->teams)[i];
+	}
+	delete this->teams;
 	delete logWriter;
 }
 

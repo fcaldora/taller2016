@@ -5,6 +5,7 @@
  *      Author: luciano
  */
 #include <list>
+#include <vector>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -25,7 +26,6 @@ using namespace std;
 #define kServerTag "Servidor"
 #define kConfigurationTag "configuracion"
 #define kLogLevelTag "nivelDeLog"
-#define kMaxNumberOfClientsTag "CantidadMaximaClientes"
 #define kPortTag "Puerto"
 #define tagVentana "ventana"
 #define tagAlto "alto"
@@ -81,6 +81,7 @@ struct clientMsj {
 	char type[kLongChar];
 	char value[kLongChar];
 	int clientID; //Token
+	bool isFirstTimeLogin;
 };
 
 struct mensaje {

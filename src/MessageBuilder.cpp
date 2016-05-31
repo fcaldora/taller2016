@@ -17,6 +17,15 @@ clientMsj MessageBuilder::createSuccessfullyConnectedMessageForClient(Client *cl
 	strncpy(message.type, "connection_ok", kLongChar);
 	strncpy(message.value, "Client connected", kLongChar);
 	message.clientID = client->clientID;
+	message.isFirstTimeLogin = true;
+
+	return message;
+}
+
+clientMsj MessageBuilder::createSuccessfullyReconnectedMessageForClient(Client *client) {
+	clientMsj message = this->createSuccessfullyConnectedMessageForClient(client);
+	message.isFirstTimeLogin = false;
+
 	return message;
 }
 
@@ -189,36 +198,28 @@ mensaje MessageBuilder::createUpdatePhotogramMessageForPlane(Avion* plane) {
 	return photogramMsg;
 }
 
-menuResponseMessage MessageBuilder::createMenuMessage(Team *firstTeam, Team *secondTeam) {
+menuResponseMessage MessageBuilder::createMenuMessage(vector<Team *> *teams) {
 	menuResponseMessage message;
 
 	message.id = 0;
+	message.firstTeamIsAvailableToJoin = false;
+	message.secondTeamIsAvailableToJoin = false;
+	strncpy(message.firstTeamName , "", kLongChar);
+	strncpy(message.secondTeamName , "", kLongChar);
+	message.userCanCreateATeam = true;
 
-	if (firstTeam == NULL) {
-		message.secondTeamIsAvailableToJoin = false;
-		message.userCanCreateATeam = true;
-		strncpy(message.secondTeamName , "", kLongChar);
-		if (secondTeam == NULL) {
-			message.firstTeamIsAvailableToJoin = false;
-			strncpy(message.firstTeamName , "", kLongChar);
-		} else {
-			strncpy(message.firstTeamName , secondTeam->teamName.c_str(), kLongChar);
-			message.firstTeamIsAvailableToJoin = !secondTeam->isFull();
-		}
-	} else {
-		strncpy(message.firstTeamName , firstTeam->teamName.c_str(), kLongChar);
-		message.firstTeamIsAvailableToJoin = !firstTeam->isFull();
-		if (secondTeam == NULL) {
-			message.secondTeamIsAvailableToJoin = false;
-			strncpy(message.secondTeamName , "", kLongChar);
-			message.userCanCreateATeam = true;
-		} else {
-			strncpy(message.secondTeamName , secondTeam->teamName.c_str(), kLongChar);
-			message.secondTeamIsAvailableToJoin = !secondTeam->isFull();
-			message.userCanCreateATeam = false;
-		}
+	if (teams->size() >= 1) {
+		message.firstTeamIsAvailableToJoin = !(*teams)[0]->isFull();
+		strncpy(message.firstTeamName , (*teams)[0]->teamName.c_str(), kLongChar);
+	}
+	if (teams->size() == 2) {
+		message.userCanCreateATeam = false;
+		message.secondTeamIsAvailableToJoin = !(*teams)[1]->isFull();
+		strncpy(message.secondTeamName , (*teams)[1]->teamName.c_str(), kLongChar);
 	}
 
+	cout << message.firstTeamName << " " << message.firstTeamIsAvailableToJoin << endl;
+	cout << message.secondTeamName << " " << message.secondTeamIsAvailableToJoin << " " << message.userCanCreateATeam << endl;
 	return message;
 }
 

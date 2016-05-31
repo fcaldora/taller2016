@@ -4,3 +4,10 @@ Conexion de cliente recibida
 Esperando conexion de cliente
 Conexion de cliente recibida
 Esperando conexion de cliente
+Conexion de cliente recibida
+Esperando conexion de cliente
+Conexion de cliente recibida
+Esperando conexion de cliente
+Conexion de cliente recibida
+Nombre ya utilizado, reanudando partida de: 3
+Esperando conexion de cliente

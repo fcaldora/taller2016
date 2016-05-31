@@ -43,8 +43,7 @@ private:
 	ClientList *clientList;
 	Procesador *procesor;
 	Escenario* escenario;
-	Team *firstTeam;
-	Team *secondTeam;
+	vector<Team *> *teams;
 
 	void sendInitialGameInfo();
 	void detachClientMessagesThreads();
