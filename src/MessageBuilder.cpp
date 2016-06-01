@@ -218,8 +218,6 @@ menuResponseMessage MessageBuilder::createMenuMessage(vector<Team *> *teams) {
 		strncpy(message.secondTeamName , (*teams)[1]->teamName.c_str(), kLongChar);
 	}
 
-	cout << message.firstTeamName << " " << message.firstTeamIsAvailableToJoin << endl;
-	cout << message.secondTeamName << " " << message.secondTeamIsAvailableToJoin << " " << message.userCanCreateATeam << endl;
 	return message;
 }
 

@@ -493,8 +493,6 @@ void GameManager::createTeamWithNameForClient(string teamName, Client *client) {
 	newTeam->clients.push_back(client);
 	this->teams->push_back(newTeam);
 
-	cout << this->teams->size() << endl;
-
 	this->sendInitialGameInfo();
 }
 
