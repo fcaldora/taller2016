@@ -333,7 +333,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 						clientReader, client, clientList, procesor, escenario, parser, teams);
 				mensaje mensajeAvion = MessageBuilder().createInitialMessageForClient(client);
 				drawableList.push_back(mensajeAvion);
-				vector<LifeObject *> lifeObjects = parser->getLifeObjects();
+				vector<DrawableObject *> lifeObjects = parser->getLifeObjects();
 
 				vector<mensaje> messages = MessageBuilder().createLifeObjectMessagesForLifeObjects(lifeObjects);
 
@@ -341,7 +341,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 					drawableList.push_back(message);
 				}
 
-				for (LifeObject *lifeObject : lifeObjects) {
+				for (DrawableObject *lifeObject : lifeObjects) {
 					delete lifeObject;
 				}
 
@@ -396,6 +396,10 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		}
 	}
 	pthread_exit(NULL);
+}
+
+int GameManager::firstBulletId() {
+	return this->parser->getMaxNumberOfClients() + this->escenario->getNumberElements() + this->parser->getNumberOfLifesPerClient() + 3;
 }
 
 int GameManager::initGameWithArguments(int argc, char* argv[]) {
@@ -455,7 +459,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		drawableList.push_back(elementMsg);
 	}
 	escenario.transformPositions();
-	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements());
+	objects.setIdOfFirstBullet(this->firstBulletId());
 
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,

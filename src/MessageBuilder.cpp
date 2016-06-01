@@ -221,24 +221,26 @@ menuResponseMessage MessageBuilder::createMenuMessage(vector<Team *> *teams) {
 	return message;
 }
 
-vector<mensaje> MessageBuilder::createLifeObjectMessagesForLifeObjects(vector<LifeObject *> lifeObjects) {
+vector<mensaje> MessageBuilder::createLifeObjectMessagesForLifeObjects(vector<DrawableObject *> lifeObjects) {
 	vector <mensaje> messages;
 
-	for (int i = 0 ; i < lifeObjects.size() ; i++) {
+	int i = 0;
+	for (DrawableObject *lifeObject : lifeObjects) {
 		mensaje message;
 
 		strcpy(message.action, "create");
-		strcpy(message.imagePath, lifeObjects[i]->getPath().c_str());
-		message.id = lifeObjects[i]->getId();
-		message.photograms = lifeObjects[i]->getPhotograms();
-		message.actualPhotogram = lifeObjects[i]->getActualPhotogram();
-		message.height = lifeObjects[i]->getHeigth();
-		message.width = lifeObjects[i]->getWidth();
-		message.posX = (lifeObjects[i]->getPosX() * i + 15 * (i + 1));
-		message.posY = lifeObjects[i]->getPosY();
+		strcpy(message.imagePath, lifeObject->getPath().c_str());
+		message.id = lifeObject->getId();
+		message.photograms = lifeObject->getPhotograms();
+		message.actualPhotogram = lifeObject->getActualPhotogram();
+		message.height = lifeObject->getHeigth();
+		message.width = lifeObject->getWidth();
+		message.posX = (lifeObject->getPosX() * i + 15 * (i + 1));
+		message.posY = lifeObject->getPosY();
 		message.activeState = true;
 
 		messages.push_back(message);
+		i++;
 	}
 
 	return messages;

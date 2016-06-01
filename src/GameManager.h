@@ -47,6 +47,7 @@ private:
 
 	void sendInitialGameInfo();
 	void detachClientMessagesThreads();
+	int firstBulletId();
 };
 
 #endif /* GAMEMANAGER_H_ */

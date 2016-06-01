@@ -315,8 +315,8 @@ int XmlParser::getNumberOfLifesPerClient() {
 	return atoi(numberOfLifesPerClient->GetText());
 }
 
-vector<LifeObject*> XmlParser::getLifeObjects() {
-	vector<LifeObject *> lifeObjects;
+vector<DrawableObject*> XmlParser::getLifeObjects() {
+	vector<DrawableObject *> lifeObjects;
 
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement *lifes = docHandle.FirstChild(kLifesTag).ToElement();
@@ -327,9 +327,9 @@ vector<LifeObject*> XmlParser::getLifeObjects() {
 	}
 
 	for (int i = 0 ; i < this->getNumberOfLifesPerClient() ; i++) {
-		LifeObject *lifeObject = new LifeObject();
+		DrawableObject *lifeObject = new DrawableObject();
 		TiXmlElement *id = life->FirstChildElement(tagId);
-		lifeObject->setId(atoi(id->GetText()));
+		lifeObject->setId(atoi(id->GetText()) + i);
 		TiXmlElement *path = life->FirstChildElement(tagPath);
 		lifeObject->setPath(string(path->GetText()));
 		TiXmlElement *width = life->FirstChildElement(tagAncho);
@@ -337,9 +337,11 @@ vector<LifeObject*> XmlParser::getLifeObjects() {
 		TiXmlElement *height = life->FirstChildElement(tagAlto);
 		lifeObject->setHeigth(atoi(height->GetText()));
 		TiXmlElement *xPosition = life->FirstChildElement(tagPosX);
-		lifeObject->setPosX(atoi(xPosition->GetText()));
+		lifeObject->setPosX(atoi(xPosition->GetText()) * (i + 1) + i * lifeObject->getWidth());
+
 		TiXmlElement *yPosition = life->FirstChildElement(tagPosY);
-		lifeObject->setPosY(atoi(yPosition->GetText()));
+		int windowHeight = this->getAltoVentana();
+		lifeObject->setPosY(windowHeight - lifeObject->getHeigth() - atoi(yPosition->GetText()));
 
 		lifeObjects.push_back(lifeObject);
 	}
@@ -354,5 +356,4 @@ void XmlParser::reloadDoc(){
 }
 
 XmlParser::~XmlParser() {
-	// TODO Auto-generated destructor stub
 }

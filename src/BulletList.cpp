@@ -43,6 +43,7 @@ int BulletList::getFirstId(){
 }
 
 void BulletList::setIdOfFirstBullet(int id){
+	cout << id <<endl;
 	this->firstBulletId = id;
 	this->lastBulletId = id;
 }
