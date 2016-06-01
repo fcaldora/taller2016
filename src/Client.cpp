@@ -18,6 +18,9 @@ Client::Client(string name, int socketM, int socketKA, Avion* plane) {
 }
 
 Client::~Client() {
+	for (DrawableObject *life : this->lifes) {
+		delete life;
+	}
 }
 
 

@@ -13,6 +13,8 @@
 #include <strings.h>
 #include <stdio.h>
 #include "Avion.h"
+#include "DrawableObject.h"
+#include "Constants.h"
 
 using namespace std;
 
@@ -61,7 +63,7 @@ public:
 	int clientID;
 	int earnedPoints;
 	bool isFirstTimeLogin;
-	int currentNumberOfLifes;
+	vector<DrawableObject *> lifes;
 
 private:
 	string name;

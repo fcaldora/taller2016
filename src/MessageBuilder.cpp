@@ -235,7 +235,7 @@ vector<mensaje> MessageBuilder::createLifeObjectMessagesForLifeObjects(vector<Dr
 		message.actualPhotogram = lifeObject->getActualPhotogram();
 		message.height = lifeObject->getHeigth();
 		message.width = lifeObject->getWidth();
-		message.posX = (lifeObject->getPosX() * i + 15 * (i + 1));
+		message.posX = (lifeObject->getPosX());
 		message.posY = lifeObject->getPosY();
 		message.activeState = true;
 

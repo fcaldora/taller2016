@@ -54,51 +54,6 @@ GameManager::GameManager() {
 	this->teams = teams;
 }
 
-void GameManager::reloadGameFromXml(){
-	drawableList.clear();
-	parser->reloadDoc();
-	escenario->deleteElements();
-	mensaje ventanaMsj, escenarioMsj;
-	memset(&ventanaMsj, 0, sizeof(mensaje));
-	memset(&escenarioMsj, 0, sizeof(mensaje));
-	parser->getFondoEscenario(*escenario);
-	ventanaMsj.height = parser->getAltoVentana();
-	ventanaMsj.width = parser->getAnchoVentana();
-	escenario->setScrollingStep(1);
-	escenario->setWindowHeight(ventanaMsj.height);
-	escenario->setHeigth(parser->getAltoEscenario());
-	this->procesor->setScreenHeight(parser->getAltoVentana());
-	this->procesor->setScreenWidth(parser->getAnchoVentana());
-	escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
-	strcpy(ventanaMsj.action,"windowSize");
-	this->broadcastMessage(ventanaMsj);
-	this->broadcastMessage(escenarioMsj);
-	drawableList.push_back(escenarioMsj);
-	for(int i = 0; i < parser->getNumberOfElements(); i++){
-		DrawableObject* object = new DrawableObject();
-		mensaje elementMsg;
-		memset(&elementMsg, 0, sizeof(mensaje));
-		parser->getElement(*object, i);
-		escenario->addElement(object);
-		elementMsg = MessageBuilder().createBackgroundElementUpdateMessageForElement(object);
-		strncpy(elementMsg.action, "create", 20);
-		drawableList.push_back(elementMsg);
-		this->broadcastMessage(elementMsg);
-	}
-	escenario->transformPositions();
-	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements());
-	mensaje avionMsj;
-	int i = 1;
-	list<Client*>::iterator it = clientList->clients.begin();
-	for (; it != clientList->clients.end(); it++){
-		(*it)->plane = parser->getAvion(i);
-		avionMsj = MessageBuilder().createInitialMessageForClient((*it));
-		this->broadcastMessage(avionMsj);
-		i++;
-	}
-}
-
-
 int sendMsj(int socket, int bytesAEnviar, clientMsj* mensaje) {
 	int enviados = 0;
 	int res = 0;
@@ -323,7 +278,6 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				Avion *clientPlane = parser->getAvion(numberOfCurrentAcceptedClients);
 				Client* client = new Client(name, socketConnection, 0, clientPlane);
 				client->isFirstTimeLogin = true;
-				client->currentNumberOfLifes = parser->getNumberOfLifesPerClient();
 
 				clientList->addClient(client);
 
@@ -333,16 +287,13 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 						clientReader, client, clientList, procesor, escenario, parser, teams);
 				mensaje mensajeAvion = MessageBuilder().createInitialMessageForClient(client);
 				drawableList.push_back(mensajeAvion);
-				vector<DrawableObject *> lifeObjects = parser->getLifeObjects();
 
-				vector<mensaje> messages = MessageBuilder().createLifeObjectMessagesForLifeObjects(lifeObjects);
+				client->lifes = parser->getLifeObjects();
+
+				vector<mensaje> messages = MessageBuilder().createLifeObjectMessagesForLifeObjects(client->lifes);
 
 				for (mensaje message : messages) {
 					drawableList.push_back(message);
-				}
-
-				for (DrawableObject *lifeObject : lifeObjects) {
-					delete lifeObject;
 				}
 
 				sendMsj(socketConnection, sizeof(message), &(message));
@@ -470,6 +421,57 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	clientConnectionWaiter.detach();
 	broadcastThread.detach();
 	return EXIT_SUCCESS;
+}
+
+void GameManager::reloadGameFromXml(){
+	drawableList.clear();
+	parser->reloadDoc();
+	escenario->deleteElements();
+	mensaje ventanaMsj, escenarioMsj;
+	memset(&ventanaMsj, 0, sizeof(mensaje));
+	memset(&escenarioMsj, 0, sizeof(mensaje));
+	parser->getFondoEscenario(*escenario);
+	ventanaMsj.height = parser->getAltoVentana();
+	ventanaMsj.width = parser->getAnchoVentana();
+	escenario->setScrollingStep(1);
+	escenario->setWindowHeight(ventanaMsj.height);
+	escenario->setHeigth(parser->getAltoEscenario());
+	this->procesor->setScreenHeight(parser->getAltoVentana());
+	this->procesor->setScreenWidth(parser->getAnchoVentana());
+	escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
+	strcpy(ventanaMsj.action,"windowSize");
+	this->broadcastMessage(ventanaMsj);
+	this->broadcastMessage(escenarioMsj);
+	drawableList.push_back(escenarioMsj);
+	for(int i = 0; i < parser->getNumberOfElements(); i++){
+		DrawableObject* object = new DrawableObject();
+		mensaje elementMsg;
+		memset(&elementMsg, 0, sizeof(mensaje));
+		parser->getElement(*object, i);
+		escenario->addElement(object);
+		elementMsg = MessageBuilder().createBackgroundElementUpdateMessageForElement(object);
+		strncpy(elementMsg.action, "create", 20);
+		drawableList.push_back(elementMsg);
+		this->broadcastMessage(elementMsg);
+	}
+	escenario->transformPositions();
+	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements());
+	mensaje avionMsj;
+	int i = 1;
+	list<Client*>::iterator it = clientList->clients.begin();
+	for (; it != clientList->clients.end(); it++){
+		(*it)->plane = parser->getAvion(i);
+		avionMsj = MessageBuilder().createInitialMessageForClient((*it));
+		this->broadcastMessage(avionMsj);
+		i++;
+	}
+
+	for (Client *client : this->clientList->clients) {
+		vector<mensaje> messages = MessageBuilder().createLifeObjectMessagesForLifeObjects(client->lifes);
+		for (mensaje message : messages) {
+			sendMsjInfo(client->getSocketMessages(), sizeof(message), &message);
+		}
+	}
 }
 
 void GameManager::userDidChooseExitoption() {
