@@ -53,6 +53,17 @@ mensaje MessageBuilder::createInitialMessageForClient(Client *client) {
 	return message;
 }
 
+mensaje MessageBuilder::createInitialScoreMessage(Score* playerScore, int posX, int posY){
+	mensaje message;
+
+	strcpy(message.action, "createScore");
+	message.id = playerScore->getId();
+	message.posX = posX;
+	message.posY = posY;
+
+	return message;
+}
+
 mensaje MessageBuilder::createPlaneMovementMessageForClient(Client *client) {
 	mensaje message;
 	message.id = client->plane->getId();
@@ -179,6 +190,21 @@ mensaje MessageBuilder::createExplosionMessage(Explosion* explosion){
 	message.posY = explosion->getPosY();
 	message.activeState = true;
 	message.actualPhotogram = explosion->getActualPhotogram();
+
+	return message;
+}
+
+mensaje MessageBuilder::createEnemyPlaneCreationMessage(EnemyPlane* enemyPlane){
+	mensaje message;
+	message.id = enemyPlane->getId();
+	strcpy(message.action,"create");
+	strcpy(message.imagePath, enemyPlane->getPath().c_str());
+	message.height = enemyPlane->getHeigth();
+	message.width = enemyPlane->getWidth();
+	message.posX = enemyPlane->getPosX();
+	message.posY = enemyPlane->getPosY();
+	message.activeState = true;
+	message.actualPhotogram = enemyPlane->getActualPhotogram();
 
 	return message;
 }

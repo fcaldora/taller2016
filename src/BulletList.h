@@ -30,7 +30,7 @@ public:
 	list<Object>::iterator begin();
 	list<Object>::iterator end();
 	virtual ~BulletList();
-
+	void setLastId(int id);
 private:
 	list<Object> objectList;
 	std::mutex mutex;

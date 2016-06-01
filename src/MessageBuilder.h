@@ -13,6 +13,8 @@
 #include "Object.h"
 #include "Escenario.h"
 #include "Explosion.h"
+#include "EnemyPlane.h"
+#include "Score.h"
 
 class MessageBuilder {
 public:
@@ -23,6 +25,7 @@ public:
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
 	mensaje createInitialMessageForClient(Client *client);
+	mensaje createInitialScoreMessage(Score* score, int posx, int posy);
 	mensaje createPlaneMovementMessageForClient(Client *client);
 	mensaje createInitBackgroundMessage(Escenario *escenario);
 	mensaje createBulletMessage(Object*);
@@ -35,6 +38,7 @@ public:
 	mensaje createDisconnectionMessageForClient(Client* client);
 	mensaje createUpdatePhotogramMessageForPlane(Avion* plane);
 	mensaje createExplosionMessage(Explosion* explosion);
+	mensaje createEnemyPlaneCreationMessage(EnemyPlane* enemyPlane);
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);
 };

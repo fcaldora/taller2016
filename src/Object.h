@@ -102,6 +102,14 @@ public:
 		this->step = step;
 	}
 
+	int getClientId() const {
+		return clientId;
+	}
+
+	void setClientId(int clientId) {
+		this->clientId = clientId;
+	}
+
 private:
 	int id;
 	string imagePath;
@@ -113,6 +121,7 @@ private:
 	int heigth;
 	int step;
 	bool status;
+	int clientId;
 
 
 };

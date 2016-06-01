@@ -86,7 +86,7 @@ void EnemyPlane::move(){
 }
 
 bool EnemyPlane::notVisible(int width, int height){
-	return(this->posX > (width + 50) || this->posY > (height+50) || this->posX < -200 || this->posY < -200);
+	return(this->posX > (width + 50) || this->posY > (height+50));
 }
 
 int EnemyPlane::collideWithClient(ClientList* clientList){
@@ -120,9 +120,6 @@ int EnemyPlane::collideWithClient(ClientList* clientList){
 		}
 	}
 	return -1;
-
-
-
-
 }
+
 

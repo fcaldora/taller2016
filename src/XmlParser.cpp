@@ -347,6 +347,108 @@ int XmlParser::getNumberOfPowerUp(){
 	return quantity;
 }
 
+void XmlParser::getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Formation*> formations){
+	list<Formation*>::iterator it;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* enemyPlanesElement = docHandle.FirstChild(tagEnemyPlanes).ToElement();
+	TiXmlElement* enemyPlaneElement = enemyPlanesElement->FirstChildElement(tagEnemyPlane);
+	for (int i = 0; i < enemyPlaneNum ; i++){
+		enemyPlaneElement = enemyPlaneElement->NextSiblingElement(tagEnemyPlane);
+	}
+	if ( enemyPlaneElement == NULL){
+		cout<<"Error al cargar el avion enemigo desde archivo"<<endl;
+		return;
+	}
+	TiXmlElement* typeElement = enemyPlaneElement->FirstChildElement(tagLifes);
+	int lifes = atoi(typeElement->GetText());
+	if(lifes <= 0){
+		lifes = 1;
+	}
+	enemyPlane->setLifes(lifes);
+	TiXmlElement* idElement = enemyPlaneElement->FirstChildElement(tagId);
+	enemyPlane->setId(atoi(idElement->GetText()));
+	TiXmlElement* altoElement = enemyPlaneElement->FirstChildElement(tagAlto);
+	enemyPlane->setHeigth(atoi(altoElement->GetText()));
+	TiXmlElement* anchoElement = enemyPlaneElement->FirstChildElement(tagAncho);
+	enemyPlane->setWidth(atoi(anchoElement->GetText()));
+	TiXmlElement* xElement = enemyPlaneElement->FirstChildElement(tagPosX);
+	enemyPlane->setPosX(atoi(xElement->GetText()));
+	TiXmlElement* yElement = enemyPlaneElement->FirstChildElement(tagPosY);
+	enemyPlane->setPosY(atoi(yElement->GetText()));
+	TiXmlElement* actualPhotogramElement = enemyPlaneElement->FirstChildElement(tagActualPhotogram);
+	enemyPlane->setActualPhotogram(atoi(actualPhotogramElement->GetText()));
+	TiXmlElement* photogramsElement = enemyPlaneElement->FirstChildElement(tagPhotograms);
+	enemyPlane->setPhotograms(atoi(photogramsElement->GetText()));
+	TiXmlElement* pathElement = enemyPlaneElement->FirstChildElement(tagPath);
+	enemyPlane->setPath(pathElement->GetText());
+	TiXmlElement* crazyMoves = enemyPlaneElement->FirstChildElement(tagCrazy);
+	enemyPlane->setCrazyMoves(atoi(crazyMoves->GetText()) == 1);
+	TiXmlElement* facingDirection = enemyPlaneElement->FirstChildElement(tagFacingDirection);
+	enemyPlane->setFacingDirection(facingDirection->GetText());
+	TiXmlElement* score = enemyPlaneElement->FirstChildElement(tagScore);
+	enemyPlane->setScore(atoi(score->GetText()));
+	TiXmlElement* formationIdElement = enemyPlaneElement->FirstChildElement(tagFormationId);
+	Formation* finalFormation;
+	if(atoi(formationIdElement->GetText()) != -1){
+		if(atoi(typeElement->GetText()) == 1){
+			for(it = formations.begin(); it != formations.end(); it++){
+				if((*it)->getId() == atoi(formationIdElement->GetText())){
+					enemyPlane->setFormation((*it));
+				}
+			}
+		}
+	}else{
+		finalFormation = NULL;
+	}
+	enemyPlane->setFormation(finalFormation);
+	//Factor para que el avion no se desplace tan rapido
+	enemyPlane->setSpeedFactor(0);
+}
+
+
+int XmlParser::getNumberOfEnemyPlanes(){
+	int quantity = 0;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* enemyPlanesElement = docHandle.FirstChild(tagEnemyPlanes).ToElement();
+	TiXmlElement* enemyPlaneElement = enemyPlanesElement->FirstChildElement(tagEnemyPlane);
+	while(enemyPlaneElement != NULL){
+		quantity++;
+		enemyPlaneElement = enemyPlaneElement->NextSiblingElement(tagEnemyPlane);
+	}
+	return quantity;
+}
+
+void XmlParser::getFormation(Formation* formation, int formationNum){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* formationsElement = docHandle.FirstChild(tagFormations).ToElement();
+	TiXmlElement* formationElement = formationsElement->FirstChildElement(tagFormation);
+	for (int i = 0; i < formationNum ; i++){
+		formationElement = formationElement->NextSiblingElement(tagFormation);
+	}
+	if ( formationElement == NULL){
+		cout<<"Error al cargar la formacion desde archivo"<<endl;
+		return;
+	}
+	TiXmlElement* extraPointsElement = formationElement->FirstChildElement(tagExtraPoints);
+	formation->setExtraPoints(atoi(extraPointsElement->GetText()));
+	TiXmlElement* quantityElement = formationElement->FirstChildElement(tagQuantity);
+	formation->setQuantity(atoi(quantityElement->GetText()));
+	TiXmlElement* idElement = formationElement->FirstChildElement(tagId);
+	formation->setId(atoi(idElement->GetText()));
+}
+
+int XmlParser::getNumberOfFormations(){
+	int quantity = 0;
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* formationsElement = docHandle.FirstChild(tagFormations).ToElement();
+	TiXmlElement* formationElement = formationsElement->FirstChildElement(tagFormation);
+	while(formationElement != NULL){
+		quantity++;
+		formationElement = formationElement->NextSiblingElement(tagFormation);
+	}
+	return quantity;
+}
+
 XmlParser::~XmlParser() {
 	// TODO Auto-generated destructor stub
 }

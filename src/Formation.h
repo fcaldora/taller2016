@@ -13,11 +13,11 @@ public:
 	Formation();
 	virtual ~Formation();
 
-	bool isExtraPoints() const {
+	int getExtraPoints() {
 		return extraPoints;
 	}
 
-	void setExtraPoints(bool extraPoints) {
+	void setExtraPoints(int extraPoints) {
 		this->extraPoints = extraPoints;
 	}
 
@@ -49,7 +49,7 @@ private:
 	int id;
 	int quantity;
 	int hitId;
-	bool extraPoints;
+	int extraPoints;
 };
 
 #endif /* FORMATION_H_ */

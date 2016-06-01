@@ -32,6 +32,9 @@
 #include <unistd.h>
 #include "EnemyPlane.h"
 #include "Explosion.h"
+#include "Formation.h"
+#include "Score.h"
+#include "ScoreManager.h"
 
 #define kServerTestFile "serverTest.txt"
 
@@ -43,6 +46,9 @@ map<unsigned int, thread> keepAliveThreads;
 BulletList objects;
 list<EnemyPlane*> enemyPlanes;
 list<Explosion*> explosions;
+list<Formation*> formations;
+list<Score*> scores;
+ScoreManager* scoreManager;
 bool appShouldTerminate, gameInitiated, userWasConnected;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
@@ -64,6 +70,9 @@ void GameManager::reloadGameFromXml(){
 	drawableList.clear();
 	parser->reloadDoc();
 	escenario->deleteElements();
+	enemyPlanes.clear();
+	formations.clear();
+	explosions.clear();
 	mensaje ventanaMsj, escenarioMsj;
 	memset(&ventanaMsj, 0, sizeof(mensaje));
 	memset(&escenarioMsj, 0, sizeof(mensaje));
@@ -91,8 +100,21 @@ void GameManager::reloadGameFromXml(){
 		drawableList.push_back(elementMsg);
 		this->broadcastMessage(elementMsg);
 	}
+	for(int i = 0; i < parser->getNumberOfFormations(); i++){
+		Formation* formation = new Formation();
+		parser->getFormation(formation, i);
+		formations.push_back(formation);
+	}
+	for(int i = 0; i < parser->getNumberOfEnemyPlanes(); i++){
+		EnemyPlane* enemyPlane = new EnemyPlane();
+		parser->getEnemyPlane(enemyPlane, i, formations);
+		enemyPlanes.push_back(enemyPlane);
+		mensaje enemyPlanesMsj = MessageBuilder().createEnemyPlaneCreationMessage(enemyPlane);
+		drawableList.push_back(enemyPlanesMsj);
+		this->broadcastMessage(enemyPlanesMsj);
+	}
 	escenario->transformPositions();
-	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements());
+	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements() + parser->getNumberOfEnemyPlanes() + parser->getNumberOfPowerUp());
 	mensaje avionMsj;
 	int i = 1;
 	list<Client*>::iterator it = clientList->clients.begin();
@@ -177,14 +199,19 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 	std::list<Object>::iterator objectIt;
 	std::list<EnemyPlane*>::iterator enemyPlanesIt;
 	std::list<Explosion*>::iterator explosionsIt;
+	std::list<Score*>::iterator scoreIt;
 	int contador = 0;
 	int hit = -1;
+	int bulletId = -1;
 	while(!appShouldTerminate){
 		usleep(1000);
 		objects.moveBullets();
 		for(int i = 0; i < objects.bulletQuantity(); i++){
 			mensaje msg;
 			hit = objects.bulletMessage(i, msg, processor->getScreenWidth(), processor->getScreenHeight(), enemyPlanes);
+			if(hit != -1){
+				bulletId = objects.getObject(i).getClientId();
+			}
 			if(strcmp(msg.action, "Bullet deleted") != 0)
 				broadcast(msg, clientList);
 		}
@@ -233,7 +260,19 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				if((*enemyPlanesIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())
 						|| hit == (*enemyPlanesIt)->getId() || clientId != -1){
 					//Aviso a los clientes que borren al avion enemigo y creo explosion
-					Explosion* explosion = new Explosion((*enemyPlanesIt)->getPosX(), (*enemyPlanesIt)->getPosY(), false, 15000 + explosions.size());
+					Explosion* explosion = new Explosion((*enemyPlanesIt)->getPosX(), (*enemyPlanesIt)->getPosY(), false,  objects.getLastId() + 1);
+					objects.setLastId(objects.getLastId() + 1);
+					if(bulletId != -1){
+						if(hit == -2){
+							//scoreManager->increaseScoreForHit(bulletId, (*enemyPlanesIt));
+						}else{
+							if((*enemyPlanesIt)->getFormation() != NULL){
+								//scoreManager->increaseScoreForFormationDestroy(bulletId, (*enemyPlanesIt));
+							}else{
+								scoreManager->increaseDestroyScore(bulletId, (*enemyPlanesIt));
+							}
+						}
+					}
 					msj = MessageBuilder().createExplosionMessage(explosion);
 					broadcast(msj, clientList);
 					enemiesMutex.lock();
@@ -252,6 +291,14 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				}
 
 				broadcast(msj, clientList);
+				for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
+					strcpy(msj.action, "score");
+					msj.id = (*scoreIt)->getId();
+					msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
+					msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
+					msj.photograms = (*scoreIt)->getScore();
+					broadcast(msj, clientList);
+				}
 			}
 			if(contador == 29){
 				for(explosionsIt = explosions.begin(); explosionsIt != explosions.end(); explosionsIt++){
@@ -369,6 +416,13 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 						clientReader, socketConnection, clientList, procesor, escenario);
 				mensaje mensajeAvion = MessageBuilder().createInitialMessageForClient(client);
 				drawableList.push_back(mensajeAvion);
+				//Creo puntaje para el cliente
+				Score* playerScore = new Score();
+				playerScore->setId(client->getPlane()->getId());
+				playerScore->setScore(0);
+				scores.push_back(playerScore);
+				//mensaje mensajeScore = MessageBuilder().createInitialScoreMessage(playerScore, playerScore->getScoreXPosition(procesor->getScreenWidth()), playerScore->getScoreYPosition(procesor->getScreenHeight()));
+				//drawableList.push_back(mensajeScore);
 			}
 		} else {
 			Client* client = clientList->getClientForName(message.value);
@@ -395,6 +449,8 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 		if(numberOfCurrentAcceptedClients == maxNumberOfClients && !gameInitiated){
 			sendGameInfo(clientList);
 			gameInitiated = true;
+			scoreManager = new ScoreManager();
+			scoreManager->setScores(scores);
 		}
 		if(userWasConnected){
 			mensaje mensajeObjeto;
@@ -591,17 +647,28 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		mensaje powerUpMsj = MessageBuilder().createBackgroundElementCreationMessageForElement(&powerUp);
 		drawableList.push_back(powerUpMsj);
 	}
+	for(int i = 0; i < parser->getNumberOfFormations(); i++){
+		Formation* formation = new Formation();
+		parser->getFormation(formation, i);
+		formations.push_back(formation);
+	}
+	for(int i = 0; i < parser->getNumberOfEnemyPlanes(); i++){
+		EnemyPlane* enemyPlane = new EnemyPlane();
+		parser->getEnemyPlane(enemyPlane, i, formations);
+		enemyPlanes.push_back(enemyPlane);
+		mensaje enemyPlanesMsj = MessageBuilder().createEnemyPlaneCreationMessage(enemyPlane);
+		drawableList.push_back(enemyPlanesMsj);
+	}
 	escenario.transformPositions();
-	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements() + parser->getNumberOfPowerUp());
+	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements() + parser->getNumberOfPowerUp() + parser->getNumberOfEnemyPlanes() + 1);
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario);
-	std::thread enemyPlanesThread(createEnemyPlanes,maxNumberOfClients,this->procesor, this->clientList);
 	this->menuPresenter->presentMenu();
 
 	clientConnectionWaiter.detach();
 	broadcastThread.detach();
-	enemyPlanesThread.detach();
+	//enemyPlanesThread.detach();
 	return EXIT_SUCCESS;
 }
 

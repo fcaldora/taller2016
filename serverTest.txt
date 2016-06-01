@@ -72,7 +72,7 @@
 		<ancho>68</ancho>
 		<alto>68</alto>
 		<x>100</x>
-		<y>100</y>
+		<y>350</y>
 		<cantidad>8</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
@@ -87,7 +87,7 @@
 		<ancho>68</ancho>
 		<alto>68</alto>
 		<x>200</x>
-		<y>100</y>
+		<y>350</y>
 		<cantidad>8</cantidad>
 		<velocidadDesplazamiento>1</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
@@ -96,7 +96,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>7</id>
+		<id>8</id>
 		<path>Avion3.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -110,7 +110,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>8</id>
+		<id>9</id>
 		<path>Avion4.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -124,3 +124,137 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 </aviones>
+<formations>
+	<formation>
+		<id>100</id>
+		<extraPoints>500</extraPoints>
+		<quantity>5</quantity>
+	</formation>
+	<formation>
+		<id>101</id>
+		<extraPoints>1000</extraPoints>
+		<quantity>1</quantity>
+	</formation>
+</formations>
+<enemyPlanes>
+	<enemyPlane>
+		<id>8</id>
+		<lifes>1</lifes>
+		<alto>34</alto>
+		<ancho>34</ancho>
+		<x>25</x>
+		<y>-25</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane1.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>100</score>
+		<formationId>1</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>9</id>
+		<lifes>1</lifes>
+		<alto>34</alto>
+		<ancho>34</ancho>
+		<x>70</x>
+		<y>-50</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane1.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>100</score>
+		<formationId>-1</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>10</id>
+		<lifes>1</lifes>
+		<alto>34</alto>
+		<ancho>34</ancho>
+		<x>15</x>
+		<y>-25</y>
+		<actualPhotogram>2</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane1.png</path>
+		<facingDirection>SOUTHEAST</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>100</score>
+		<formationId>1</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>11</id>
+		<lifes>5</lifes>
+		<alto>67</alto>
+		<ancho>67</ancho>
+		<x>150</x>
+		<y>-50</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane3.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>500</score>
+		<formationId>2</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>12</id>
+		<lifes>1</lifes>
+		<alto>67</alto>
+		<ancho>67</ancho>
+		<x>85</x>
+		<y>-400</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane3.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>500</score>
+		<formationId>1</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>13</id>
+		<lifes>1</lifes>
+		<alto>67</alto>
+		<ancho>67</ancho>
+		<x>200</x>
+		<y>-350</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane3.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>1</crazyMoves>
+		<score>500</score>
+		<formationId>1</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>14</id>
+		<lifes>1</lifes>
+		<alto>67</alto>
+		<ancho>67</ancho>
+		<x>150</x>
+		<y>-200</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane3.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>500</score>
+		<formationId>1</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>15</id>
+		<lifes>10</lifes>
+		<alto>124</alto>
+		<ancho>95</ancho>
+		<x>250</x>
+		<y>500</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane4.png</path>
+		<facingDirection>NORTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>1000</score>
+		<formationId>2</formationId>
+	</enemyPlane>
+</enemyPlanes>

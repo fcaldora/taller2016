@@ -3,6 +3,7 @@
 #include "DrawableObject.h"
 #include "Avion.h"
 #include "PowerUp.h"
+#include "EnemyPlane.h"
 #include <iostream>
 #ifndef XMLPARSER_H_
 #define XMLPARSER_H_
@@ -25,8 +26,12 @@ public:
 	int getSprite(DrawableObject &object, int numSprite);
 	int getElement(DrawableObject &element, int elementNum);
 	void getPowerUp(PowerUp& powerUp, int powerUpNum);
+	void getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Formation*> formations);
+	void getFormation(Formation* formation, int formationNum);
 	int getNumberOfPowerUp();
 	int getNumberOfElements();
+	int getNumberOfEnemyPlanes();
+	int getNumberOfFormations();
 	int getFondoEscenario(DrawableObject &object);
 	Avion* getAvion(int nroCliente);
 	void reloadDoc();

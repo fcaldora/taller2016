@@ -102,6 +102,10 @@ list<Object>::iterator BulletList::end(){
 	return this->objectList.end();
 }
 
+void BulletList::setLastId(int id){
+	this->lastBulletId = id;
+}
+
 BulletList::~BulletList() {
 	// TODO Auto-generated destructor stub
 }
