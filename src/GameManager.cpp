@@ -50,6 +50,7 @@ list<Formation*> formations;
 list<Score*> scores;
 ScoreManager* scoreManager;
 bool appShouldTerminate, gameInitiated, userWasConnected;
+bool aterrizaje;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
 list<mensaje> drawableList; //lista que guarda todos los mensajes iniciales para levantar el juego :
@@ -73,6 +74,7 @@ void GameManager::reloadGameFromXml(){
 	enemyPlanes.clear();
 	formations.clear();
 	explosions.clear();
+	escenario->deletePowerUps();
 	mensaje ventanaMsj, escenarioMsj;
 	memset(&ventanaMsj, 0, sizeof(mensaje));
 	memset(&escenarioMsj, 0, sizeof(mensaje));
@@ -113,8 +115,16 @@ void GameManager::reloadGameFromXml(){
 		drawableList.push_back(enemyPlanesMsj);
 		this->broadcastMessage(enemyPlanesMsj);
 	}
+	for(int i = 0; i < parser->getNumberOfPowerUp(); i++){
+		PowerUp* powerUp = new PowerUp();
+		parser->getPowerUp(*powerUp, i);
+		escenario->addPowerUp(powerUp);
+		mensaje powerUpMsj = MessageBuilder().createBackgroundElementCreationMessageForElement(powerUp);
+		drawableList.push_back(powerUpMsj);
+		this->broadcastMessage(powerUpMsj);
+	}
 	escenario->transformPositions();
-	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements() + parser->getNumberOfEnemyPlanes() + parser->getNumberOfPowerUp());
+	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements() + parser->getNumberOfPowerUp());
 	mensaje avionMsj;
 	int i = 1;
 	list<Client*>::iterator it = clientList->clients.begin();
@@ -125,6 +135,9 @@ void GameManager::reloadGameFromXml(){
 		this->broadcastMessage(avionMsj);
 		i++;
 	}
+	mensaje sortPlaneMsg;
+	strncpy(sortPlaneMsg.action, "sortPlane", kLongChar);
+	this->broadcastMessage(sortPlaneMsg);
 }
 
 
@@ -219,6 +232,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 		if(gameInitiated){
 			usleep(1000);
 			escenario->update();
+			aterrizaje = escenario->hayQueAterrizar();
 			msj = MessageBuilder().createBackgroundUpdateMessage(escenario);
 			broadcast(msj, clientList);
 			for (int i = 0; i < escenario->getNumberElements(); i++){
@@ -330,6 +344,13 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				}
 			}
 		}
+		if(aterrizaje){
+			for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
+				(*it)->plane->aterrizar(escenario->getPortaAvionesX());
+				mensaje planeUpdate = MessageBuilder().createPlaneMovementMessageForClient((*it));
+				broadcast(planeUpdate, clientList);
+			}
+		}
 	}
 }
 
@@ -339,6 +360,9 @@ void sendGameInfo(ClientList* clientList){
 	for (it = drawableList.begin(); it != drawableList.end(); it++){
 		broadcast((*it), clientList);
 	}
+	mensaje sortPlaneMsg;
+	strncpy(sortPlaneMsg.action, "sortPlane", kLongChar);
+	broadcast(sortPlaneMsg, clientList);
 }
 
 void disconnectClientForSocketConnection(unsigned int socketConnection, ClientList *clientList) {
@@ -370,7 +394,7 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 			Client *client = clientList->getClientForSocket(socketConnection);
 			mensaje disconnection = MessageBuilder().createDisconnectionMessageForClient(client);
 			broadcast(disconnection, clientList);
-		} else {
+		} else if(!aterrizaje) {
 			procesor->processMessage(message);
 		}
 	}
@@ -410,7 +434,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 
 				clientList->addClient(client);
 
-				message = MessageBuilder().createSuccessfullyConnectedMessage();
+				message = MessageBuilder().createSuccessfullyConnectedMessage(clientPlane->getId());
 
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, socketConnection, clientList, procesor, escenario);
@@ -437,7 +461,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
 
-				message = MessageBuilder().createSuccessfullyConnectedMessage();
+				message = MessageBuilder().createSuccessfullyConnectedMessage(client->plane->getId());
 				escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
 				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList, procesor, escenario);
 				userWasConnected = true;
@@ -468,6 +492,16 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				strncpy(elementMsg.action, "create", 20);
 				sendMsjInfo(socketConnection, sizeof(mensaje), &elementMsg);
 			}
+			for (int i = 0; i < parser->getNumberOfPowerUp(); i++){
+				PowerUp powerUp;
+				mensaje powerUpMsg;
+				parser->getPowerUp(powerUp, i);
+				powerUpMsg = MessageBuilder().createBackgroundElementCreationMessageForElement(&powerUp);
+				sendMsjInfo(socketConnection, sizeof(mensaje), &powerUpMsg);
+			}
+			mensaje sortPlaneMsg;
+			strncpy(sortPlaneMsg.action, "sortPlane", kLongChar);
+			sendMsjInfo(socketConnection, sizeof(mensaje), &sortPlaneMsg);
 		}
 	}
 	pthread_exit(NULL);
@@ -641,10 +675,10 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		drawableList.push_back(elementMsg);
 	}
 	for(int i = 0; i < parser->getNumberOfPowerUp(); i++){
-		PowerUp powerUp;
-		parser->getPowerUp(powerUp, i);
-		escenario.addPowerUp(&powerUp);
-		mensaje powerUpMsj = MessageBuilder().createBackgroundElementCreationMessageForElement(&powerUp);
+		PowerUp* powerUp = new PowerUp();
+		parser->getPowerUp(*powerUp, i);
+		escenario.addPowerUp(powerUp);
+		mensaje powerUpMsj = MessageBuilder().createBackgroundElementCreationMessageForElement(powerUp);
 		drawableList.push_back(powerUpMsj);
 	}
 	for(int i = 0; i < parser->getNumberOfFormations(); i++){
@@ -660,6 +694,8 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		drawableList.push_back(enemyPlanesMsj);
 	}
 	escenario.transformPositions();
+	aterrizaje = false;
+	escenario.setPosPortaAviones(parser->getPosXPortaAviones(),parser->getPosYPortaAviones());
 	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements() + parser->getNumberOfPowerUp() + parser->getNumberOfEnemyPlanes() + 1);
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,

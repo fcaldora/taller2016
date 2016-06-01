@@ -21,7 +21,7 @@ public:
 	MessageBuilder();
 	virtual ~MessageBuilder();
 
-	clientMsj createSuccessfullyConnectedMessage();
+	clientMsj createSuccessfullyConnectedMessage(int planeId);
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
 	mensaje createInitialMessageForClient(Client *client);
@@ -39,6 +39,8 @@ public:
 	mensaje createUpdatePhotogramMessageForPlane(Avion* plane);
 	mensaje createExplosionMessage(Explosion* explosion);
 	mensaje createEnemyPlaneCreationMessage(EnemyPlane* enemyPlane);
+	mensaje createBulletSoundMessage();
+
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);
 };

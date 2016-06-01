@@ -32,6 +32,7 @@ public:
 	bool updatePhotogram();
 	bool doubleShooting();
 	void setDoubleShooting(bool);
+	void aterrizar(int finishX);
 	bool isLooping;
 
 private:

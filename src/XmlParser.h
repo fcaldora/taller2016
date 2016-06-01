@@ -32,6 +32,8 @@ public:
 	int getNumberOfElements();
 	int getNumberOfEnemyPlanes();
 	int getNumberOfFormations();
+	int getPosXPortaAviones();
+	int getPosYPortaAviones();
 	int getFondoEscenario(DrawableObject &object);
 	Avion* getAvion(int nroCliente);
 	void reloadDoc();

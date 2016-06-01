@@ -7,14 +7,12 @@
 </Servidor>
 
 <ventana>
-	<ancho>800</ancho>
-	<alto>600</alto>
+	<ancho>500</ancho>
+	<alto>500</alto>
 </ventana>
 <escenario>
 	<ancho>800</ancho>
 	<alto>10000</alto>
-	<portaAvionesX>300</portaAvionesX>
-	<portaAvionesY>9000</portaAvionesY>
 	<fondo>
 		<spriteId>0</spriteId>
 		<ancho>1024</ancho>
@@ -47,12 +45,12 @@
 			<y>1000</y>
 		</elemento>
 		<elemento>
-			<path>pAviones.png</path>
+			<path>inicio.png</path>
 			<id>6</id>
-			<ancho>256</ancho>
-			<alto>244</alto>
-			<x>300</x>
-			<y>9000</y>
+			<ancho>320</ancho>
+			<alto>200</alto>
+			<x>100</x>
+			<y>1200</y>
 		</elemento>
 	</elementos>
 </escenario>
@@ -247,8 +245,8 @@
 	<enemyPlane>
 		<id>15</id>
 		<lifes>10</lifes>
-		<alto>124</alto>
-		<ancho>95</ancho>
+		<alto>67</alto>
+		<ancho>67</ancho>
 		<x>250</x>
 		<y>500</y>
 		<actualPhotogram>1</actualPhotogram>

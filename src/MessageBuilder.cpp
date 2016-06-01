@@ -11,9 +11,9 @@ MessageBuilder::MessageBuilder() {
 	// TODO Auto-generated constructor stub
 }
 
-clientMsj MessageBuilder::createSuccessfullyConnectedMessage() {
+clientMsj MessageBuilder::createSuccessfullyConnectedMessage(int planeId) {
 	clientMsj message;
-	strncpy(message.id, "0", kLongChar);
+	strncpy(message.id, std::to_string(planeId).c_str(), kLongChar);
 	strncpy(message.type, "connection_ok", kLongChar);
 	strncpy(message.value, "Client connected", kLongChar);
 	return message;
@@ -100,6 +100,12 @@ mensaje MessageBuilder::createBulletMessage(Object* bullet){
 	message.posY = bullet->getPosY();
 	message.activeState = true;
 	message.actualPhotogram = bullet->getActualPhotogram();
+	return message;
+}
+
+mensaje MessageBuilder::createBulletSoundMessage() {
+	mensaje message;
+	strcpy(message.action,"bulletSound");
 	return message;
 }
 
