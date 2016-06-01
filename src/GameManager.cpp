@@ -690,6 +690,7 @@ Object GameManager::createBulletForClient(Client* client, int posX){
 	//Aca hay que setear. Si el cliente tiene disparo doble, se crean dos balas.
 	Object bullet;
 	bullet.setId(objects.getLastId() + 1);
+	bullet.setClientId(client->getPlane()->getId());
 	bullet.setPath("bullet.png");
 	//bullet.setPosX(client->plane->getPosX() + client->plane->getWidth()/2 - 15);
 	bullet.setPosX(posX);
