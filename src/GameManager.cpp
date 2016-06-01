@@ -424,7 +424,7 @@ Object* GameManager::createBulletForClient(Client* client){
 	bullet.setHeigth(30);
 	bullet.setStatus(true);
 	//La velocidad de disparo es relativa a la velocidad del avion.
-	bullet.setStep(client->plane->getVelDisparo() + client->plane->getVelDesplazamiento());
+	bullet.setStep((client->plane->getVelDisparo() + client->plane->getVelDesplazamiento())/5);
 	objects.addElement(bullet);
 	return &bullet;
 }
