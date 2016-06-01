@@ -323,6 +323,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				Avion *clientPlane = parser->getAvion(numberOfCurrentAcceptedClients);
 				Client* client = new Client(name, socketConnection, 0, clientPlane);
 				client->isFirstTimeLogin = true;
+				client->currentNumberOfLifes = parser->getNumberOfLifesPerClient();
 
 				clientList->addClient(client);
 
@@ -332,6 +333,18 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 						clientReader, client, clientList, procesor, escenario, parser, teams);
 				mensaje mensajeAvion = MessageBuilder().createInitialMessageForClient(client);
 				drawableList.push_back(mensajeAvion);
+				vector<LifeObject *> lifeObjects = parser->getLifeObjects();
+
+				vector<mensaje> messages = MessageBuilder().createLifeObjectMessagesForLifeObjects(lifeObjects);
+
+				for (mensaje message : messages) {
+					drawableList.push_back(message);
+				}
+
+				for (LifeObject *lifeObject : lifeObjects) {
+					delete lifeObject;
+				}
+
 				sendMsj(socketConnection, sizeof(message), &(message));
 				sendClientMenuMessage(socketConnection, teams);
 
@@ -478,9 +491,9 @@ void GameManager::sendInitialGameInfo() {
 }
 
 void GameManager::addClientToTeamWithName(Client *client, string teamName) {
-	for (unsigned int i = 0; i < this->teams->size(); i++) {
-		if (strcmp((*this->teams)[i]->teamName.c_str(), teamName.c_str()) == 0) {
-			(*this->teams)[i]->clients.push_back(client);
+	for (Team *team : *this->teams) {
+		if (strcmp(team->teamName.c_str(), teamName.c_str()) == 0) {
+			team->clients.push_back(client);
 		}
 	}
 
@@ -492,8 +505,6 @@ void GameManager::createTeamWithNameForClient(string teamName, Client *client) {
 	Team *newTeam = new Team(this->teams->size(), teamName, maxNumberOfPlayersPerTeam);
 	newTeam->clients.push_back(client);
 	this->teams->push_back(newTeam);
-
-	cout << this->teams->size() << endl;
 
 	this->sendInitialGameInfo();
 }
@@ -537,8 +548,8 @@ GameManager::~GameManager() {
 	delete this->xmlLoader;
 	delete this->socketManager;
 	delete this->escenario;
-	for(unsigned int i = 0; i < this->teams->size(); i++) {
-	    delete (*this->teams)[i];
+	for (Team *team : *this->teams) {
+	    delete team;
 	}
 	delete this->teams;
 	delete logWriter;

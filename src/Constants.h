@@ -50,6 +50,9 @@ using namespace std;
 #define tagVueltaSpriteID "vueltaSpriteId"
 #define tagDisparosSpriteId "disparosSpriteId"
 #define tagAviones "aviones"
+#define kLifesTag "vidas"
+#define kLifeTag "vida"
+#define kNumberOfLifes "cantidadDeVidas"
 #define kMaxNumberOfPlayersPerTeamTag "CantidadDeJugadoresPorEquipo"
 
 struct sprite{

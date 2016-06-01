@@ -218,9 +218,30 @@ menuResponseMessage MessageBuilder::createMenuMessage(vector<Team *> *teams) {
 		strncpy(message.secondTeamName , (*teams)[1]->teamName.c_str(), kLongChar);
 	}
 
-	cout << message.firstTeamName << " " << message.firstTeamIsAvailableToJoin << endl;
-	cout << message.secondTeamName << " " << message.secondTeamIsAvailableToJoin << " " << message.userCanCreateATeam << endl;
 	return message;
+}
+
+vector<mensaje> MessageBuilder::createLifeObjectMessagesForLifeObjects(vector<LifeObject *> lifeObjects) {
+	vector <mensaje> messages;
+
+	for (int i = 0 ; i < lifeObjects.size() ; i++) {
+		mensaje message;
+
+		strcpy(message.action, "create");
+		strcpy(message.imagePath, lifeObjects[i]->getPath().c_str());
+		message.id = lifeObjects[i]->getId();
+		message.photograms = lifeObjects[i]->getPhotograms();
+		message.actualPhotogram = lifeObjects[i]->getActualPhotogram();
+		message.height = lifeObjects[i]->getHeigth();
+		message.width = lifeObjects[i]->getWidth();
+		message.posX = (lifeObjects[i]->getPosX() * i + 15 * (i + 1));
+		message.posY = lifeObjects[i]->getPosY();
+		message.activeState = true;
+
+		messages.push_back(message);
+	}
+
+	return messages;
 }
 
 MessageBuilder::~MessageBuilder() {

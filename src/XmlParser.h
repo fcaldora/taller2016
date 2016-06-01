@@ -6,6 +6,8 @@
 #ifndef XMLPARSER_H_
 #define XMLPARSER_H_
 
+#include "LifeObject.h"
+
 using namespace std;
 
 class XmlParser {
@@ -28,6 +30,8 @@ public:
 	Avion* getAvion(int nroCliente);
 	void reloadDoc();
 	int getMaxNumberOfPlayerPerTeam();
+	int getNumberOfLifesPerClient();
+	vector<LifeObject*> getLifeObjects();
 
 private:
 	TiXmlDocument doc;

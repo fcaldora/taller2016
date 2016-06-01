@@ -2,7 +2,7 @@
 	<configuracion>
 		<nivelDeLog>2</nivelDeLog>
 	</configuracion>
-    <CantidadDeJugadoresPorEquipo>2</CantidadDeJugadoresPorEquipo>
+    <CantidadDeJugadoresPorEquipo>1</CantidadDeJugadoresPorEquipo>
     <Puerto>8080</Puerto>
 </Servidor>
 
@@ -113,3 +113,14 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 </aviones>
+<vidas>
+	<cantidadDeVidas>2</cantidadDeVidas>
+	<vida>
+		<id>9</id>
+		<path>vida.png</path>
+		<ancho>50</ancho>
+		<alto>50</alto>
+		<x>15</x>
+		<y>15</y>
+	</vida>
+</vidas>

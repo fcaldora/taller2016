@@ -13,6 +13,7 @@
 #include "Object.h"
 #include "Escenario.h"
 #include "Team.h"
+#include "LifeObject.h"
 
 class MessageBuilder {
 public:
@@ -36,6 +37,7 @@ public:
 	mensaje createDisconnectionMessageForClient(Client* client);
 	mensaje createUpdatePhotogramMessageForPlane(Avion* plane);
 	menuResponseMessage createMenuMessage(vector<Team *> *teams);
+	vector<mensaje> createLifeObjectMessagesForLifeObjects(vector<LifeObject *> lifeObjects);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

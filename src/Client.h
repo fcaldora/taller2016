@@ -61,6 +61,7 @@ public:
 	int clientID;
 	int earnedPoints;
 	bool isFirstTimeLogin;
+	int currentNumberOfLifes;
 
 private:
 	string name;

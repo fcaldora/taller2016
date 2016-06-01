@@ -304,6 +304,49 @@ Avion* XmlParser::getAvion(int nroCliente){
 	return avion;
 }
 
+int XmlParser::getNumberOfLifesPerClient() {
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement *lifes = docHandle.FirstChild(kLifesTag).ToElement();
+	if(!lifes){
+		cout<<"Error al obtener las vidas"<<endl;
+		return 0;
+	}
+	TiXmlElement *numberOfLifesPerClient = lifes->FirstChildElement(kNumberOfLifes);
+	return atoi(numberOfLifesPerClient->GetText());
+}
+
+vector<LifeObject*> XmlParser::getLifeObjects() {
+	vector<LifeObject *> lifeObjects;
+
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement *lifes = docHandle.FirstChild(kLifesTag).ToElement();
+	TiXmlElement *life = lifes->FirstChildElement(kLifeTag)->ToElement();
+	if(!life){
+		cout<<"Error al obtener las vidas"<<endl;
+		return lifeObjects;
+	}
+
+	for (int i = 0 ; i < this->getNumberOfLifesPerClient() ; i++) {
+		LifeObject *lifeObject = new LifeObject();
+		TiXmlElement *id = life->FirstChildElement(tagId);
+		lifeObject->setId(atoi(id->GetText()));
+		TiXmlElement *path = life->FirstChildElement(tagPath);
+		lifeObject->setPath(string(path->GetText()));
+		TiXmlElement *width = life->FirstChildElement(tagAncho);
+		lifeObject->setWidth(atoi(width->GetText()));
+		TiXmlElement *height = life->FirstChildElement(tagAlto);
+		lifeObject->setHeigth(atoi(height->GetText()));
+		TiXmlElement *xPosition = life->FirstChildElement(tagPosX);
+		lifeObject->setPosX(atoi(xPosition->GetText()));
+		TiXmlElement *yPosition = life->FirstChildElement(tagPosY);
+		lifeObject->setPosY(atoi(yPosition->GetText()));
+
+		lifeObjects.push_back(lifeObject);
+	}
+
+	return lifeObjects;
+}
+
 void XmlParser::reloadDoc(){
 	if(!this->doc.LoadFile(this->fileName.c_str())){
 		cout<<"Error al recargar el archivo.Archivo inexistente"<<endl;

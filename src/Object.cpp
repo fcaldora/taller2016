@@ -11,7 +11,6 @@ Object::Object() {
 	this->actualPhotogram = 1;
 	this->photograms = 1;
 	this->step = 1;
-
 }
 
 Object::~Object() {
