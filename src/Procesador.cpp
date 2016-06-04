@@ -84,7 +84,7 @@ void Procesador::processMovementMessage(clientMsj message) {
 
 void Procesador::processShootMessage(clientMsj message) {
 	Client* client = this->clientList->getClientForName(message.id);
-	if (client->plane->isLooping)
+	if (client->plane->isLooping || !client->isAlive())
 		return;
 	if(client->plane->doubleShooting()){
 		int leftPlane = client->plane->getPosX();
