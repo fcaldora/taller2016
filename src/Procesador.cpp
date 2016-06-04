@@ -135,6 +135,10 @@ void Procesador::processExitMessage(clientMsj message){
 	this->gameManager->broadcastMessage(closeMsj);
 }
 
+void Procesador::processEnemyBullet(EnemyPlane* enemyPlane){
+	this->gameManager->createEnemyBullet(enemyPlane);
+}
+
 Procesador::~Procesador() {
 	// TODO Auto-generated destructor stub
 }

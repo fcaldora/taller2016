@@ -84,6 +84,7 @@ public:
 
 	int collideWithClient(ClientList* clientList);
 
+	bool isOnScreen(int width, int height);
 private:
 	Formation* formation;
 	int score;

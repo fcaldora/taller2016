@@ -97,18 +97,29 @@ public:
 
 	bool notVisible(int width, int height);
 	bool haveCollision(EnemyPlane* plane);
+	bool haveCollision2(Client* client);
 	int crashedWithPlane(list<EnemyPlane*> enemyPlanes);
 	void setStep(int step){
 		this->step = step;
 	}
 
-	int getClientId() const {
+	int getClientId()  {
 		return clientId;
 	}
 
 	void setClientId(int clientId) {
 		this->clientId = clientId;
 	}
+
+	bool isEnemyBullet() const {
+		return enemyBullet;
+	}
+
+	void setEnemyBullet(bool enemyBullet) {
+		this->enemyBullet = enemyBullet;
+	}
+
+	int crashedWithClient(ClientList* clientList);
 
 private:
 	int id;
@@ -122,6 +133,7 @@ private:
 	int step;
 	bool status;
 	int clientId;
+	bool enemyBullet;
 
 
 };

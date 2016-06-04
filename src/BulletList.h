@@ -26,7 +26,7 @@ public:
 	int getLastId();
 	int getFirstId();
 	void moveBullets();
-	int bulletMessage(int bulletNumber, mensaje &msg, int ScreenWidth, int ScreenHeight, list<EnemyPlane*> enemyPlanes);
+	int bulletMessage(int bulletNumber, mensaje &msg, int ScreenWidth, int ScreenHeight, list<EnemyPlane*> enemyPlanes, ClientList* clientList);
 	list<Object>::iterator begin();
 	list<Object>::iterator end();
 	virtual ~BulletList();

@@ -73,6 +73,7 @@
 		<path>Avion1.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
+		<lifes>3</lifes>
 		<x>100</x>
 		<y>350</y>
 		<cantidad>8</cantidad>
@@ -88,6 +89,7 @@
 		<path>Avion2.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
+		<lifes>3</lifes>
 		<x>200</x>
 		<y>350</y>
 		<cantidad>8</cantidad>
@@ -102,6 +104,7 @@
 		<path>Avion3.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
+		<lifes>3</lifes>
 		<x>300</x>
 		<y>100</y>
 		<cantidad>8</cantidad>
@@ -116,6 +119,7 @@
 		<path>Avion4.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
+		<lifes>3</lifes>
 		<x>400</x>
 		<y>100</y>
 		<cantidad>8</cantidad>
@@ -160,7 +164,7 @@
 		<alto>34</alto>
 		<ancho>34</ancho>
 		<x>70</x>
-		<y>-50</y>
+		<y>-250</y>
 		<actualPhotogram>1</actualPhotogram>
 		<photograms>8</photograms>
 		<path>enemyplane1.png</path>
@@ -174,7 +178,7 @@
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
-		<x>15</x>
+		<x>180</x>
 		<y>-25</y>
 		<actualPhotogram>2</actualPhotogram>
 		<photograms>8</photograms>
@@ -190,7 +194,7 @@
 		<alto>67</alto>
 		<ancho>67</ancho>
 		<x>150</x>
-		<y>-50</y>
+		<y>-400</y>
 		<actualPhotogram>1</actualPhotogram>
 		<photograms>8</photograms>
 		<path>enemyplane3.png</path>
@@ -201,11 +205,11 @@
 	</enemyPlane>
 	<enemyPlane>
 		<id>12</id>
-		<lifes>1</lifes>
+		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
 		<x>85</x>
-		<y>-400</y>
+		<y>-350</y>
 		<actualPhotogram>1</actualPhotogram>
 		<photograms>8</photograms>
 		<path>enemyplane3.png</path>
@@ -216,7 +220,7 @@
 	</enemyPlane>
 	<enemyPlane>
 		<id>13</id>
-		<lifes>1</lifes>
+		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
 		<x>200</x>
@@ -231,7 +235,7 @@
 	</enemyPlane>
 	<enemyPlane>
 		<id>14</id>
-		<lifes>1</lifes>
+		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
 		<x>150</x>

@@ -40,6 +40,7 @@ public:
 	mensaje createExplosionMessage(Explosion* explosion);
 	mensaje createEnemyPlaneCreationMessage(EnemyPlane* enemyPlane);
 	mensaje createBulletSoundMessage();
+	mensaje createEnemyBulletCreationMessage(EnemyPlane* enemyPlane, int id);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

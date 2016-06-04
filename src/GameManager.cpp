@@ -41,6 +41,7 @@
 std::mutex mutexColaMensajes;
 std::mutex writingInLogFileMutex;
 std::mutex enemiesMutex;
+std::mutex enemyBulletMutex;
 map<unsigned int, thread> clientEntranceMessages;
 map<unsigned int, thread> keepAliveThreads;
 BulletList objects;
@@ -124,7 +125,7 @@ void GameManager::reloadGameFromXml(){
 		this->broadcastMessage(powerUpMsj);
 	}
 	escenario->transformPositions();
-	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements() + parser->getNumberOfPowerUp());
+	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements() + parser->getNumberOfPowerUp() + parser->getNumberOfEnemyPlanes() + 1);
 	mensaje avionMsj;
 	int i = 1;
 	list<Client*>::iterator it = clientList->clients.begin();
@@ -214,6 +215,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 	std::list<Explosion*>::iterator explosionsIt;
 	std::list<Score*>::iterator scoreIt;
 	int contador = 0;
+	int disparos = 0;
 	int hit = -1;
 	int bulletId = -1;
 	while(!appShouldTerminate){
@@ -221,9 +223,24 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 		objects.moveBullets();
 		for(int i = 0; i < objects.bulletQuantity(); i++){
 			mensaje msg;
-			hit = objects.bulletMessage(i, msg, processor->getScreenWidth(), processor->getScreenHeight(), enemyPlanes);
+			hit = objects.bulletMessage(i, msg, processor->getScreenWidth(), processor->getScreenHeight(), enemyPlanes, clientList);
 			if(hit != -1){
-				bulletId = objects.getObject(i).getClientId();
+				if(hit > clientList->clients.size()){
+					bulletId = objects.getObject(i).getClientId();
+				}else if(hit != -2){
+					mensaje clientHit;
+					//Aviso a los clientes que borren al avion-
+					Client* client = clientList->getClientForPlaneId(hit);
+					//Explosion* explosion = new Explosion(client->getPlane()->getPosX(), client->getPlane()->getPosY(), true, 15000 + explosions.size());
+					//msj = MessageBuilder().createExplosionMessage(explosion);
+					//broadcast(msj, clientList);
+					client->setAlive(false);
+					strcpy(clientHit.action, "delete");
+					clientHit.id = client->getPlane()->getId();
+					broadcast(clientHit, clientList);
+				}else{
+					//Algun mensaje para avisarle que le quitaron una vida al cliente
+				}
 			}
 			if(strcmp(msg.action, "Bullet deleted") != 0)
 				broadcast(msg, clientList);
@@ -273,20 +290,15 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				}
 				if((*enemyPlanesIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())
 						|| hit == (*enemyPlanesIt)->getId() || clientId != -1){
+					if(hit == (*enemyPlanesIt)->getId()){
+						scoreManager->increaseDestroyScore(bulletId, (*enemyPlanesIt));
+						if((*enemyPlanesIt)->getFormation() != NULL){
+							//scoreManager->increaseScoreForFormationDestroy(bulletId, (*enemyPlanesIt));
+						}
+					}
 					//Aviso a los clientes que borren al avion enemigo y creo explosion
 					Explosion* explosion = new Explosion((*enemyPlanesIt)->getPosX(), (*enemyPlanesIt)->getPosY(), false,  objects.getLastId() + 1);
 					objects.setLastId(objects.getLastId() + 1);
-					if(bulletId != -1){
-						if(hit == -2){
-							//scoreManager->increaseScoreForHit(bulletId, (*enemyPlanesIt));
-						}else{
-							if((*enemyPlanesIt)->getFormation() != NULL){
-								//scoreManager->increaseScoreForFormationDestroy(bulletId, (*enemyPlanesIt));
-							}else{
-								scoreManager->increaseDestroyScore(bulletId, (*enemyPlanesIt));
-							}
-						}
-					}
 					msj = MessageBuilder().createExplosionMessage(explosion);
 					broadcast(msj, clientList);
 					enemiesMutex.lock();
@@ -297,22 +309,39 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					enemiesMutex.unlock();
 					enemyPlanesIt--;
 				}else{
+					if(hit == -2){
+						scoreManager->increaseScoreForHit(bulletId, (*enemyPlanesIt));
+					}
 					strcpy(msj.action, "draw");
 					msj.id = (*enemyPlanesIt)->getId();
 					msj.actualPhotogram = (*enemyPlanesIt)->getActualPhotogram();
 					msj.posX = (*enemyPlanesIt)->getPosX();
 					msj.posY = (*enemyPlanesIt)->getPosY();
+					//Creo una bala si el avion esta visible y el random es 23
+					if((*enemyPlanesIt)->isOnScreen(processor->getScreenWidth(), processor->getScreenHeight())){
+						if(disparos == 1000){
+							mensaje disparo;
+							strcpy(disparo.action, "create");
+							disparo = MessageBuilder().createEnemyBulletCreationMessage((*enemyPlanesIt), objects.getLastId() + 1);
+							broadcast(disparo, clientList);
+							processor->processEnemyBullet((*enemyPlanesIt));
+						}
+					}
 				}
 
 				broadcast(msj, clientList);
-				for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
-					strcpy(msj.action, "score");
-					msj.id = (*scoreIt)->getId();
-					msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
-					msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
-					msj.photograms = (*scoreIt)->getScore();
-					broadcast(msj, clientList);
-				}
+			}
+			if(disparos == 1000){
+				disparos = 0;
+			}
+			for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
+				strcpy(msj.action, "score");
+				msj.id = (*scoreIt)->getId();
+				msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
+				msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
+				msj.photograms = (*scoreIt)->getScore();
+				cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
+				broadcast(msj, clientList);
 			}
 			if(contador == 29){
 				for(explosionsIt = explosions.begin(); explosionsIt != explosions.end(); explosionsIt++){
@@ -333,6 +362,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					broadcast(msj, clientList);
 				}
 			}
+			disparos++;
 		}
 		contador++;
 		if (contador == 30){
@@ -507,120 +537,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 	pthread_exit(NULL);
 }
 
-void* createEnemyPlanes(int maxNumberOfClients, Procesador* procesor, ClientList* clientList){
-	int posX, moment;
-	int createdEnemyPlanes = 0;
-	mensaje msj;
-	bool alreadyRunning = false;
-	while(!appShouldTerminate){
-		if( clientList->clients.size() == maxNumberOfClients || alreadyRunning){
-			alreadyRunning = true;
-			usleep(9000);
-			moment = rand()%500;
-			if(moment < 2){
-				EnemyPlane* enemyPlane = new EnemyPlane();
-				enemyPlane->setActualPhotogram(1);
-				enemyPlane->setPosX((rand()%procesor->getScreenWidth()));
-				enemyPlane->setPosY(1);
-				enemyPlane->setPhotograms(8);
-				enemyPlane->setFacingDirection("SOUTH");
-				enemyPlane->setFormation(NULL);
-				enemyPlane->setCrazyMoves(false);
-				enemyPlane->setSpeedFactor(0);
-				enemyPlane->setLifes(1);
-				enemyPlane->setId( 5000 + createdEnemyPlanes);
-				enemyPlane->setWidth(34);
-				enemyPlane->setHeigth(34);
-				enemyPlane->setPath("enemyplane1.png");
-				enemyPlane->setTimesFacingOneDirection(1);
-				enemiesMutex.lock();
-				enemyPlanes.push_back(enemyPlane);
-				enemiesMutex.unlock();
-				msj.id =  5000 + createdEnemyPlanes;
-				strcpy(msj.action, "create");
-				msj.posX = enemyPlane->getPosX();
-				msj.posY = 0;
-				strcpy(msj.imagePath, "enemyplane1.png");
-				msj.photograms = 8;
-				msj.height = 34;
-				msj.width = 34;
-				msj.actualPhotogram = 1;
-				createdEnemyPlanes++;
-				broadcast(msj, clientList);
-			}else if(moment == 75){
-				Formation* formation = new Formation();
-				formation->setExtraPoints(true);
-				formation->setId(5000 + createdEnemyPlanes);
-				formation->setQuantity(5);
-				for(int i=0; i<5; i++){
-					EnemyPlane* enemyPlane = new EnemyPlane();
-					enemyPlane->setActualPhotogram(2);
-					enemyPlane->setPosX(25 - i*34);
-					enemyPlane->setPosY(30 - i*34);
-					enemyPlane->setPhotograms(8);
-					enemyPlane->setFacingDirection("SOUTHEAST");
-					enemyPlane->setFormation(formation);
-					enemyPlane->setLifes(1);
-					enemyPlane->setCrazyMoves(false);
-					enemyPlane->setSpeedFactor(0);
-					enemyPlane->setId( 5000 + createdEnemyPlanes);
-					enemyPlane->setWidth(34);
-					enemyPlane->setHeigth(34);
-					enemyPlane->setPath("enemyplane2.png");
-					enemyPlane->setTimesFacingOneDirection(1);
-					enemiesMutex.lock();
-					enemyPlanes.push_back(enemyPlane);
-					enemiesMutex.unlock();
-					msj.id =  5000 + createdEnemyPlanes;
-					strcpy(msj.action, "create");
-					msj.posX = enemyPlane->getPosX();
-					msj.posY = enemyPlane->getPosY();
-					strcpy(msj.imagePath, "enemyplane2.png");
-					msj.photograms = 8;
-					msj.height = 34;
-					msj.width = 34;
-					msj.actualPhotogram = 2;
-					createdEnemyPlanes++;
-					broadcast(msj, clientList);
-				}
-			}else if(moment == 36){
-				Formation* formation = new Formation();
-				formation->setExtraPoints(true);
-				formation->setId(5000 + createdEnemyPlanes);
-				formation->setQuantity(5);
-				EnemyPlane* enemyPlane = new EnemyPlane();
-				enemyPlane->setActualPhotogram(1);
-				enemyPlane->setPosX(250);
-				enemyPlane->setPosY(0);
-				enemyPlane->setPhotograms(1);
-				enemyPlane->setFacingDirection("SOUTH");
-				enemyPlane->setFormation(formation);
-				enemyPlane->setLifes(5);
-				enemyPlane->setCrazyMoves(false);
-				enemyPlane->setSpeedFactor(0);
-				enemyPlane->setId( 5000 + createdEnemyPlanes);
-				enemyPlane->setWidth(81);
-				enemyPlane->setHeigth(81);
-				enemyPlane->setPath("enemyplane3.png");
-				enemyPlane->setTimesFacingOneDirection(1);
-				enemiesMutex.lock();
-				enemyPlanes.push_back(enemyPlane);
-				enemiesMutex.unlock();
-				msj.id =  5000 + createdEnemyPlanes;
-				strcpy(msj.action, "create");
-				msj.posX = enemyPlane->getPosX();
-				msj.posY = enemyPlane->getPosY();
-				strcpy(msj.imagePath, "enemyplane3.png");
-				msj.photograms = 8;
-				msj.height = 81;
-				msj.width = 81;
-				msj.actualPhotogram = 1;
-				createdEnemyPlanes++;
-				broadcast(msj, clientList);
-			}
-		}
-	}
-}
+
 
 int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->menuPresenter = new MenuPresenter(this->appShouldTerminate, this);
@@ -722,6 +639,21 @@ void GameManager::restartGame() {
 	escenario->restart();
 }
 
+void GameManager::createEnemyBullet(EnemyPlane* enemyPlane){
+	Object bullet;
+	bullet.setId(objects.getLastId() + 1);
+	bullet.setPosX(enemyPlane->getPosX() + enemyPlane->getWidth()/2);
+	bullet.setPosY(enemyPlane->getPosY() + enemyPlane->getWidth());
+	bullet.setWidth(6);
+	bullet.setHeigth(6);
+	bullet.setActualPhotogram(1);
+	bullet.setPath("enemybullet.png");
+	bullet.setStatus(true);
+	bullet.setStep(1);
+	bullet.setEnemyBullet(true);
+	objects.addElement(bullet);
+}
+
 Object GameManager::createBulletForClient(Client* client, int posX){
 	//Aca hay que setear. Si el cliente tiene disparo doble, se crean dos balas.
 	Object bullet;
@@ -735,6 +667,7 @@ Object GameManager::createBulletForClient(Client* client, int posX){
 	bullet.setHeigth(30);
 	bullet.setStatus(true);
 	bullet.setStep((client->plane->getVelDisparo() + client->plane->getVelDesplazamiento())/5);
+	bullet.setEnemyBullet(false);
 	objects.addElement(bullet);
 	return bullet;
 }

@@ -35,10 +35,19 @@ public:
 	void aterrizar(int finishX);
 	bool isLooping;
 
+	int getLifes() const {
+		return lifes;
+	}
+
+	void setLifes(int lifes) {
+		this->lifes = lifes;
+	}
+
 private:
 	int velDesplazamiento;
 	int velDisparo;
 	bool hasDoubleShooting;
+	int lifes;
 };
 
 #endif /* AVION_H_ */

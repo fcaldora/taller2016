@@ -20,6 +20,7 @@ public:
 	list<Score*> getScores();
 	void increaseScore(int id,int hit, int score, int extraScore);
 	void increaseDestroyScore(int id, EnemyPlane* enemyPlane);
+	void increaseScoreForHit(int id, EnemyPlane* enemyPlane);
 private:
 	list<Score*> scores;
 };

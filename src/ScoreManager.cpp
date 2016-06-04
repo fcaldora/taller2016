@@ -37,3 +37,12 @@ void ScoreManager::increaseDestroyScore(int id, EnemyPlane* enemyPlane){
 		}
 	}
 }
+
+void ScoreManager::increaseScoreForHit(int id, EnemyPlane* enemyPlane){
+	list<Score*>::iterator it;
+	for(it = this->scores.begin(); it != this->scores.end(); it++){
+		if((*it)->getId() == id){
+			(*it)->setScore((*it)->getScore() + enemyPlane->getScore());
+		}
+	}
+}

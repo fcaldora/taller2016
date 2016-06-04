@@ -295,6 +295,8 @@ Avion* XmlParser::getAvion(int nroCliente){
 	avion->setVelDesplazamiento(atoi(velDesplElem->GetText()));
 	TiXmlElement* cantElem = avionElem->FirstChildElement(tagCantidad);
 	avion->setPhotograms(atoi(cantElem->GetText()));
+	TiXmlElement* lifes = avionElem->FirstChildElement(tagLifes);
+	avion->setLifes(atoi(lifes->GetText()));
 	return avion;
 }
 

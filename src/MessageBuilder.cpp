@@ -215,6 +215,21 @@ mensaje MessageBuilder::createEnemyPlaneCreationMessage(EnemyPlane* enemyPlane){
 	return message;
 }
 
+mensaje MessageBuilder::createEnemyBulletCreationMessage(EnemyPlane* enemyPlane, int id) {
+	mensaje message;
+	message.id = id;
+	strcpy(message.action,"create");
+	strcpy(message.imagePath, "enemybullet.png");
+	message.height = 6;
+	message.width = 6;
+	message.posX = enemyPlane->getPosX() + enemyPlane->getWidth()/2;
+	message.posY = enemyPlane->getPosY() + enemyPlane->getHeigth();
+	message.activeState = true;
+	message.actualPhotogram = 1;
+
+	return message;
+}
+
 MessageBuilder::~MessageBuilder() {
 	// TODO Auto-generated destructor stub
 }

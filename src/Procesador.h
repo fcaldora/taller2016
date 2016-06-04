@@ -12,6 +12,7 @@
 
 using namespace std;
 
+#include "EnemyPlane.h"
 #include "ClientList.h"
 
 class GameManager;
@@ -39,7 +40,7 @@ public:
 	void setScreenWidth(int screenWidth) {
 		this->screenWidth = screenWidth;
 	}
-
+	void processEnemyBullet(EnemyPlane* enemyPlane);
 	GameManager *gameManager;
 
 private:

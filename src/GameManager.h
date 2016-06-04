@@ -14,6 +14,7 @@
 #include "ClientList.h"
 #include "Procesador.h"
 #include "BulletList.h"
+#include "EnemyPlane.h"
 
 class MenuPresenter;
 
@@ -30,7 +31,7 @@ public:
 	void restartGame();
 	Object createBulletForClient(Client* client, int posX);
 	void reloadGameFromXml();
-
+	void createEnemyBullet(EnemyPlane* enemyPlane);
 private:
 	bool appShouldTerminate;
 	MenuPresenter *menuPresenter;

@@ -19,7 +19,11 @@ Object::~Object() {
 }
 
 void Object::move(){
-	this->posY -= step;
+	if(this->isEnemyBullet()){
+		this->posY += step;
+	}else{
+		this->posY -= step;
+	}
 }
 
 bool Object::notVisible(int width, int height){
@@ -51,6 +55,31 @@ bool Object::haveCollision(EnemyPlane* plane){
 
 }
 
+bool Object::haveCollision2(Client* client){
+	bool xCollision = false;
+	bool yCollision = false;
+	int leftPlaneX = client->getPlane()->getPosX();
+	int rightPlaneX = client->getPlane()->getPosX() + client->getPlane()->getWidth();
+	int upPlaneY = client->getPlane()->getPosY();
+	int leftBulletX = posX;
+	int rightBulletX= posX + width;
+	int downBulletY = posY + heigth;
+	if(leftBulletX >= leftPlaneX && rightBulletX <= rightPlaneX)
+		xCollision = true;
+	else if(leftBulletX <= rightPlaneX && rightBulletX >= rightPlaneX)
+		xCollision = true;
+	else if(rightBulletX >= leftPlaneX && leftBulletX <= leftPlaneX)
+		xCollision = true;
+
+	if(downBulletY >= upPlaneY)
+		yCollision = true;
+
+	if(yCollision && xCollision)
+		return true;
+	return false;
+
+}
+
 int Object::crashedWithPlane(list<EnemyPlane*> enemyPlanes){
 	list<EnemyPlane*>::iterator it;
 	for(it = enemyPlanes.begin(); it != enemyPlanes.end(); it++){
@@ -60,6 +89,22 @@ int Object::crashedWithPlane(list<EnemyPlane*> enemyPlanes){
 				return (*it)->getId();
 			}
 			return -2;
+		}
+	}
+	return -1;
+}
+
+int Object::crashedWithClient(ClientList* clientList){
+	list<Client*>::iterator it;
+	for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
+		if((*it)->isAlive()){
+			if(this->haveCollision2((*it))){
+				(*it)->getPlane()->setLifes((*it)->getPlane()->getLifes() - 1);
+				if((*it)->getPlane()->getLifes() <= 0){
+					return (*it)->getPlane()->getId();
+				}
+				return -2;
+			}
 		}
 	}
 	return -1;

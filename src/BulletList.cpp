@@ -73,10 +73,15 @@ void BulletList::moveBullets(){
 	}
 }
 
-int BulletList::bulletMessage(int bulletNumber, mensaje &msg, int width, int height, list<EnemyPlane*> enemyPlanes){
+int BulletList::bulletMessage(int bulletNumber, mensaje &msg, int width, int height, list<EnemyPlane*> enemyPlanes, ClientList* clientList){
 //HARDCODADO EL BULLETID + 7. MODIFICAR!
 	Object object = this->getObject(bulletNumber);
-	int id = object.crashedWithPlane(enemyPlanes);
+	int id;
+	if(object.isEnemyBullet()){
+		id = object.crashedWithClient(clientList);
+	}else{
+		id = object.crashedWithPlane(enemyPlanes);
+	}
 	if((object.notVisible(width, height) || id != -1) && object.isStatic()){
 		strcpy(msg.action, "delete");
 		msg.id = object.getId();

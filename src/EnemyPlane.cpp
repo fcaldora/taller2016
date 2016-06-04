@@ -122,4 +122,6 @@ int EnemyPlane::collideWithClient(ClientList* clientList){
 	return -1;
 }
 
-
+bool EnemyPlane::isOnScreen(int width, int height){
+	return (this->posX < width && this->posY < height && this->posX > 0 && this->posY > 0);
+}
