@@ -89,7 +89,7 @@ void Procesador::processShootMessage(clientMsj message) {
 
 	Object *bullet = this->gameManager->createBulletForClient(client);
 	mensaje response = MessageBuilder().createBulletMessage(bullet);
-	mensaje soundMessage = MessageBuilder().createBulletSoundMessage();
+	mensaje soundMessage = MessageBuilder().createBulletSoundMessage(message);
 	this->gameManager->broadcastMessage(response);
 	this->gameManager->broadcastMessage(soundMessage);
 }
