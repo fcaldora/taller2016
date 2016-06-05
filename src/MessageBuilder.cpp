@@ -92,8 +92,9 @@ mensaje MessageBuilder::createBulletMessage(Object* bullet){
 	return message;
 }
 
-mensaje MessageBuilder::createBulletSoundMessage() {
+mensaje MessageBuilder::createBulletSoundMessage(clientMsj clientMsj) {
 	mensaje message;
+	strcpy(message.imagePath, clientMsj.id);
 	strcpy(message.action,"bulletSound");
 	return message;
 }

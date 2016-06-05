@@ -33,7 +33,7 @@ public:
 	mensaje createReconnectionMessageForClient(Client* client);
 	mensaje createDisconnectionMessageForClient(Client* client);
 	mensaje createUpdatePhotogramMessageForPlane(Avion* plane);
-	mensaje createBulletSoundMessage();
+	mensaje createBulletSoundMessage(clientMsj clientMsj);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);
