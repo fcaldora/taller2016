@@ -41,6 +41,7 @@ public:
 	mensaje createEnemyPlaneCreationMessage(EnemyPlane* enemyPlane);
 	mensaje createBulletSoundMessage();
 	mensaje createEnemyBulletCreationMessage(EnemyPlane* enemyPlane, int id);
+	mensaje createLifeMessage(int id, int height, int width);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

@@ -220,10 +220,30 @@ mensaje MessageBuilder::createEnemyBulletCreationMessage(EnemyPlane* enemyPlane,
 	message.id = id;
 	strcpy(message.action,"create");
 	strcpy(message.imagePath, "enemybullet.png");
-	message.height = 6;
-	message.width = 6;
+	message.height = 12;
+	message.width = 12;
 	message.posX = enemyPlane->getPosX() + enemyPlane->getWidth()/2;
 	message.posY = enemyPlane->getPosY() + enemyPlane->getHeigth();
+	message.activeState = true;
+	message.actualPhotogram = 1;
+
+	return message;
+}
+
+mensaje MessageBuilder::createLifeMessage(int id, int height, int width){
+	mensaje message;
+	message.id = id;
+	strcpy(message.action,"create");
+	strcpy(message.imagePath, "heart.png");
+	message.height = 50;
+	message.width = 50;
+	if(id == 5001 || id == 10001 || id == 15001){
+		message.posX = 0 + (id/5000)*50;
+		message.posY = 25;
+	}else{
+		message.posX = width - (id/5000)*50;
+		message.posY = 25;
+	}
 	message.activeState = true;
 	message.actualPhotogram = 1;
 

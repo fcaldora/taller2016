@@ -101,9 +101,10 @@ int Object::crashedWithClient(ClientList* clientList){
 			if(this->haveCollision2((*it))){
 				(*it)->getPlane()->setLifes((*it)->getPlane()->getLifes() - 1);
 				if((*it)->getPlane()->getLifes() <= 0){
+					(*it)->setAlive(false);
 					return (*it)->getPlane()->getId();
 				}
-				return -2;
+				return (*it)->getPlane()->getId();
 			}
 		}
 	}

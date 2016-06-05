@@ -132,8 +132,13 @@ void GameManager::reloadGameFromXml(){
 	for (; it != clientList->clients.end(); it++){
 		(*it)->plane = parser->getAvion(i);
 		(*it)->setAlive(true);
+		(*it)->plane->setLifes(3);
 		avionMsj = MessageBuilder().createInitialMessageForClient((*it));
 		this->broadcastMessage(avionMsj);
+		for(int i=1; i<4; i++){
+			mensaje corazon = MessageBuilder().createLifeMessage(5000*i + (*it)->plane->getId(), procesor->getScreenHeight(), procesor->getScreenWidth());
+			this->broadcastMessage(corazon);
+		}
 		i++;
 	}
 	mensaje sortPlaneMsg;
@@ -234,12 +239,21 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					//Explosion* explosion = new Explosion(client->getPlane()->getPosX(), client->getPlane()->getPosY(), true, 15000 + explosions.size());
 					//msj = MessageBuilder().createExplosionMessage(explosion);
 					//broadcast(msj, clientList);
-					client->setAlive(false);
-					strcpy(clientHit.action, "delete");
-					clientHit.id = client->getPlane()->getId();
+					cout << "USER HAS BEEN HIT" << endl;
+					strcpy(clientHit.action, "path");
+					clientHit.id = client->getPlane()->getId() + (5000*(client->getPlane()->getLifes() + 1));
+					cout << "LIFE ID " << clientHit.id << endl;
+					strcpy(clientHit.imagePath, "nheart.png");
+					clientHit.width = 50;
+					clientHit.height = 50;
 					broadcast(clientHit, clientList);
+					if(!client->isAlive()){
+						strcpy(clientHit.action, "delete");
+						clientHit.id = client->getPlane()->getId();
+						broadcast(clientHit, clientList);
+					}
 				}else{
-					//Algun mensaje para avisarle que le quitaron una vida al cliente
+
 				}
 			}
 			if(strcmp(msg.action, "Bullet deleted") != 0)
@@ -340,7 +354,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
 				msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
 				msj.photograms = (*scoreIt)->getScore();
-				cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
+				//cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
 				broadcast(msj, clientList);
 			}
 			if(contador == 29){
@@ -475,6 +489,10 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				playerScore->setId(client->getPlane()->getId());
 				playerScore->setScore(0);
 				scores.push_back(playerScore);
+				for(int i=1; i<4; i++){
+					mensaje corazon = MessageBuilder().createLifeMessage(5000*i + clientPlane->getId(), procesor->getScreenHeight(), procesor->getScreenWidth());
+					drawableList.push_back(corazon);
+				}
 				//mensaje mensajeScore = MessageBuilder().createInitialScoreMessage(playerScore, playerScore->getScoreXPosition(procesor->getScreenWidth()), playerScore->getScoreYPosition(procesor->getScreenHeight()));
 				//drawableList.push_back(mensajeScore);
 			}

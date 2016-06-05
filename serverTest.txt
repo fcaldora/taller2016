@@ -253,7 +253,7 @@
 		<lifes>10</lifes>
 		<alto>124</alto>
 		<ancho>95</ancho>
-		<x>250</x>
+		<x>400</x>
 		<y>500</y>
 		<actualPhotogram>1</actualPhotogram>
 		<photograms>8</photograms>
