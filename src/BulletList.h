@@ -20,13 +20,14 @@ public:
 	void addElement(Object obj);
 	void setIdOfFirstBullet(int id);
 	void deleteElement(int id);
-	Object getObject(unsigned int number);
+	Object* getObject(unsigned int number);
 	int getObjectId(int numberOfObject);
 	int bulletQuantity();
 	int getLastId();
 	int getFirstId();
 	void moveBullets();
 	int bulletMessage(int bulletNumber, mensaje &msg, int ScreenWidth, int ScreenHeight, list<EnemyPlane*> enemyPlanes, ClientList* clientList);
+	void clearBullets();
 	list<Object>::iterator begin();
 	list<Object>::iterator end();
 	virtual ~BulletList();

@@ -231,7 +231,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			hit = objects.bulletMessage(i, msg, processor->getScreenWidth(), processor->getScreenHeight(), enemyPlanes, clientList);
 			if(hit != -1){
 				if(hit > clientList->clients.size()){
-					bulletId = objects.getObject(i).getClientId();
+					bulletId = objects.getObject(i)->getClientId();
 				}else if(hit != -2){
 					mensaje clientHit;
 					//Aviso a los clientes que borren al avion-
@@ -259,6 +259,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			if(strcmp(msg.action, "Bullet deleted") != 0)
 				broadcast(msg, clientList);
 		}
+		objects.clearBullets();
 		mensaje msj;
 		if(gameInitiated){
 			usleep(1000);

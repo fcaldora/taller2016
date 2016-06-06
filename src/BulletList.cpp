@@ -51,17 +51,16 @@ int BulletList::bulletQuantity(){
 	return (this->objectList.size());
 }
 
-//DEBE ENCONTRAR EL OBJETO POR ID, EN VEZ DE POR POSICION EN LA LISTA
-Object BulletList::getObject(unsigned int number){
-	Object obj;
+Object* BulletList::getObject(unsigned int number){
+	Object* obj;
 	if(number > this->bulletQuantity()){
-		obj.setStatus(false);
+		obj->setStatus(false);
 		return obj;
 	}
 	list<Object>::iterator it = this->objectList.begin();
 	for(unsigned int i = 0; i < number; i++)
 		it++;
-	return (*it);
+	return &(*it);
 }
 
 void BulletList::moveBullets(){
@@ -74,25 +73,24 @@ void BulletList::moveBullets(){
 }
 
 int BulletList::bulletMessage(int bulletNumber, mensaje &msg, int width, int height, list<EnemyPlane*> enemyPlanes, ClientList* clientList){
-//HARDCODADO EL BULLETID + 7. MODIFICAR!
-	Object object = this->getObject(bulletNumber);
+	Object* object = this->getObject(bulletNumber);
 	int id;
-	if(object.isEnemyBullet()){
-		id = object.crashedWithClient(clientList);
+	if(object->isEnemyBullet()){
+		id = object->crashedWithClient(clientList);
 	}else{
-		id = object.crashedWithPlane(enemyPlanes);
+		id = object->crashedWithPlane(enemyPlanes);
 	}
-	if((object.notVisible(width, height) || id != -1) && object.isStatic()){
+	if((object->notVisible(width, height) || id != -1) && object->isStatic()){
 		strcpy(msg.action, "delete");
-		msg.id = object.getId();
-		object.setStatus(false);
-		this->deleteElement(object.getId());
-	}else if(object.isStatic()){
+		msg.id = object->getId();
+		object->setStatus(false);
+		//this->deleteElement(object.getId());
+	}else if(object->isStatic()){
 		strcpy(msg.action, "draw");
-		msg.id = object.getId();
-		msg.posX = object.getPosX();
-		msg.posY = object.getPosY();
-		msg.actualPhotogram = object.getActualPhotogram();
+		msg.id = object->getId();
+		msg.posX = object->getPosX();
+		msg.posY = object->getPosY();
+		msg.actualPhotogram = object->getActualPhotogram();
 	}else{//object is not static
 		strncpy(msg.action, "Bullet deleted", 20);
 	}
@@ -109,6 +107,16 @@ list<Object>::iterator BulletList::end(){
 
 void BulletList::setLastId(int id){
 	this->lastBulletId = id;
+}
+
+void BulletList::clearBullets(){
+	list<Object>::iterator it;
+	for(it = begin(); it != end(); it++){
+		if(!(*it).isStatic()){
+			deleteElement((*it).getId());
+			it--;
+		}
+	}
 }
 
 BulletList::~BulletList() {
