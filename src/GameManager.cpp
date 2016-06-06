@@ -350,13 +350,15 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				disparos = 0;
 			}
 			for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
-				strcpy(msj.action, "score");
-				msj.id = (*scoreIt)->getId();
-				msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
-				msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
-				msj.photograms = (*scoreIt)->getScore();
-				//cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
-				broadcast(msj, clientList);
+				if((*scoreIt)->hasChanged()){
+					strcpy(msj.action, "score");
+					msj.id = (*scoreIt)->getId();
+					msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
+					msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
+					msj.photograms = (*scoreIt)->getScore();
+					//cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
+					broadcast(msj, clientList);
+				}
 			}
 			if(contador == 29){
 				for(explosionsIt = explosions.begin(); explosionsIt != explosions.end(); explosionsIt++){

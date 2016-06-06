@@ -8,8 +8,9 @@
 #include "Score.h"
 
 Score::Score() {
-	// TODO Auto-generated constructor stub
-
+	score = 0;
+	lastScore = 0;
+	id = 0;
 }
 
 Score::~Score() {
@@ -23,6 +24,13 @@ int Score::getScoreXPosition(int width){
 		return width - width/4;
 	}
 	return 50;
+}
+
+bool Score::hasChanged(){
+	if (score == lastScore)
+		return false;
+	lastScore = score;
+	return true;
 }
 
 int Score::getScoreYPosition(int height){

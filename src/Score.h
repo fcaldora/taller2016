@@ -29,10 +29,13 @@ public:
 		this->score = score;
 	}
 
+	bool hasChanged();
+
 	int getScoreXPosition(int width);
 	int getScoreYPosition(int height);
 private:
 	int score;
+	int lastScore;
 	int id;
 };
 
