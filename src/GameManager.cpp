@@ -302,31 +302,34 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					strcpy(msj.action, "delete");
 					msj.id = clientId;
 					broadcast(msj, clientList);
+					(*enemyPlanesIt)->setLifes(0);
 				}
 				if((*enemyPlanesIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())
 						|| hit == (*enemyPlanesIt)->getId() || clientId != -1){
 					if(hit == (*enemyPlanesIt)->getId()){
-						scoreManager->increaseDestroyScore(bulletId, (*enemyPlanesIt));
+						scoreManager->increaseScoreForHit(bulletId, (*enemyPlanesIt));
+						//scoreManager->increaseDestroyScore(bulletId, (*enemyPlanesIt));
 						if((*enemyPlanesIt)->getFormation() != NULL){
 							//scoreManager->increaseScoreForFormationDestroy(bulletId, (*enemyPlanesIt));
 						}
 					}
-					//Aviso a los clientes que borren al avion enemigo y creo explosion
-					Explosion* explosion = new Explosion((*enemyPlanesIt)->getPosX(), (*enemyPlanesIt)->getPosY(), false,  objects.getLastId() + 1);
-					objects.setLastId(objects.getLastId() + 1);
-					msj = MessageBuilder().createExplosionMessage(explosion);
-					broadcast(msj, clientList);
-					enemiesMutex.lock();
-					explosions.push_back(explosion);
-					strcpy(msj.action, "delete");
-					msj.id = (*enemyPlanesIt)->getId();
-					enemyPlanes.erase(enemyPlanesIt);
-					enemiesMutex.unlock();
-					enemyPlanesIt--;
-				}else{
-					if(hit == -2){
-						scoreManager->increaseScoreForHit(bulletId, (*enemyPlanesIt));
+
+					if((*enemyPlanesIt)->getLifes() <= 0){
+						//Aviso a los clientes que borren al avion enemigo y creo explosion
+						Explosion* explosion = new Explosion((*enemyPlanesIt)->getPosX(), (*enemyPlanesIt)->getPosY(), false,  objects.getLastId() + 1);
+						objects.setLastId(objects.getLastId() + 1);
+						msj = MessageBuilder().createExplosionMessage(explosion);
+						broadcast(msj, clientList);
+						enemiesMutex.lock();
+						explosions.push_back(explosion);
+						strcpy(msj.action, "delete");
+						msj.id = (*enemyPlanesIt)->getId();
+						enemyPlanes.erase(enemyPlanesIt);
+						enemiesMutex.unlock();
+						enemyPlanesIt--;
 					}
+					hit = -1;
+				}else{
 					strcpy(msj.action, "draw");
 					msj.id = (*enemyPlanesIt)->getId();
 					msj.actualPhotogram = (*enemyPlanesIt)->getActualPhotogram();
@@ -356,7 +359,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
 					msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
 					msj.photograms = (*scoreIt)->getScore();
-					//cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
+					cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
 					broadcast(msj, clientList);
 				}
 			}
