@@ -68,6 +68,7 @@ public:
 	}
 
 	Avion* plane;
+	bool isFirstTimeConnected;
 
 private:
 	string name;

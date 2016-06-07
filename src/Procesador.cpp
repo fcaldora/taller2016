@@ -56,6 +56,15 @@ void Procesador::processMessage(clientMsj message) {
 	}
 }
 
+void Procesador::processMenuMessageForClient(menuRequestMessage message, Client *client) {
+	if (strcmp(message.type, "join_team") == 0) {
+		this->gameManager->addClientToTeamWithName(client, message.teamName);
+	}
+	if (strcmp(message.type, "create_team") == 0) {
+		this->gameManager->createTeamWithNameForClient(message.teamName, client);
+	}
+}
+
 void Procesador::processMovementMessage(clientMsj message) {
 	Client* client = this->clientList->getClientForName(message.id);
 	if (client->plane->isLooping)

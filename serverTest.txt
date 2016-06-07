@@ -2,7 +2,7 @@
 	<configuracion>
 		<nivelDeLog>2</nivelDeLog>
 	</configuracion>
-    <CantidadMaximaClientes>2</CantidadMaximaClientes>
+    <CantidadDeJugadoresPorEquipo>2</CantidadDeJugadoresPorEquipo>
     <Puerto>8080</Puerto>
 </Servidor>
 
@@ -24,7 +24,7 @@
 	<elementos>
 		<elemento>
 			<path>isla1.png</path>
-			<id>3</id>
+			<id>7</id>
 			<ancho>64</ancho>
 			<alto>63</alto>
 			<x>50</x>
@@ -32,7 +32,7 @@
 		</elemento>
 		<elemento>
 			<path>isla2.png</path>
-			<id>4</id>
+			<id>8</id>
 			<ancho>64</ancho>
 			<alto>63</alto>
 			<x>50</x>
@@ -40,7 +40,7 @@
 		</elemento>
 		<elemento>
 			<path>barco1.png</path>
-			<id>5</id>
+			<id>9</id>
 			<ancho>33</ancho>
 			<alto>98</alto>
 			<x>50</x>
@@ -48,7 +48,7 @@
 		</elemento>
 		<elemento>
 			<path>pAviones.png</path>
-			<id>6</id>
+			<id>10</id>
 			<ancho>256</ancho>
 			<alto>244</alto>
 			<x>300</x>
@@ -59,7 +59,7 @@
 <powerUps>
 	<powerUp>
 		<path>x2.png</path>
-		<id>7</id>
+		<id>11</id>
 		<x>300</x>
 		<y>2500</y>
 		<ancho>32</ancho>
@@ -100,7 +100,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>8</id>
+		<id>3</id>
 		<path>Avion3.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -115,13 +115,43 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>9</id>
+		<id>4</id>
 		<path>Avion4.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
 		<lifes>3</lifes>
 		<x>400</x>
 		<y>100</y>
+		<cantidad>8</cantidad>
+		<velocidadDesplazamiento>5</velocidadDesplazamiento>
+		<velocidadDisparos>6</velocidadDisparos>
+		<avionSpriteId>avion</avionSpriteId>
+		<vueltaSpriteId>disparo</vueltaSpriteId>
+		<disparosSpriteId>vuelta</disparosSpriteId>
+	</avion>
+	<avion>
+		<id>5</id>
+		<path>Avion1.png</path>
+		<ancho>68</ancho>
+		<alto>68</alto>
+		<lifes>3</lifes>
+		<x>450</x>
+		<y>150</y>
+		<cantidad>8</cantidad>
+		<velocidadDesplazamiento>5</velocidadDesplazamiento>
+		<velocidadDisparos>6</velocidadDisparos>
+		<avionSpriteId>avion</avionSpriteId>
+		<vueltaSpriteId>disparo</vueltaSpriteId>
+		<disparosSpriteId>vuelta</disparosSpriteId>
+	</avion>
+	<avion>
+		<id>6</id>
+		<path>Avion2.png</path>
+		<ancho>68</ancho>
+		<alto>68</alto>
+		<lifes>3</lifes>
+		<x>400</x>
+		<y>200</y>
 		<cantidad>8</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
@@ -144,7 +174,7 @@
 </formations>
 <enemyPlanes>
 	<enemyPlane>
-		<id>8</id>
+		<id>12</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -159,7 +189,7 @@
 		<formationId>1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>9</id>
+		<id>13</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -174,7 +204,7 @@
 		<formationId>-1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>10</id>
+		<id>14</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -189,7 +219,7 @@
 		<formationId>1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>11</id>
+		<id>15</id>
 		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
@@ -204,7 +234,7 @@
 		<formationId>2</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>12</id>
+		<id>16</id>
 		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
@@ -219,7 +249,7 @@
 		<formationId>1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>13</id>
+		<id>17</id>
 		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
@@ -234,7 +264,7 @@
 		<formationId>1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>14</id>
+		<id>18</id>
 		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
@@ -249,7 +279,7 @@
 		<formationId>1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>15</id>
+		<id>19</id>
 		<lifes>10</lifes>
 		<alto>124</alto>
 		<ancho>95</ancho>

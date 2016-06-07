@@ -33,6 +33,10 @@ public:
 	Object createBulletForClient(Client* client, int posX);
 	void reloadGameFromXml();
 	void createEnemyBullet(EnemyPlane* enemyPlane);
+
+	void addClientToTeamWithName(Client *client, string teamName);
+	void createTeamWithNameForClient(string teamName, Client *client);
+
 private:
 	bool appShouldTerminate;
 	MenuPresenter *menuPresenter;
@@ -45,6 +49,7 @@ private:
 	vector<Team *> *teams;
 
 	void detachClientMessagesThreads();
+	void sendInitialGameInfo();
 };
 
 #endif /* GAMEMANAGER_H_ */

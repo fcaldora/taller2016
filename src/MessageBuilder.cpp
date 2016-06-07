@@ -8,14 +8,31 @@
 #include "MessageBuilder.h"
 
 MessageBuilder::MessageBuilder() {
-	// TODO Auto-generated constructor stub
 }
 
-clientMsj MessageBuilder::createSuccessfullyConnectedMessage(int planeId) {
+//clientMsj MessageBuilder::createSuccessfullyConnectedMessage(int planeId) {
+//	clientMsj message;
+//	strncpy(message.id, std::to_string(planeId).c_str(), kLongChar);
+//	strncpy(message.type, "connection_ok", kLongChar);
+//	strncpy(message.value, "Client connected", kLongChar);
+//	return message;
+//}
+
+clientMsj MessageBuilder::createSuccessfullyConnectedMessageForClient(Client *client) {
 	clientMsj message;
-	strncpy(message.id, std::to_string(planeId).c_str(), kLongChar);
+	string planeID = std::to_string(client->plane->getId());
+	strncpy(message.id, planeID.c_str(), kLongChar);
 	strncpy(message.type, "connection_ok", kLongChar);
 	strncpy(message.value, "Client connected", kLongChar);
+	message.isFirstTimeLogin = true;
+
+	return message;
+}
+
+clientMsj MessageBuilder::createSuccessfullyReconnectedMessageForClient(Client *client) {
+	clientMsj message = this->createSuccessfullyConnectedMessageForClient(client);
+	message.isFirstTimeLogin = false;
+
 	return message;
 }
 
@@ -269,7 +286,6 @@ menuResponseMessage MessageBuilder::createMenuMessage(vector<Team *> *teams) {
 		message.secondTeamIsAvailableToJoin = !(*teams)[1]->isFull();
 		strncpy(message.secondTeamName , (*teams)[1]->teamName.c_str(), kLongChar);
 	}
-
 	return message;
 }
 

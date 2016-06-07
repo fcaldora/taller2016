@@ -67,6 +67,8 @@ using namespace std;
 #define tagFormationId "formationId"
 #define tagActualPhotogram "actualPhotogram"
 #define tagPhotograms "photograms"
+#define kMaxNumberOfPlayersPerTeamTag "CantidadDeJugadoresPorEquipo"
+
 #define DOUBLESHOOTING 1
 #define KILLENEMIES 2
 #define ADDINGPOINTS 3
@@ -99,6 +101,7 @@ struct clientMsj {
 	char id[kLongChar];
 	char type[kLongChar];
 	char value[kLongChar];
+	bool isFirstTimeLogin;
 };
 
 struct mensaje {

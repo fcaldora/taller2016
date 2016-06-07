@@ -22,7 +22,8 @@ public:
 	MessageBuilder();
 	virtual ~MessageBuilder();
 
-	clientMsj createSuccessfullyConnectedMessage(int planeId);
+	clientMsj createSuccessfullyConnectedMessageForClient(Client *client);
+	clientMsj createSuccessfullyReconnectedMessageForClient(Client *client);
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
 	mensaje createInitialMessageForClient(Client *client);
