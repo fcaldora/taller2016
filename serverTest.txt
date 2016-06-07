@@ -93,7 +93,7 @@
 		<x>200</x>
 		<y>350</y>
 		<cantidad>8</cantidad>
-		<velocidadDesplazamiento>1</velocidadDesplazamiento>
+		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
 		<vueltaSpriteId>disparo</vueltaSpriteId>
@@ -108,7 +108,7 @@
 		<x>300</x>
 		<y>100</y>
 		<cantidad>8</cantidad>
-		<velocidadDesplazamiento>1</velocidadDesplazamiento>
+		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
 		<vueltaSpriteId>disparo</vueltaSpriteId>
@@ -123,7 +123,7 @@
 		<x>400</x>
 		<y>100</y>
 		<cantidad>8</cantidad>
-		<velocidadDesplazamiento>1</velocidadDesplazamiento>
+		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
 		<vueltaSpriteId>disparo</vueltaSpriteId>

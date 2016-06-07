@@ -115,6 +115,21 @@ struct mensaje {
 	char errorMsj[kLongChar];
 };
 
+struct menuRequestMessage {
+	int id;
+	char type[kLongChar]; // create_team || join_team
+	char teamName[kLongChar];
+};
+
+struct menuResponseMessage {
+	int id;
+	bool userCanCreateATeam;
+	char firstTeamName[kLongChar];
+	bool firstTeamIsAvailableToJoin;
+	char secondTeamName[kLongChar];
+	bool secondTeamIsAvailableToJoin;
+};
+
 enum LogLevelType {
 	LogLevelTypeOnlyErrors = 1,
 	LogLevelTypeEverything = 2

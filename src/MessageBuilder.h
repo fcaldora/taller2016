@@ -15,6 +15,7 @@
 #include "Explosion.h"
 #include "EnemyPlane.h"
 #include "Score.h"
+#include "Team.h"
 
 class MessageBuilder {
 public:
@@ -42,6 +43,7 @@ public:
 	mensaje createBulletSoundMessage();
 	mensaje createEnemyBulletCreationMessage(EnemyPlane* enemyPlane, int id);
 	mensaje createLifeMessage(int id, int height, int width);
+	menuResponseMessage createMenuMessage(vector<Team *> *teams);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

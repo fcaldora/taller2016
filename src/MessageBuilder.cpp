@@ -250,7 +250,29 @@ mensaje MessageBuilder::createLifeMessage(int id, int height, int width){
 	return message;
 }
 
+menuResponseMessage MessageBuilder::createMenuMessage(vector<Team *> *teams) {
+	menuResponseMessage message;
+
+	message.id = 0;
+	message.firstTeamIsAvailableToJoin = false;
+	message.secondTeamIsAvailableToJoin = false;
+	strncpy(message.firstTeamName , "", kLongChar);
+	strncpy(message.secondTeamName , "", kLongChar);
+	message.userCanCreateATeam = true;
+
+	if (teams->size() >= 1) {
+		message.firstTeamIsAvailableToJoin = !(*teams)[0]->isFull();
+		strncpy(message.firstTeamName , (*teams)[0]->teamName.c_str(), kLongChar);
+	}
+	if (teams->size() == 2) {
+		message.userCanCreateATeam = false;
+		message.secondTeamIsAvailableToJoin = !(*teams)[1]->isFull();
+		strncpy(message.secondTeamName , (*teams)[1]->teamName.c_str(), kLongChar);
+	}
+
+	return message;
+}
+
 MessageBuilder::~MessageBuilder() {
-	// TODO Auto-generated destructor stub
 }
 
