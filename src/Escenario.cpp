@@ -34,12 +34,15 @@ void Escenario::setScrollingStep(double step){
 }
 
 void Escenario::update(){
-	if(this->scrollingOffset > this->heigth ){
-		scrollingOffset = 0;
-	}else{
+	//if(this->scrollingOffset > this->heigth ){
+		//scrollingOffset = 0;
+	//}else{
 		scrollingOffset += scrollingStep;
+	//}
+	if(this->scrollingOffset >= this->stagesPositions.front()){
+		this->stagesPositions.pop_front();
+		this->portaAvionesY = this->stagesPositions.front();
 	}
-
 	this->posYActual += scrollingStep;
 	this->posY = scrollingOffset;
 	list<DrawableObject*>::iterator it;
@@ -49,8 +52,8 @@ void Escenario::update(){
 	for(int i = 0; i < powerUps.numberOfPowerUps(); i++){
 		powerUps.getPowerUp(i)->setPosY(powerUps.getPowerUp(i)->getPosY() + scrollingStep);
 	}
-	if(this->posYActual == this->heigth)
-		restart();
+	//if(this->posYActual == this->heigth)
+		//restart();
 }
 
 void Escenario::deleteElement(int elementId){
@@ -158,6 +161,16 @@ int Escenario::getPortaAvionesY(){
 
 void Escenario::deletePowerUps(){
 	this->powerUps.deletePowerUps();
+}
+
+void Escenario::setStagesPositions(XmlParser* parser){
+	parser->getStagesPositions(stagesPositions);
+}
+
+bool Escenario::gameFinished(){
+	if(scrollingOffset >= this->heigth)
+		return true;
+	return false;
 }
 
 Escenario::~Escenario() {

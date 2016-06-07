@@ -10,6 +10,7 @@
 #include "DrawableObject.h"
 #include "PowerUpList.h"
 #include "PowerUp.h"
+#include "XmlParser.h"
 #ifndef ESCENARIO_H_
 #define ESCENARIO_H_
 
@@ -39,8 +40,11 @@ public:
 	bool hayQueAterrizar();
 	void restart();
 	void deleteElements();
+	void setStagesPositions(XmlParser* parser);
+	bool gameFinished();
 private:
 	list<DrawableObject*> elements;
+	list<int> stagesPositions;
 	PowerUpList powerUps;
 	int posYActual;
 	int scrollingStep;

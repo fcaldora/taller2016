@@ -458,7 +458,8 @@ int XmlParser::getPosXPortaAviones(){
 		return -1;
 	}
 	TiXmlElement* posX = escenarioElem->FirstChildElement("portaAvionesX");
-	return (atoi(posX->GetText()));
+	TiXmlElement* anchoPAviones = escenarioElem->FirstChildElement("anchoPortaAviones");
+	return ((atoi(posX->GetText()) + atoi(anchoPAviones->GetText())/2));
 }
 
 int XmlParser::getPosYPortaAviones(){
@@ -470,6 +471,17 @@ int XmlParser::getPosYPortaAviones(){
 	}
 	TiXmlElement* posY = escenarioElem->FirstChildElement("portaAvionesY");
 	return (atoi(posY->GetText()));
+}
+
+void XmlParser::getStagesPositions(list<int> &stagesPositions){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
+	TiXmlElement* stagesPos = escenarioElem->FirstChildElement("stagesPositions");
+	TiXmlElement* stagePos = stagesPos->FirstChildElement("stagePosition");
+	while (stagePos != NULL){
+		stagesPositions.push_back(atoi(stagePos->GetText()));
+		stagePos = stagePos->NextSiblingElement("stagePosition");
+	}
 }
 
 XmlParser::~XmlParser() {

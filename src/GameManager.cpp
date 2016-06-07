@@ -401,6 +401,12 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				broadcast(planeUpdate, clientList);
 			}
 		}
+		if(escenario->gameFinished()){
+			mensaje finishMsj;
+			strncpy(finishMsj.action,"theEnd",kLongChar);
+			broadcast(finishMsj,clientList);
+			appShouldTerminate = true;
+		}
 	}
 }
 
@@ -637,6 +643,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	escenario.transformPositions();
 	aterrizaje = false;
 	escenario.setPosPortaAviones(parser->getPosXPortaAviones(),parser->getPosYPortaAviones());
+	escenario.setStagesPositions(parser);
 	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements() + parser->getNumberOfPowerUp() + parser->getNumberOfEnemyPlanes() + 1);
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,
