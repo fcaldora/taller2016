@@ -55,18 +55,24 @@ void PowerUp::setType(int type){
 	this->type = type;
 }
 
-void PowerUp::applyPowerUp(Avion* avion){
+void PowerUp::applyPowerUp(Avion* avion, ScoreManager* score, list<EnemyPlane*> &enemyPlanes, Procesador* processor){
+	list<EnemyPlane*>::iterator it;
 	switch(this->type){
 	case 1:
 		avion->setDoubleShooting(true);
 		break;
 	case 2:
-		//Matar a todos los enemigos que aparecen en pantalla y otorgarle los puntos
-		//que correspondan al avion.
+		for(it = enemyPlanes.begin(); it != enemyPlanes.end(); it++){
+			if((*it)->isOnScreen(processor->getScreenWidth(), processor->getScreenHeight())){
+				(*it)->setLifes(0);
+				score->increaseDestroyScore(avion->getId(), (*it));
+			}
+		}
 		break;
 	case 3:
-		//Aca deberia sumar puntos al cliente o al avion.
 		cout<<"Sumar  "<<this->pointsToAdd<<" puntos"<<endl;
+		score->increaseScoreForPowerUp(avion->getId(), pointsToAdd);
+		break;
 	}
 }
 

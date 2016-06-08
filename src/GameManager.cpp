@@ -278,7 +278,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
 					if (escenario->getPowerUp(i) != NULL){
 						if(escenario->getPowerUp(i)->haveCollision((*it)->getPlane())){
-							escenario->getPowerUp(i)->applyPowerUp((*it)->getPlane());
+							escenario->getPowerUp(i)->applyPowerUp((*it)->getPlane(), scoreManager, enemyPlanes, processor);
 							mensaje deletePowerUp;
 							strncpy(deletePowerUp.action,"delete",20);
 							deletePowerUp.id = escenario->getPowerUp(i)->getId();
@@ -305,7 +305,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					(*enemyPlanesIt)->setLifes(0);
 				}
 				if((*enemyPlanesIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())
-						|| hit == (*enemyPlanesIt)->getId() || clientId != -1){
+						|| hit == (*enemyPlanesIt)->getId() || clientId != -1 || (*enemyPlanesIt)->getLifes() <= 0){
 					if(hit == (*enemyPlanesIt)->getId()){
 						scoreManager->increaseScoreForHit(bulletId, (*enemyPlanesIt));
 						//scoreManager->increaseDestroyScore(bulletId, (*enemyPlanesIt));

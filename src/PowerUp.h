@@ -8,6 +8,9 @@
 #ifndef POWERUP_H_
 #define POWERUP_H_
 #include <iostream>
+#include "ScoreManager.h"
+#include "EnemyPlane.h"
+#include "Procesador.h"
 #include "Avion.h"
 
 using namespace std;
@@ -20,7 +23,7 @@ public:
 	void setPointsToAdd(int points);
 	int getType();
 	int getPointsToAdd();
-	void applyPowerUp(Avion* avion);
+	void applyPowerUp(Avion* avion, ScoreManager* scoreManager, list<EnemyPlane*>& enemyPlanes, Procesador* processor);
 
 private:
 	int type;

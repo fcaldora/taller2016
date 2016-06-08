@@ -21,6 +21,7 @@ public:
 	void increaseScore(int id,int hit, int score, int extraScore);
 	void increaseDestroyScore(int id, EnemyPlane* enemyPlane);
 	void increaseScoreForHit(int id, EnemyPlane* enemyPlane);
+	void increaseScoreForPowerUp(int id, int powerUpBonus);
 private:
 	list<Score*> scores;
 };

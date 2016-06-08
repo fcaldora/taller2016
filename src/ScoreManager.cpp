@@ -46,3 +46,16 @@ void ScoreManager::increaseScoreForHit(int id, EnemyPlane* enemyPlane){
 		}
 	}
 }
+
+void ScoreManager::increaseScoreForPowerUp(int id, int powerUpBonus){
+	list<Score*>::iterator it = scores.begin();
+	bool encontrado = false;
+	while(!encontrado && it != scores.end()){
+		if((*it)->getId() == id){
+			(*it)->setScore((*it)->getScore() + powerUpBonus);
+			encontrado = true;
+		}else{
+			it++;
+		}
+	}
+}
