@@ -21,6 +21,14 @@ public:
 		this->id = id;
 	}
 
+	void setClientSocket(int socket){
+		clientSocket = socket;
+	}
+
+	int getClientSocket(){
+		return clientSocket;
+	}
+
 	int getScore() const {
 		return score;
 	}
@@ -37,6 +45,7 @@ private:
 	int score;
 	int lastScore;
 	int id;
+	int clientSocket;
 };
 
 #endif /* SCORE_H_ */

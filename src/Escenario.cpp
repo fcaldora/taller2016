@@ -21,6 +21,8 @@ Escenario::Escenario() {
 	this->windowHeight = 0;
 	this->portaAvionesY = 0;
 	this->portaAvionesX = 0;
+	this->currentStage = 0;
+	this->oldStage = 0;
 }
 
 void Escenario::addElement(DrawableObject* element){
@@ -42,6 +44,7 @@ void Escenario::update(){
 	if(this->scrollingOffset >= this->stagesPositions.front()){
 		this->stagesPositions.pop_front();
 		this->portaAvionesY = this->stagesPositions.front();
+		this->currentStage++;
 	}
 	this->posYActual += scrollingStep;
 	this->posY = scrollingOffset;
@@ -171,6 +174,17 @@ bool Escenario::gameFinished(){
 	if(scrollingOffset >= this->heigth)
 		return true;
 	return false;
+}
+
+int Escenario::getCurrentStageNumber(){
+	return currentStage;
+}
+
+bool Escenario::stageHasChanged(){
+	if(oldStage == currentStage)
+		return false;
+	oldStage = currentStage;
+	return true;
 }
 
 Escenario::~Escenario() {

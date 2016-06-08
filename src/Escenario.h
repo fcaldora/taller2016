@@ -42,10 +42,14 @@ public:
 	void deleteElements();
 	void setStagesPositions(XmlParser* parser);
 	bool gameFinished();
+	bool stageHasChanged();
+	int getCurrentStageNumber();
 private:
 	list<DrawableObject*> elements;
 	list<int> stagesPositions;
 	PowerUpList powerUps;
+	int currentStage;
+	int oldStage;
 	int posYActual;
 	int scrollingStep;
 	int scrollingOffset;

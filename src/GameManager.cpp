@@ -401,9 +401,18 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				broadcast(planeUpdate, clientList);
 			}
 		}
+		if(escenario->stageHasChanged()){
+			mensaje endStageMsj;
+			strncpy(endStageMsj.action, "endStage", kLongChar);
+			for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
+				endStageMsj.photograms = (*scoreIt)->getScore(); //Envio puntaje
+				endStageMsj.actualPhotogram = escenario->getCurrentStageNumber(); //Envio numero de etapa
+				sendMsjInfo((*scoreIt)->getClientSocket(), sizeof(mensaje), &endStageMsj);
+			}
+		}
 		if(escenario->gameFinished()){
 			mensaje finishMsj;
-			strncpy(finishMsj.action,"theEnd",kLongChar);
+			strncpy(finishMsj.action,"close",kLongChar);
 			broadcast(finishMsj,clientList);
 			appShouldTerminate = true;
 		}
@@ -500,6 +509,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				Score* playerScore = new Score();
 				playerScore->setId(client->getPlane()->getId());
 				playerScore->setScore(0);
+				playerScore->setClientSocket(socketConnection);
 				scores.push_back(playerScore);
 				for(int i=1; i<4; i++){
 					mensaje corazon = MessageBuilder().createLifeMessage(5000*i + clientPlane->getId(), procesor->getScreenHeight(), procesor->getScreenWidth());
