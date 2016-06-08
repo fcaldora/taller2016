@@ -28,19 +28,15 @@ bool PowerUp::haveCollision(Avion* plane){
 	int upPowerupY = posY;
 	int downPowerupY = posY + heigth;
 
-	if(leftPlaneX >= leftPowerupX && leftPlaneX <= rightPowerupX)
-		xCollision = true;
-	else if(rightPlaneX >= leftPowerupX && rightPlaneX <= rightPowerupX)
-		xCollision = true;
-
-	if(upPlaneY >= upPowerupY && upPlaneY <= downPowerupY)
-		yCollision = true;
-	else if(downPlaneY >= upPowerupY && downPlaneY <= downPowerupY)
-		yCollision = true;
-
-	if(yCollision && xCollision)
-		return true;
-	return false;
+	if(downPlaneY < upPowerupY)
+		return false;
+	if(upPlaneY > downPowerupY)
+		return false;
+	if(leftPlaneX > rightPowerupX)
+		return false;
+	if(rightPlaneX < leftPowerupX)
+		return false;
+	return true;
 }
 
 int PowerUp::getType(){
