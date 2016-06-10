@@ -54,6 +54,10 @@ void Procesador::processMessage(clientMsj message) {
 		this->processExitMessage(message);
 		return;
 	}
+	if(strcmp(message.type, "practiceOff") == 0){
+		this->processPracticeOffMessage();
+		return;
+	}
 }
 
 void Procesador::processMovementMessage(clientMsj message) {
@@ -137,6 +141,10 @@ void Procesador::processExitMessage(clientMsj message){
 
 void Procesador::processEnemyBullet(EnemyPlane* enemyPlane){
 	this->gameManager->createEnemyBullet(enemyPlane);
+}
+
+void Procesador::processPracticeOffMessage(){
+	this->gameManager->getScenary()->setPracticeMode(false);
 }
 
 Procesador::~Procesador() {

@@ -38,6 +38,7 @@ public:
 	Avion* getAvion(int nroCliente);
 	void reloadDoc();
 	void getStagesPositions(list<int> &stagesPositions);
+	bool startWithPracticeMode();
 
 private:
 	TiXmlDocument doc;

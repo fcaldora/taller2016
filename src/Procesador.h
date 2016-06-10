@@ -53,6 +53,7 @@ private:
 	void processResetMessage(clientMsj message);
 	void processAnimationMessage(clientMsj message);
 	void processExitMessage(clientMsj message);
+	void processPracticeOffMessage();
 };
 
 #endif /* PROCESADOR_H_ */

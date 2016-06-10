@@ -44,7 +44,10 @@ public:
 	bool gameFinished();
 	bool stageHasChanged();
 	int getCurrentStageNumber();
+	void setPracticeMode(bool);
+	bool getPracticeMode();
 private:
+	bool practiceMode;
 	list<DrawableObject*> elements;
 	list<int> stagesPositions;
 	PowerUpList powerUps;

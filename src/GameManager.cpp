@@ -68,6 +68,10 @@ GameManager::GameManager() {
 	this->procesor = NULL;
 }
 
+Escenario* GameManager::getScenary(){
+	return escenario;
+}
+
 void GameManager::reloadGameFromXml(){
 	drawableList.clear();
 	parser->reloadDoc();
@@ -337,7 +341,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					msj.posY = (*enemyPlanesIt)->getPosY();
 					//Creo una bala si el avion esta visible y el random es 23
 					if((*enemyPlanesIt)->isOnScreen(processor->getScreenWidth(), processor->getScreenHeight())){
-						if(disparos == 1000){
+						if(disparos == 1000 && !escenario->getPracticeMode()){
 							mensaje disparo;
 							strcpy(disparo.action, "create");
 							disparo = MessageBuilder().createEnemyBulletCreationMessage((*enemyPlanesIt), objects.getLastId() + 1);
@@ -650,6 +654,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 		mensaje enemyPlanesMsj = MessageBuilder().createEnemyPlaneCreationMessage(enemyPlane);
 		drawableList.push_back(enemyPlanesMsj);
 	}
+	escenario.setPracticeMode(parser->startWithPracticeMode());
 	escenario.transformPositions();
 	aterrizaje = false;
 	escenario.setPosPortaAviones(parser->getPosXPortaAviones(),parser->getPosYPortaAviones());

@@ -484,6 +484,16 @@ void XmlParser::getStagesPositions(list<int> &stagesPositions){
 	}
 }
 
+bool XmlParser::startWithPracticeMode(){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* escenarioElem = docHandle.FirstChild(tagEscenario).ToElement();
+	TiXmlElement* practiceElem = escenarioElem->FirstChildElement("practica");
+	if(strcmp(practiceElem->GetText(), "on") == 0){
+		return true;
+	}
+	return false;
+}
+
 XmlParser::~XmlParser() {
 	// TODO Auto-generated destructor stub
 }

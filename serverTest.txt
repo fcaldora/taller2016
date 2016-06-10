@@ -16,6 +16,7 @@
 	<portaAvionesX>300</portaAvionesX>
 	<portaAvionesY>8500</portaAvionesY>
 	<anchoPortaAviones>224</anchoPortaAviones>
+	<practica>on</practica>
 	<fondo>
 		<spriteId>0</spriteId>
 		<ancho>1024</ancho>

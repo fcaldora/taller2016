@@ -23,6 +23,7 @@ Escenario::Escenario() {
 	this->portaAvionesX = 0;
 	this->currentStage = 0;
 	this->oldStage = 0;
+	this->practiceMode = false;
 }
 
 void Escenario::addElement(DrawableObject* element){
@@ -185,6 +186,14 @@ bool Escenario::stageHasChanged(){
 		return false;
 	oldStage = currentStage;
 	return true;
+}
+
+void Escenario::setPracticeMode(bool mode){
+	practiceMode = mode;
+}
+
+bool Escenario::getPracticeMode(){
+	return practiceMode;
 }
 
 Escenario::~Escenario() {

@@ -32,6 +32,7 @@ public:
 	Object createBulletForClient(Client* client, int posX);
 	void reloadGameFromXml();
 	void createEnemyBullet(EnemyPlane* enemyPlane);
+	Escenario* getScenary();
 private:
 	bool appShouldTerminate;
 	MenuPresenter *menuPresenter;
