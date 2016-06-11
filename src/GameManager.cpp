@@ -129,6 +129,7 @@ void GameManager::reloadGameFromXml(){
 		drawableList.push_back(powerUpMsj);
 		this->broadcastMessage(powerUpMsj);
 	}
+	scoreManager->resetScores();
 	escenario->transformPositions();
 	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements() + parser->getNumberOfPowerUp() + parser->getNumberOfEnemyPlanes() + 1);
 	mensaje avionMsj;
