@@ -59,6 +59,7 @@ using namespace std;
 #define tagLifes "lifes"
 #define tagCrazy "crazyMoves"
 #define tagScore "score"
+#define tagLastHitScore "lastHitScore"
 #define tagFormation "formation"
 #define tagFormations "formations"
 #define tagExtraPoints "extraPoints"

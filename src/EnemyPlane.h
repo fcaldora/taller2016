@@ -85,6 +85,15 @@ public:
 	int collideWithClient(ClientList* clientList);
 
 	bool isOnScreen(int width, int height);
+
+	int getLastHitScore() const {
+		return lastHitScore;
+	}
+
+	void setLastHitScore(int lastHitScore) {
+		this->lastHitScore = lastHitScore;
+	}
+
 private:
 	Formation* formation;
 	int score;
@@ -93,6 +102,7 @@ private:
 	int timesFacingOneDirection;
 	bool crazyMoves;
 	int speedFactor;
+	int lastHitScore;
 };
 
 #endif /* ENEMYPLANE_H_ */

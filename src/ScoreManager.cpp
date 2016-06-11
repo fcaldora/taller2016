@@ -33,7 +33,16 @@ void ScoreManager::increaseDestroyScore(int id, EnemyPlane* enemyPlane){
 	list<Score*>::iterator it;
 	for(it = this->scores.begin(); it != this->scores.end(); it++){
 		if((*it)->getId() == id){
-			(*it)->setScore((*it)->getScore() + enemyPlane->getScore());
+			(*it)->setScore((*it)->getScore() + enemyPlane->getScore() + enemyPlane->getLastHitScore());
+			if(enemyPlane->getFormation() != NULL){
+				if(enemyPlane->getFormation()->getQuantity() == 0){
+					enemyPlane->getFormation()->setDestroyed(true);
+					if(enemyPlane->getFormation()->isBonus()){
+						cout << "IT IS! here are your " << enemyPlane->getFormation()->getExtraPoints() << " extra points" << endl;
+						(*it)->setScore((*it)->getScore() + enemyPlane->getFormation()->getExtraPoints());
+					}
+				}
+			}
 		}
 	}
 }

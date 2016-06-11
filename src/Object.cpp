@@ -85,10 +85,19 @@ int Object::crashedWithPlane(list<EnemyPlane*> enemyPlanes){
 	for(it = enemyPlanes.begin(); it != enemyPlanes.end(); it++){
 		if(this->haveCollision(*it)){
 			(*it)->setLifes((*it)->getLifes() - 1);
+			if((*it)->getFormation() != NULL){
+				(*it)->getFormation()->setQuantity((*it)->getFormation()->getQuantity() - 1);
+				if((*it)->getFormation()->isBonus()){
+					//Primera vez seteo el client id
+					if((*it)->getFormation()->getHitId() == -1) (*it)->getFormation()->setHitId(this->getClientId());
+					(*it)->getFormation()->setBonus((*it)->getFormation()->getHitId() == this->getClientId());
+					(*it)->getFormation()->setHitId(this->getClientId());
+				}
+			}
 			if((*it)->getLifes() <= 0){
 				return (*it)->getId();
 			}
-			return -2;
+			return (*it)->getId();
 		}
 	}
 	return -1;

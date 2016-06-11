@@ -389,14 +389,14 @@ void XmlParser::getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Fo
 	enemyPlane->setFacingDirection(facingDirection->GetText());
 	TiXmlElement* score = enemyPlaneElement->FirstChildElement(tagScore);
 	enemyPlane->setScore(atoi(score->GetText()));
+	TiXmlElement* lastHitScore = enemyPlaneElement->FirstChildElement(tagLastHitScore);
+	enemyPlane->setLastHitScore(atoi(lastHitScore->GetText()));
 	TiXmlElement* formationIdElement = enemyPlaneElement->FirstChildElement(tagFormationId);
 	Formation* finalFormation;
 	if(atoi(formationIdElement->GetText()) != -1){
-		if(atoi(typeElement->GetText()) == 1){
-			for(it = formations.begin(); it != formations.end(); it++){
-				if((*it)->getId() == atoi(formationIdElement->GetText())){
-					enemyPlane->setFormation((*it));
-				}
+		for(it = formations.begin(); it != formations.end(); it++){
+			if((*it)->getId() == atoi(formationIdElement->GetText())){
+				finalFormation = (*it);
 			}
 		}
 	}else{
@@ -437,6 +437,10 @@ void XmlParser::getFormation(Formation* formation, int formationNum){
 	formation->setQuantity(atoi(quantityElement->GetText()));
 	TiXmlElement* idElement = formationElement->FirstChildElement(tagId);
 	formation->setId(atoi(idElement->GetText()));
+	//inicializo el bonus en verdadero y hit id en -1
+	formation->setBonus(true);
+	formation->setHitId(-1);
+	formation->setDestroyed(false);
 }
 
 int XmlParser::getNumberOfFormations(){

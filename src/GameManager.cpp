@@ -42,6 +42,7 @@ std::mutex mutexColaMensajes;
 std::mutex writingInLogFileMutex;
 std::mutex enemiesMutex;
 std::mutex enemyBulletMutex;
+std::mutex formationsMutex;
 map<unsigned int, thread> clientEntranceMessages;
 map<unsigned int, thread> keepAliveThreads;
 BulletList objects;
@@ -223,6 +224,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 	std::list<EnemyPlane*>::iterator enemyPlanesIt;
 	std::list<Explosion*>::iterator explosionsIt;
 	std::list<Score*>::iterator scoreIt;
+	std::list<Formation*>::iterator formationIt;
 	int contador = 0;
 	int disparos = 0;
 	int hit = -1;
@@ -236,6 +238,15 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			if(hit != -1){
 				if(hit > clientList->clients.size()){
 					bulletId = objects.getObject(i)->getClientId();
+					for(enemyPlanesIt = enemyPlanes.begin(); enemyPlanesIt != enemyPlanes.end(); enemyPlanesIt++){
+						if(hit == (*enemyPlanesIt)->getId()){
+							if((*enemyPlanesIt)->getLifes() > 0){
+								scoreManager->increaseScoreForHit(bulletId, (*enemyPlanesIt));
+							}else{
+								scoreManager->increaseDestroyScore(bulletId, (*enemyPlanesIt));
+							}
+						}
+					}
 				}else if(hit != -2){
 					mensaje clientHit;
 					//Aviso a los clientes que borren al avion-
@@ -309,29 +320,19 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					(*enemyPlanesIt)->setLifes(0);
 				}
 				if((*enemyPlanesIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())
-						|| hit == (*enemyPlanesIt)->getId() || clientId != -1 || (*enemyPlanesIt)->getLifes() <= 0){
-					if(hit == (*enemyPlanesIt)->getId()){
-						scoreManager->increaseScoreForHit(bulletId, (*enemyPlanesIt));
-						//scoreManager->increaseDestroyScore(bulletId, (*enemyPlanesIt));
-						if((*enemyPlanesIt)->getFormation() != NULL){
-							//scoreManager->increaseScoreForFormationDestroy(bulletId, (*enemyPlanesIt));
-						}
-					}
-
-					if((*enemyPlanesIt)->getLifes() <= 0){
-						//Aviso a los clientes que borren al avion enemigo y creo explosion
-						Explosion* explosion = new Explosion((*enemyPlanesIt)->getPosX(), (*enemyPlanesIt)->getPosY(), false,  objects.getLastId() + 1);
-						objects.setLastId(objects.getLastId() + 1);
-						msj = MessageBuilder().createExplosionMessage(explosion);
-						broadcast(msj, clientList);
-						enemiesMutex.lock();
-						explosions.push_back(explosion);
-						strcpy(msj.action, "delete");
-						msj.id = (*enemyPlanesIt)->getId();
-						enemyPlanes.erase(enemyPlanesIt);
-						enemiesMutex.unlock();
-						enemyPlanesIt--;
-					}
+						|| (*enemyPlanesIt)->getLifes() <= 0){
+					//Aviso a los clientes que borren al avion enemigo y creo explosion
+					Explosion* explosion = new Explosion((*enemyPlanesIt)->getPosX(), (*enemyPlanesIt)->getPosY(), false,  objects.getLastId() + 1);
+					objects.setLastId(objects.getLastId() + 1);
+					msj = MessageBuilder().createExplosionMessage(explosion);
+					broadcast(msj, clientList);
+					enemiesMutex.lock();
+					explosions.push_back(explosion);
+					strcpy(msj.action, "delete");
+					msj.id = (*enemyPlanesIt)->getId();
+					enemyPlanes.erase(enemyPlanesIt);
+					enemiesMutex.unlock();
+					enemyPlanesIt--;
 					hit = -1;
 				}else{
 					strcpy(msj.action, "draw");
@@ -387,6 +388,14 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				}
 			}
 			disparos++;
+			for(formationIt = formations.begin(); formationIt != formations.end(); formationIt++){
+				if((*formationIt)->isDestroyed()){
+					formationsMutex.lock();
+					formations.erase(formationIt);
+					formationsMutex.unlock();
+					formationIt--;
+				}
+			}
 		}
 		contador++;
 		if (contador == 30){

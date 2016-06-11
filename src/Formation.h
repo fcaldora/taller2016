@@ -45,11 +45,29 @@ public:
 		this->quantity = quantity;
 	}
 
+	bool isBonus() const {
+		return bonus;
+	}
+
+	void setBonus(bool bonus) {
+		this->bonus = bonus;
+	}
+
+	bool isDestroyed() const {
+		return destroyed;
+	}
+
+	void setDestroyed(bool destroyed) {
+		this->destroyed = destroyed;
+	}
+
 private:
 	int id;
 	int quantity;
 	int hitId;
 	int extraPoints;
+	bool bonus;
+	bool destroyed;
 };
 
 #endif /* FORMATION_H_ */
