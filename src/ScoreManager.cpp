@@ -68,3 +68,10 @@ void ScoreManager::increaseScoreForPowerUp(int id, int powerUpBonus){
 		}
 	}
 }
+
+void ScoreManager::resetScores(){
+	list<Score*>::iterator it;
+	for(it = scores.begin(); it != scores.end(); it++){
+		(*it)->setScore(0);
+	}
+}
