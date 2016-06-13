@@ -68,6 +68,8 @@ using namespace std;
 #define tagFormationId "formationId"
 #define tagActualPhotogram "actualPhotogram"
 #define tagPhotograms "photograms"
+#define kMaxNumberOfPlayersPerTeamTag "CantidadDeJugadoresPorEquipo"
+
 #define DOUBLESHOOTING 1
 #define KILLENEMIES 2
 #define ADDINGPOINTS 3
@@ -100,6 +102,7 @@ struct clientMsj {
 	char id[kLongChar];
 	char type[kLongChar];
 	char value[kLongChar];
+	bool isFirstTimeLogin;
 };
 
 struct mensaje {
@@ -114,6 +117,21 @@ struct mensaje {
 	int actualPhotogram;
 	int photograms;
 	char errorMsj[kLongChar];
+};
+
+struct menuRequestMessage {
+	int id;
+	char type[kLongChar]; // create_team || join_team
+	char teamName[kLongChar];
+};
+
+struct menuResponseMessage {
+	int id;
+	bool userCanCreateATeam;
+	char firstTeamName[kLongChar];
+	bool firstTeamIsAvailableToJoin;
+	char secondTeamName[kLongChar];
+	bool secondTeamIsAvailableToJoin;
 };
 
 enum LogLevelType {

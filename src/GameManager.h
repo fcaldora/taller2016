@@ -15,6 +15,7 @@
 #include "Procesador.h"
 #include "BulletList.h"
 #include "EnemyPlane.h"
+#include "Team.h"
 
 class MenuPresenter;
 
@@ -33,6 +34,10 @@ public:
 	void reloadGameFromXml();
 	void createEnemyBullet(EnemyPlane* enemyPlane);
 	Escenario* getScenary();
+
+	void addClientToTeamWithName(Client *client, string teamName);
+	void createTeamWithNameForClient(string teamName, Client *client);
+
 private:
 	bool appShouldTerminate;
 	MenuPresenter *menuPresenter;
@@ -42,8 +47,10 @@ private:
 	ClientList *clientList;
 	Procesador *procesor;
 	Escenario* escenario;
+	vector<Team *> *teams;
 
 	void detachClientMessagesThreads();
+	void sendInitialGameInfo();
 };
 
 #endif /* GAMEMANAGER_H_ */

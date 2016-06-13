@@ -67,6 +67,8 @@ GameManager::GameManager() {
 	this->xmlLoader = NULL;
 	this->escenario = NULL;
 	this->procesor = NULL;
+	vector<Team *> *teams = new vector<Team *>;
+	this->teams = teams;
 }
 
 Escenario* GameManager::getScenary(){
@@ -152,6 +154,23 @@ void GameManager::reloadGameFromXml(){
 	this->broadcastMessage(sortPlaneMsg);
 }
 
+int sendMenuMessage(int socket, int bytesToSend, menuResponseMessage *message) {
+	int bytesSent = 0;
+	int res = 0;
+
+	while (bytesSent < bytesToSend) {
+		res = send(socket, &(message)[bytesSent], bytesToSend - bytesSent,
+		MSG_WAITALL);
+		if (res == 0) { //Se cerró la conexion. Escribir en log de errores de conexion.
+			return 0;
+		} else if (res < 0) { //Error en el envio del mensaje. Escribir en el log.
+			return -1;
+		} else {
+			bytesSent += res;
+		}
+	}
+	return bytesSent;
+}
 
 int sendMsj(int socket, int bytesAEnviar, clientMsj* mensaje) {
 	int enviados = 0;
@@ -209,6 +228,21 @@ int readMsj(int socket, int bytesARecibir, clientMsj* mensaje) {
 	return recibidos;
 }
 
+void readMenuMessage(int socket, int bytesToReceive, menuRequestMessage* message) {
+	int currentBytesReceived = 0;
+	int totalBytesReceived = 0;
+	while (totalBytesReceived < bytesToReceive) {
+		currentBytesReceived = recv(socket, &message[totalBytesReceived],
+				bytesToReceive - totalBytesReceived, MSG_WAITALL);
+		if (currentBytesReceived < 0) {
+			shutdown(socket, SHUT_RDWR);
+		} else if (currentBytesReceived == 0) { //se corto la conexion desde el lado del servidor.
+			shutdown(socket, SHUT_RDWR);
+		} else {
+			totalBytesReceived += currentBytesReceived;
+		}
+	}
+}
 
 void broadcast(mensaje msg, ClientList* clientList){
 	std::list<Client*>::iterator it;
@@ -460,17 +494,27 @@ void disconnectClientForSocketConnection(unsigned int socketConnection, ClientLi
 	}
 }
 
-void *clientReader(int socketConnection, ClientList *clientList, Procesador *procesor, Escenario* escenario) {
+void receiveClientMenuMessage (Client *client, Procesador *procesor) {
+	menuRequestMessage message;
+	readMenuMessage(client->getSocketMessages(), sizeof(message), &message);
+	cout << message.type << " " << message.teamName << endl;
+	procesor->processMenuMessageForClient(message, client);
+}
+
+void *clientReader(Client *client, ClientList *clientList, Procesador *procesor, Escenario* escenario) {
 	int res = 0;
 	bool clientHasDisconnected = false;
+
+	if (client->isFirstTimeConnected)
+		receiveClientMenuMessage(client, procesor);
+
 	while (!appShouldTerminate && !clientHasDisconnected) {
 		clientMsj message;
-		res = readMsj(socketConnection, sizeof(message), &message);
+		res = readMsj(client->getSocketMessages(), sizeof(message), &message);
 		if (res < 0) {
-			shutdown(socketConnection, SHUT_RDWR);
+			shutdown(client->getSocketMessages(), SHUT_RDWR);
 			clientHasDisconnected = true;
-			disconnectClientForSocketConnection(socketConnection, clientList);
-			Client *client = clientList->getClientForSocket(socketConnection);
+			disconnectClientForSocketConnection(client->getSocketMessages(), clientList);
 			mensaje disconnection = MessageBuilder().createDisconnectionMessageForClient(client);
 			broadcast(disconnection, clientList);
 		} else if(!aterrizaje) {
@@ -480,7 +524,7 @@ void *clientReader(int socketConnection, ClientList *clientList, Procesador *pro
 	pthread_exit(NULL);
 }
 
-void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor, Escenario* escenario) {
+void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParser *parser, ClientList *clientList, Procesador *procesor, Escenario* escenario, vector<Team *> *teams) {
 	while (!appShouldTerminate) {
 		logWriter->writeWaitingForClientConnection();
 		int socketConnection = accept(socketHandle, NULL, NULL);
@@ -504,19 +548,22 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 
 			if (numberOfCurrentAcceptedClients >= maxNumberOfClients) {
 				message = MessageBuilder().createServerFullMessage();
+				sendMsj(socketConnection, sizeof(message), &(message));
+
 			} else {
 				numberOfCurrentAcceptedClients++;
 				//Creo el cliente con el nombre del mensaje y lo agrego a la lista
 				string name(message.value);
 				Avion *clientPlane = parser->getAvion(numberOfCurrentAcceptedClients);
 				Client* client = new Client(name, socketConnection, 0, clientPlane);
+				client->isFirstTimeConnected = true;
 
 				clientList->addClient(client);
 
-				message = MessageBuilder().createSuccessfullyConnectedMessage(clientPlane->getId());
+				message = MessageBuilder().createSuccessfullyConnectedMessageForClient(client);
 
 				clientEntranceMessages[socketConnection] = std::thread(
-						clientReader, socketConnection, clientList, procesor, escenario);
+						clientReader, client, clientList, procesor, escenario);
 				mensaje mensajeAvion = MessageBuilder().createInitialMessageForClient(client);
 				drawableList.push_back(mensajeAvion);
 				//Creo puntaje para el cliente
@@ -529,14 +576,20 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 					mensaje corazon = MessageBuilder().createLifeMessage(5000*i + clientPlane->getId(), procesor->getScreenHeight(), procesor->getScreenWidth());
 					drawableList.push_back(corazon);
 				}
+				sendMsj(socketConnection, sizeof(message), &(message));
+
 				//mensaje mensajeScore = MessageBuilder().createInitialScoreMessage(playerScore, playerScore->getScoreXPosition(procesor->getScreenWidth()), playerScore->getScoreYPosition(procesor->getScreenHeight()));
 				//drawableList.push_back(mensajeScore);
+				menuResponseMessage menuMessage = MessageBuilder().createMenuMessage(teams);
+				sendMenuMessage(socketConnection, sizeof(menuMessage), &menuMessage);
 			}
 		} else {
 			Client* client = clientList->getClientForName(message.value);
 			if (client->getConnnectionState()) {
 				logWriter->writeUserNameAlreadyInUse(message.value);
 				message = MessageBuilder().createUserNameAlreadyInUseMessage();
+				sendMsj(socketConnection, sizeof(message), &(message));
+
 			} else {
 				mensaje reconnection = MessageBuilder().createReconnectionMessageForClient(client);
 				broadcast(reconnection, clientList);
@@ -544,22 +597,17 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				logWriter->writeResumeGameForUserName(message.value);
 				client->setSocketMessages(socketConnection);
 				client->setConnected(true);
+				client->isFirstTimeConnected = false;
 
-				message = MessageBuilder().createSuccessfullyConnectedMessage(client->plane->getId());
+				message = MessageBuilder().createSuccessfullyReconnectedMessageForClient(client);
 				escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
-				clientEntranceMessages[socketConnection] = std::thread(clientReader, socketConnection, clientList, procesor, escenario);
+				clientEntranceMessages[socketConnection] = std::thread(clientReader, client, clientList, procesor, escenario);
 				userWasConnected = true;
+				sendMsj(socketConnection, sizeof(message), &(message));
+
 			}
 		}
 
-		sendMsj(socketConnection, sizeof(message), &(message));
-		//Se envia la info para levantar el juego recien cuando todos se conectaron.
-		if(numberOfCurrentAcceptedClients == maxNumberOfClients && !gameInitiated){
-			sendGameInfo(clientList);
-			gameInitiated = true;
-			scoreManager = new ScoreManager();
-			scoreManager->setScores(scores);
-		}
 		if(userWasConnected){
 			mensaje mensajeObjeto;
 			sendMsjInfo(socketConnection, sizeof(mensaje), &escenarioMsj);
@@ -590,8 +638,6 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 	}
 	pthread_exit(NULL);
 }
-
-
 
 int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->menuPresenter = new MenuPresenter(this->appShouldTerminate, this);
@@ -672,7 +718,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements() + parser->getNumberOfPowerUp() + parser->getNumberOfEnemyPlanes() + 1);
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,
-			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario);
+			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario, this->teams);
 	this->menuPresenter->presentMenu();
 
 	clientConnectionWaiter.detach();
@@ -693,6 +739,35 @@ void GameManager::broadcastMessage(mensaje message) {
 
 void GameManager::restartGame() {
 	escenario->restart();
+}
+
+void GameManager::sendInitialGameInfo() {
+	//Se envia la info para levantar el juego recien cuando todos se conectaron.
+	if(numberOfCurrentAcceptedClients == this->parser->getMaxNumberOfClients() && !gameInitiated){
+		sendGameInfo(this->clientList);
+		gameInitiated = true;
+		scoreManager = new ScoreManager();
+		scoreManager->setScores(scores);
+	}
+}
+
+void GameManager::addClientToTeamWithName(Client *client, string teamName) {
+	for (unsigned int i = 0; i < this->teams->size(); i++) {
+		if (strcmp((*this->teams)[i]->teamName.c_str(), teamName.c_str()) == 0) {
+			(*this->teams)[i]->clients.push_back(client);
+		}
+	}
+
+	this->sendInitialGameInfo();
+}
+
+void GameManager::createTeamWithNameForClient(string teamName, Client *client) {
+	int maxNumberOfPlayersPerTeam = this->parser->getMaxNumberOfPlayerPerTeam();
+	Team *newTeam = new Team(this->teams->size(), teamName, maxNumberOfPlayersPerTeam);
+	newTeam->clients.push_back(client);
+	this->teams->push_back(newTeam);
+
+	this->sendInitialGameInfo();
 }
 
 void GameManager::createEnemyBullet(EnemyPlane* enemyPlane){

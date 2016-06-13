@@ -15,13 +15,15 @@
 #include "Explosion.h"
 #include "EnemyPlane.h"
 #include "Score.h"
+#include "Team.h"
 
 class MessageBuilder {
 public:
 	MessageBuilder();
 	virtual ~MessageBuilder();
 
-	clientMsj createSuccessfullyConnectedMessage(int planeId);
+	clientMsj createSuccessfullyConnectedMessageForClient(Client *client);
+	clientMsj createSuccessfullyReconnectedMessageForClient(Client *client);
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
 	mensaje createInitialMessageForClient(Client *client);
@@ -42,6 +44,7 @@ public:
 	mensaje createBulletSoundMessage();
 	mensaje createEnemyBulletCreationMessage(EnemyPlane* enemyPlane, int id);
 	mensaje createLifeMessage(int id, int height, int width);
+	menuResponseMessage createMenuMessage(vector<Team *> *teams);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

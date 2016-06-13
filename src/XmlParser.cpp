@@ -22,8 +22,12 @@ int XmlParser::getServerPort(){
 }
 
 int XmlParser::getMaxNumberOfClients(){
+	return this->getMaxNumberOfPlayerPerTeam() * 2;
+}
+
+int XmlParser::getMaxNumberOfPlayerPerTeam() {
 	TiXmlHandle docHandle(&this->doc);
-	TiXmlElement* maxElem = docHandle.FirstChild("Servidor").FirstChild("CantidadMaximaClientes").ToElement();
+	TiXmlElement* maxElem = docHandle.FirstChild("Servidor").FirstChild(kMaxNumberOfPlayersPerTeamTag).ToElement();
 
 	if (maxElem)
 		return atoi(maxElem->GetText());

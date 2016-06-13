@@ -24,6 +24,7 @@ public:
 	virtual ~Procesador();
 
 	void processMessage(clientMsj message);
+	void processMenuMessageForClient(menuRequestMessage message, Client *client);
 
 	int getScreenHeight() const {
 		return screenHeight;
