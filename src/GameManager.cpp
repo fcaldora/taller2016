@@ -294,8 +294,8 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					clientHit.id = client->getPlane()->getId() + (5000*(client->getPlane()->getLifes() + 1));
 					cout << "LIFE ID " << clientHit.id << endl;
 					strcpy(clientHit.imagePath, "nheart.png");
-					clientHit.width = 50;
-					clientHit.height = 50;
+					clientHit.width = 39;
+					clientHit.height = 42;
 					broadcast(clientHit, clientList);
 					if(!client->isAlive()){
 						strcpy(clientHit.action, "delete");
@@ -775,8 +775,8 @@ void GameManager::createEnemyBullet(EnemyPlane* enemyPlane){
 	bullet.setId(objects.getLastId() + 1);
 	bullet.setPosX(enemyPlane->getPosX() + enemyPlane->getWidth()/2);
 	bullet.setPosY(enemyPlane->getPosY() + enemyPlane->getWidth());
-	bullet.setWidth(6);
-	bullet.setHeigth(6);
+	bullet.setWidth(12);
+	bullet.setHeigth(12);
 	bullet.setActualPhotogram(1);
 	bullet.setPath("enemybullet.png");
 	bullet.setStatus(true);
@@ -790,12 +790,12 @@ Object GameManager::createBulletForClient(Client* client, int posX){
 	Object bullet;
 	bullet.setId(objects.getLastId() + 1);
 	bullet.setClientId(client->getPlane()->getId());
-	bullet.setPath("bullet.png");
+	bullet.setPath("playerbullet.png");
 	//bullet.setPosX(client->plane->getPosX() + client->plane->getWidth()/2 - 15);
 	bullet.setPosX(posX);
 	bullet.setPosY(client->plane->getPosY() + 1);
-	bullet.setWidth(30);
-	bullet.setHeigth(30);
+	bullet.setWidth(9);
+	bullet.setHeigth(20);
 	bullet.setStatus(true);
 	bullet.setStep((client->plane->getVelDisparo() + client->plane->getVelDesplazamiento())/5);
 	bullet.setEnemyBullet(false);
