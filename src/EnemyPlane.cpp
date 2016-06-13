@@ -108,10 +108,14 @@ int EnemyPlane::collideWithClient(ClientList* clientList){
 				xCollision = true;
 			else if(rightPlaneX >= leftClientX && rightPlaneX <= rightClientX)
 				xCollision = true;
+			else if(leftPlaneX >= leftClientX && rightPlaneX <= rightClientX)
+				xCollision = true;
 
 			if(upPlaneY >= upClientY && upPlaneY <= downClientY)
 				yCollision = true;
 			else if(downPlaneY >= upClientY && downPlaneY <= downClientY)
+				yCollision = true;
+			else if(downPlaneY <= downClientY && upPlaneY >= upClientY)
 				yCollision = true;
 
 			if(yCollision && xCollision){

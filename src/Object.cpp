@@ -61,9 +61,11 @@ bool Object::haveCollision2(Client* client){
 	int leftPlaneX = client->getPlane()->getPosX();
 	int rightPlaneX = client->getPlane()->getPosX() + client->getPlane()->getWidth();
 	int upPlaneY = client->getPlane()->getPosY();
+	int downPlaneY = client->getPlane()->getPosY() + client->getPlane()->getHeigth();
 	int leftBulletX = posX;
 	int rightBulletX= posX + width;
 	int downBulletY = posY + heigth;
+	int upBulletY = posY;
 	if(leftBulletX >= leftPlaneX && rightBulletX <= rightPlaneX)
 		xCollision = true;
 	else if(leftBulletX <= rightPlaneX && rightBulletX >= rightPlaneX)
@@ -71,7 +73,7 @@ bool Object::haveCollision2(Client* client){
 	else if(rightBulletX >= leftPlaneX && leftBulletX <= leftPlaneX)
 		xCollision = true;
 
-	if(downBulletY >= upPlaneY)
+	if(downBulletY >= upPlaneY && upBulletY <= downPlaneY)
 		yCollision = true;
 
 	if(yCollision && xCollision)

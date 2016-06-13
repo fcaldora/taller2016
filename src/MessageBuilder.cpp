@@ -235,8 +235,8 @@ mensaje MessageBuilder::createLifeMessage(int id, int height, int width){
 	message.id = id;
 	strcpy(message.action,"create");
 	strcpy(message.imagePath, "heart.png");
-	message.height = 50;
-	message.width = 50;
+	message.height = 42;
+	message.width = 39;
 	if(id == 5001 || id == 10001 || id == 15001){
 		message.posX = 0 + (id/5000)*50;
 		message.posY = 25;
