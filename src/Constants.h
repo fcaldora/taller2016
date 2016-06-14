@@ -69,6 +69,7 @@ using namespace std;
 #define tagActualPhotogram "actualPhotogram"
 #define tagPhotograms "photograms"
 #define kMaxNumberOfPlayersPerTeamTag "CantidadDeJugadoresPorEquipo"
+#define kFirstBulletIDTag "FirstBulletID"
 
 #define DOUBLESHOOTING 1
 #define KILLENEMIES 2

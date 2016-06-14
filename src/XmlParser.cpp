@@ -37,6 +37,18 @@ int XmlParser::getMaxNumberOfPlayerPerTeam() {
 	}
 }
 
+int XmlParser::getFirstBulletId() {
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement *firstBulletElement = docHandle.FirstChild(kServerTag).FirstChild(kFirstBulletIDTag).ToElement();
+
+	if (firstBulletElement) {
+		cout << "First bullet id " << atoi(firstBulletElement->GetText()) << endl;
+ 		return atoi(firstBulletElement->GetText());
+	} else {
+		return 100;
+	}
+}
+
 LogLevelType XmlParser::getLogLevel() {
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement *configurationElement = docHandle.FirstChild(kServerTag).FirstChild(kConfigurationTag).ToElement();
@@ -503,5 +515,4 @@ bool XmlParser::startWithPracticeMode(){
 }
 
 XmlParser::~XmlParser() {
-	// TODO Auto-generated destructor stub
 }

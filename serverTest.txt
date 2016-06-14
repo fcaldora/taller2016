@@ -3,6 +3,7 @@
 		<nivelDeLog>2</nivelDeLog>
 	</configuracion>
     <CantidadDeJugadoresPorEquipo>1</CantidadDeJugadoresPorEquipo>
+    <FirstBulletID>50</FirstBulletID>
     <Puerto>8080</Puerto>
 </Servidor>
 
@@ -24,16 +25,16 @@
 		<path>fondo.png</path>
 	</fondo>
 	<stagesPositions>
-		<stagePosition>2000</stagePosition>
-		<stagePosition>3000</stagePosition>
-		<stagePosition>6000</stagePosition>
-		<stagePosition>15000</stagePosition>
-		<stagePosition>19500</stagePosition>
+		<stagePosition>12000</stagePosition>
+		<stagePosition>13000</stagePosition>
+		<stagePosition>16000</stagePosition>
+		<stagePosition>25000</stagePosition>
+		<stagePosition>29500</stagePosition>
 	</stagesPositions>
 	<elementos>
 		<elemento>
 			<path>isla1.png</path>
-			<id>7</id>
+			<id>1</id>
 			<ancho>64</ancho>
 			<alto>63</alto>
 			<x>50</x>
@@ -41,7 +42,7 @@
 		</elemento>
 		<elemento>
 			<path>isla2.png</path>
-			<id>8</id>
+			<id>2</id>
 			<ancho>64</ancho>
 			<alto>63</alto>
 			<x>50</x>
@@ -49,7 +50,7 @@
 		</elemento>
 		<elemento>
 			<path>barco1.png</path>
-			<id>9</id>
+			<id>3</id>
 			<ancho>33</ancho>
 			<alto>98</alto>
 			<x>50</x>
@@ -57,7 +58,7 @@
 		</elemento>
 		<elemento>
 			<path>pAviones224x621.png</path>
-			<id>6</id>
+			<id>4</id>
 			<ancho>224</ancho>
 			<alto>621</alto>
 			<x>300</x>
@@ -65,7 +66,7 @@
 		</elemento>
 		<elemento>
 			<path>pAviones224x621.png</path>
-			<id>16</id>
+			<id>5</id>
 			<ancho>224</ancho>
 			<alto>621</alto>
 			<x>300</x>
@@ -73,7 +74,7 @@
 		</elemento>
 		<elemento>
 			<path>pAviones224x621.png</path>
-			<id>17</id>
+			<id>6</id>
 			<ancho>224</ancho>
 			<alto>621</alto>
 			<x>300</x>
@@ -81,7 +82,7 @@
 		</elemento>
 		<elemento>
 			<path>pAviones224x621.png</path>
-			<id>18</id>
+			<id>7</id>
 			<ancho>224</ancho>
 			<alto>621</alto>
 			<x>300</x>
@@ -89,7 +90,7 @@
 		</elemento>
 		<elemento>
 			<path>pAviones224x621.png</path>
-			<id>19</id>
+			<id>8</id>
 			<ancho>224</ancho>
 			<alto>621</alto>
 			<x>300</x>
@@ -100,7 +101,7 @@
 <powerUps>
 	<powerUp>
 		<path>x2.png</path>
-		<id>11</id>
+		<id>9</id>
 		<x>300</x>
 		<y>2500</y>
 		<ancho>32</ancho>
@@ -110,7 +111,7 @@
 </powerUps>
 <aviones>
 	<avion>
-		<id>1</id>
+		<id>10</id>
 		<path>Avion1.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -124,9 +125,8 @@
 		<vueltaSpriteId>disparo</vueltaSpriteId>
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
-	
 	<avion>
-		<id>2</id>
+		<id>11</id>
 		<path>Avion2.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -141,7 +141,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>3</id>
+		<id>12</id>
 		<path>Avion3.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -156,7 +156,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>4</id>
+		<id>13</id>
 		<path>Avion4.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -171,7 +171,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>5</id>
+		<id>14</id>
 		<path>Avion1.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -186,7 +186,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>6</id>
+		<id>15</id>
 		<path>Avion2.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -203,39 +203,39 @@
 </aviones>
 <formations>
 	<formation>
-		<id>1</id>
+		<id>16</id>
 		<extraPoints>500</extraPoints>
 		<quantity>5</quantity>
 	</formation>
 	<formation>
-		<id>2</id>
+		<id>17</id>
 		<extraPoints>500</extraPoints>
 		<quantity>5</quantity>
 	</formation>
 	<formation>
-		<id>3</id>
+		<id>18</id>
 		<extraPoints>500</extraPoints>
 		<quantity>5</quantity>
 	</formation>
 	<formation>
-		<id>4</id>
+		<id>19</id>
 		<extraPoints>500</extraPoints>
 		<quantity>5</quantity>
 	</formation>
 	<formation>
-		<id>5</id>
+		<id>20</id>
 		<extraPoints>1500</extraPoints>
 		<quantity>10</quantity>
 	</formation>
 	<formation>
-		<id>6</id>
+		<id>21</id>
 		<extraPoints>1000</extraPoints>
 		<quantity>5</quantity>
 	</formation>
 </formations>
 <enemyPlanes>
 	<enemyPlane>
-		<id>12</id>
+		<id>22</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -251,7 +251,7 @@
 		<formationId>-1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>13</id>
+		<id>23</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -267,7 +267,7 @@
 		<formationId>-1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>14</id>
+		<id>24</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -283,7 +283,7 @@
 		<formationId>-1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>15</id>
+		<id>25</id>
 		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
@@ -299,7 +299,7 @@
 		<formationId>1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>16</id>
+		<id>26</id>
 		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
@@ -315,7 +315,7 @@
 		<formationId>2</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>17</id>
+		<id>27</id>
 		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
@@ -331,7 +331,7 @@
 		<formationId>3</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>18</id>
+		<id>28</id>
 		<lifes>5</lifes>
 		<alto>67</alto>
 		<ancho>67</ancho>
@@ -347,7 +347,7 @@
 		<formationId>4</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>19</id>
+		<id>29</id>
 		<lifes>10</lifes>
 		<alto>124</alto>
 		<ancho>95</ancho>
@@ -363,7 +363,7 @@
 		<formationId>5</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>20</id>
+		<id>30</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -379,7 +379,7 @@
 		<formationId>6</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>21</id>
+		<id>31</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -395,7 +395,7 @@
 		<formationId>6</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>22</id>
+		<id>32</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -411,7 +411,7 @@
 		<formationId>6</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>23</id>
+		<id>33</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -427,7 +427,7 @@
 		<formationId>6</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>24</id>
+		<id>34</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>

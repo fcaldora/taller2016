@@ -40,6 +40,7 @@ public:
 	void getStagesPositions(list<int> &stagesPositions);
 	bool startWithPracticeMode();
 	int getMaxNumberOfPlayerPerTeam();
+	int getFirstBulletId();
 
 private:
 	TiXmlDocument doc;

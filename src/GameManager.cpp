@@ -133,7 +133,7 @@ void GameManager::reloadGameFromXml(){
 	}
 	scoreManager->resetScores();
 	escenario->transformPositions();
-	objects.setIdOfFirstBullet(parser->getMaxNumberOfClients() + escenario->getNumberElements() + parser->getNumberOfPowerUp() + parser->getNumberOfEnemyPlanes() + 1);
+	objects.setIdOfFirstBullet(this->parser->getFirstBulletId());
 	mensaje avionMsj;
 	int i = 1;
 	list<Client*>::iterator it = clientList->clients.begin();
@@ -715,7 +715,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	aterrizaje = false;
 	escenario.setPosPortaAviones(parser->getPosXPortaAviones(),parser->getPosYPortaAviones());
 	escenario.setStagesPositions(parser);
-	objects.setIdOfFirstBullet(maxNumberOfClients + escenario.getNumberElements() + parser->getNumberOfPowerUp() + parser->getNumberOfEnemyPlanes() + 1);
+	objects.setIdOfFirstBullet(this->parser->getFirstBulletId());
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario, this->teams);
