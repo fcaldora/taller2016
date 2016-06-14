@@ -203,32 +203,32 @@
 </aviones>
 <formations>
 	<formation>
-		<id>16</id>
+		<id>1</id>
 		<extraPoints>500</extraPoints>
 		<quantity>5</quantity>
 	</formation>
 	<formation>
-		<id>17</id>
+		<id>2</id>
 		<extraPoints>500</extraPoints>
 		<quantity>5</quantity>
 	</formation>
 	<formation>
-		<id>18</id>
+		<id>3</id>
 		<extraPoints>500</extraPoints>
 		<quantity>5</quantity>
 	</formation>
 	<formation>
-		<id>19</id>
+		<id>4</id>
 		<extraPoints>500</extraPoints>
 		<quantity>5</quantity>
 	</formation>
 	<formation>
-		<id>20</id>
+		<id>5</id>
 		<extraPoints>1500</extraPoints>
 		<quantity>10</quantity>
 	</formation>
 	<formation>
-		<id>21</id>
+		<id>6</id>
 		<extraPoints>1000</extraPoints>
 		<quantity>5</quantity>
 	</formation>
