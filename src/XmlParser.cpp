@@ -42,7 +42,6 @@ int XmlParser::getFirstBulletId() {
 	TiXmlElement *firstBulletElement = docHandle.FirstChild(kServerTag).FirstChild(kFirstBulletIDTag).ToElement();
 
 	if (firstBulletElement) {
-		cout << "First bullet id " << atoi(firstBulletElement->GetText()) << endl;
  		return atoi(firstBulletElement->GetText());
 	} else {
 		return 100;

@@ -497,7 +497,6 @@ void disconnectClientForSocketConnection(unsigned int socketConnection, ClientLi
 void receiveClientMenuMessage (Client *client, Procesador *procesor) {
 	menuRequestMessage message;
 	readMenuMessage(client->getSocketMessages(), sizeof(message), &message);
-	cout << message.type << " " << message.teamName << endl;
 	procesor->processMenuMessageForClient(message, client);
 }
 

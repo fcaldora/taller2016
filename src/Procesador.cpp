@@ -100,19 +100,19 @@ void Procesador::processShootMessage(clientMsj message) {
 	if (client->plane->isLooping || !client->isAlive())
 		return;
 	if(client->plane->doubleShooting()){
-		int leftPlane = client->plane->getPosX();
-		int rightPlane = client->plane->getPosX() + client->plane->getWidth()/2;
-		Object bulletLeft = this->gameManager->createBulletForClient(client, leftPlane);
-		Object bulletRight = this->gameManager->createBulletForClient(client, rightPlane);
-		mensaje responseLeft = MessageBuilder().createBulletMessage(&bulletLeft);
-		mensaje responseRight = MessageBuilder().createBulletMessage(&bulletRight);
-		this->gameManager->broadcastMessage(responseLeft);
-		this->gameManager->broadcastMessage(responseRight);
+		int leftBulletXPosition = client->plane->getPosX() + client->plane->getWidth() /4 - 5;
+		int rightBulletXPosition = client->plane->getPosX() + client->plane->getWidth() *3/4 - 5;
+		Object leftBullet = this->gameManager->createBulletForClient(client, leftBulletXPosition);
+		Object rightBullet = this->gameManager->createBulletForClient(client, rightBulletXPosition);
+		mensaje leftBulletMessage = MessageBuilder().createBulletMessage(&leftBullet);
+		mensaje rightBulletMessage = MessageBuilder().createBulletMessage(&rightBullet);
+		this->gameManager->broadcastMessage(leftBulletMessage);
+		this->gameManager->broadcastMessage(rightBulletMessage);
 	}else{
-		int middlePlane = client->plane->getPosX() + client->plane->getWidth()/2 - 15;
-		Object bullet = this->gameManager->createBulletForClient(client, middlePlane);
-		mensaje response = MessageBuilder().createBulletMessage(&bullet);
-		this->gameManager->broadcastMessage(response);
+		int middleBulletXPosition = client->plane->getPosX() + client->plane->getWidth()/2 - 5;
+		Object bullet = this->gameManager->createBulletForClient(client, middleBulletXPosition);
+		mensaje bulletMessage = MessageBuilder().createBulletMessage(&bullet);
+		this->gameManager->broadcastMessage(bulletMessage);
 	}
 	mensaje soundMessage = MessageBuilder().createBulletSoundMessage();
 	this->gameManager->broadcastMessage(soundMessage);
