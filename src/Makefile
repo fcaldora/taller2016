@@ -23,6 +23,6 @@ all:
 	g++ -Wall Explosion.cpp -c -std=c++11
 	g++ -Wall Score.cpp -c -std=c++11
 	g++ -Wall ScoreManager.cpp -c -std=c++11
-	g++ -Wall Team.h
+	g++ -Wall Team.cpp -c -std=c++11
 
 	g++ -Wall -g taller2016Server.cpp  BulletList.o PowerUp.o Team.o PowerUpList.o CargadorXML.o XmlParser.o Procesador.o LogWriter.o Avion.o Escenario.o Client.o GameManager.o ClientList.o DrawableObject.o MenuPresenter.o MessageBuilder.o Object.o SocketManager.o Formation.o EnemyPlane.o Explosion.o Score.o ScoreManager.o $(XmlLibrary) -o server -lpthread -std=c++11
