@@ -617,9 +617,10 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 					mensaje corazon = MessageBuilder().createLifeMessage(5000*i + clientPlane->getId(), procesor->getScreenHeight(), procesor->getScreenWidth());
 					drawableList.push_back(corazon);
 				}
-
-				mensaje mensajeScore = MessageBuilder().createInitialScoreMessage(playerScore, playerScore->getScoreXPosition(procesor->getScreenWidth()), playerScore->getScoreYPosition(procesor->getScreenHeight()), message);
-				drawableList.push_back(mensajeScore);
+				if(colaboration){
+					mensaje mensajeScore = MessageBuilder().createInitialScoreMessage(playerScore, playerScore->getScoreXPosition(procesor->getScreenWidth()), playerScore->getScoreYPosition(procesor->getScreenHeight()), message);
+					drawableList.push_back(mensajeScore);
+				}
 
 				message = MessageBuilder().createSuccessfullyConnectedMessageForClient(client, colaboration);
 
