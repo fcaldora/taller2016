@@ -24,13 +24,14 @@ bool Team::isFull() {
 	return (this->maxNumberOfPlayers <= this->clients.size());
 }
 
-bool Team::isClientOfThisTeam(int planeId){
-	list<Client*>::iterator it;
+bool Team::isClientOfThisTeam(int clientTeamId){
+	/*list<Client*>::iterator it;
 	for(it = clients.begin(); it != clients.end(); it++){
 		if((*it)->getPlane()->getId() == planeId)
 			return true;
 	}
-	return false;
+	return false;*/
+	return (clientTeamId == teamID);
 }
 
 void Team::addPoints(int points){

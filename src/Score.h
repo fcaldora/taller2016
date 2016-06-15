@@ -8,6 +8,7 @@
 #ifndef SCORE_H_
 #define SCORE_H_
 
+using namespace std;
 class Score {
 public:
 	Score();

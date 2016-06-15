@@ -174,6 +174,18 @@ int sendMenuMessage(int socket, int bytesToSend, menuResponseMessage *message) {
 	return bytesSent;
 }
 
+void GameManager::setTeamIdScores(int teamId, int planeId){
+	list<Score*>::iterator it;
+	for(it = scores.begin(); it != scores.end(); it++){
+		if((*it)->getId() == planeId){
+			if(!colaboration)
+				(*it)->setClientTeamId(teamId);
+			else
+				(*it)->setClientTeamId(0);
+		}
+	}
+}
+
 int sendMsj(int socket, int bytesAEnviar, clientMsj* mensaje) {
 	int enviados = 0;
 	int res = 0;
@@ -398,11 +410,11 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
 				if((*scoreIt)->hasChanged()){
 					strcpy(msj.action, "score");
-					msj.id = (*scoreIt)->getId();
-					msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
-					msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
-					msj.photograms = (*scoreIt)->getScore();
-					//msj.photograms = processor->gameManager->getScoreTeamForClient((*scoreIt)->getId());
+					msj.id = (*scoreIt)->getClientTeamId();
+					//msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
+					//msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
+					//msj.photograms = (*scoreIt)->getScore();
+					msj.photograms = processor->gameManager->getScoreTeamForClient((*scoreIt)->getClientTeamId());
 					cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
 					broadcast(msj, clientList);
 					(*scoreIt)->updateLastScore();
@@ -475,12 +487,20 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 
 void sendGameInfo(ClientList* clientList){
 	list<mensaje>::iterator it;
+	list<Client*>::iterator clientIt;
 	for (it = drawableList.begin(); it != drawableList.end(); it++){
 		broadcast((*it), clientList);
 	}
 	mensaje sortPlaneMsg;
 	strncpy(sortPlaneMsg.action, "sortPlane", kLongChar);
 	broadcast(sortPlaneMsg, clientList);
+	mensaje teamIdMsg;
+	strncpy(teamIdMsg.action, "teamId", kLongChar);
+	for(clientIt = clientList->clients.begin(); clientIt != clientList->clients.end(); clientIt++){
+		teamIdMsg.id = (*clientIt)->getTeamId();
+		sendMsjInfo((*clientIt)->getSocketMessages(), sizeof(mensaje), &teamIdMsg);
+	}
+
 }
 
 void disconnectClientForSocketConnection(unsigned int socketConnection, ClientList *clientList) {
@@ -570,13 +590,14 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 						clientReader, client, clientList, procesor, escenario);
 				mensaje mensajeAvion = MessageBuilder().createInitialMessageForClient(client);
 				drawableList.push_back(mensajeAvion);
+
 				//Creo puntaje para el cliente
 				Score* playerScore = new Score();
 				playerScore->setId(client->getPlane()->getId());
 				playerScore->setScore(0);
 				playerScore->setClientSocket(socketConnection);
-				playerScore->setClientTeamId(client->getTeamId());
 				scores.push_back(playerScore);
+
 				for(int i=1; i<4; i++){
 					mensaje corazon = MessageBuilder().createLifeMessage(5000*i + clientPlane->getId(), procesor->getScreenHeight(), procesor->getScreenWidth());
 					drawableList.push_back(corazon);
@@ -591,6 +612,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				}else{
 					procesor->addClientToColaborationTeam(client);
 					client->setTeamId(0);//id del equipo de colaboracion.
+					procesor->gameManager->setTeamIdScores(0, client->plane->getId());
 				}
 			}
 		} else {
@@ -769,6 +791,7 @@ void GameManager::addClientToTeamWithName(Client *client, string teamName) {
 		if (strcmp((*this->teams)[i]->teamName.c_str(), teamName.c_str()) == 0) {
 			(*this->teams)[i]->clients.push_back(client);
 			client->setTeamId((*this->teams)[i]->getTeamId());
+			this->setTeamIdScores((*this->teams)[i]->getTeamId(), client->plane->getId());
 		}
 	}
 
@@ -779,6 +802,7 @@ void GameManager::createTeamWithNameForClient(string teamName, Client *client) {
 	int maxNumberOfPlayersPerTeam = this->parser->getMaxNumberOfPlayerPerTeam();
 	Team *newTeam = new Team(this->teams->size(), teamName, maxNumberOfPlayersPerTeam);
 	client->setTeamId(this->teams->size());
+	this->setTeamIdScores(this->teams->size(), client->plane->getId());
 	newTeam->clients.push_back(client);
 	this->teams->push_back(newTeam);
 
@@ -789,8 +813,6 @@ void GameManager::createColaborationTeam(string teamName){
 	int maxNumberOfPlayersPerTeam = this->parser->getMaxNumberOfPlayerPerTeam();
 	Team *newTeam = new Team(this->teams->size(), teamName, maxNumberOfPlayersPerTeam);
 	this->teams->push_back(newTeam);
-
-	//this->sendInitialGameInfo();
 }
 
 void GameManager::updateScoresTeam(list<Score*> scores){
@@ -798,7 +820,7 @@ void GameManager::updateScoresTeam(list<Score*> scores){
 	for(it = scores.begin(); it != scores.end(); it++){
 		if((*it)->hasChanged()){
 			for (unsigned int i = 0; i < this->teams->size(); i++){
-				if((*this->teams)[i]->isClientOfThisTeam((*it)->getId())){
+				if((*this->teams)[i]->isClientOfThisTeam((*it)->getClientTeamId())){
 					(*this->teams)[i]->addPoints((*it)->getLastScoreDifference());
 				}
 			}
@@ -806,9 +828,9 @@ void GameManager::updateScoresTeam(list<Score*> scores){
 	}
 }
 
-int GameManager::getScoreTeamForClient(int planeId){
+int GameManager::getScoreTeamForClient(int clientTeamId){
 	for (unsigned int i = 0; i < this->teams->size(); i++){
-		if((*this->teams)[i]->isClientOfThisTeam(planeId)){
+		if((*this->teams)[i]->isClientOfThisTeam(clientTeamId)){
 			return((*this->teams)[i]->getPoints());
 		}
 	}

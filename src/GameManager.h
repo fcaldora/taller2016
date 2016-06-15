@@ -40,7 +40,7 @@ public:
 	void createColaborationTeam(string teamName);
 	void updateScoresTeam(list<Score*> scores);
 	int getScoreTeamForClient(int planeId);
-
+	void setTeamIdScores(int teamId, int planeId);
 private:
 	bool appShouldTerminate;
 	MenuPresenter *menuPresenter;

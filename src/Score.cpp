@@ -6,6 +6,7 @@
  */
 
 #include "Score.h"
+#include <iostream>
 
 Score::Score() {
 	score = 0;
