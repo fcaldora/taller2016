@@ -46,6 +46,7 @@ public:
 	int getCurrentStageNumber();
 	void setPracticeMode(bool);
 	bool getPracticeMode();
+	void resetScrollingOffset();
 private:
 	bool practiceMode;
 	list<DrawableObject*> elements;

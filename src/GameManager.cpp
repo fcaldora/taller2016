@@ -83,6 +83,8 @@ void GameManager::reloadGameFromXml(){
 	formations.clear();
 	explosions.clear();
 	escenario->deletePowerUps();
+	escenario->resetScrollingOffset();
+	escenario->setStagesPositions(parser);
 	mensaje ventanaMsj, escenarioMsj;
 	memset(&ventanaMsj, 0, sizeof(mensaje));
 	memset(&escenarioMsj, 0, sizeof(mensaje));

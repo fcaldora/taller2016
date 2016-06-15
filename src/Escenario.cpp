@@ -42,11 +42,13 @@ void Escenario::update(){
 	//}else{
 		scrollingOffset += scrollingStep;
 	//}
-	if(this->scrollingOffset >= this->stagesPositions.front()){
-		this->stagesPositions.pop_front();
-		this->portaAvionesY = this->stagesPositions.front();
-		this->currentStage++;
-	}
+		if(stagesPositions.size() > 0){
+			if(this->scrollingOffset >= this->stagesPositions.front()){
+				this->stagesPositions.pop_front();
+				this->portaAvionesY = this->stagesPositions.front();
+				this->currentStage++;
+			}
+		}
 	this->posYActual += scrollingStep;
 	this->posY = scrollingOffset;
 	list<DrawableObject*>::iterator it;
@@ -168,6 +170,7 @@ void Escenario::deletePowerUps(){
 }
 
 void Escenario::setStagesPositions(XmlParser* parser){
+	stagesPositions.clear();
 	parser->getStagesPositions(stagesPositions);
 }
 
@@ -194,6 +197,12 @@ void Escenario::setPracticeMode(bool mode){
 
 bool Escenario::getPracticeMode(){
 	return practiceMode;
+}
+
+void Escenario::resetScrollingOffset(){
+	scrollingOffset = 0;
+	currentStage = 0;
+	oldStage = 0;
 }
 
 Escenario::~Escenario() {
