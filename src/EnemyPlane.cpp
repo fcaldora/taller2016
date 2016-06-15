@@ -46,11 +46,17 @@ void EnemyPlane::changeDirection(){
 
 void EnemyPlane::movePosition(){
 	if(strcmp(this->facingDirection.c_str(), "NORTH") == 0){
+		if(this->isBigPlane() && posY < 10){
+			this->facingDirection = "WEST";
+		}
 		this->posY -= 1;
 	}else if(strcmp(this->facingDirection.c_str(), "NORTHEAST") == 0){
 		this->posY -= 1;
 		this->posX += 1;
 	}else if(strcmp(this->facingDirection.c_str(), "EAST") == 0){
+		if(this->isBigPlane() && posX > 700){
+			this->facingDirection = "WEST";
+		}
 		this->posX += 1;
 	}else if(strcmp(this->facingDirection.c_str(), "SOUTHEAST") == 0){
 		this->posX += 1;
@@ -61,6 +67,9 @@ void EnemyPlane::movePosition(){
 		this->posY += 1;
 		this->posX -= 1;
 	}else if(strcmp(this->facingDirection.c_str(), "WEST") == 0){
+		if(this->isBigPlane() && posX < 10){
+			this->facingDirection = "EAST";
+		}
 		this->posX -= 1;
 	}else if(strcmp(this->facingDirection.c_str(), "NORTHWEST") == 0){
 		this->posX -= 1;

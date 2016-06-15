@@ -27,7 +27,7 @@ public:
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
 	mensaje createInitialMessageForClient(Client *client);
-	mensaje createInitialScoreMessage(Score* score, int posx, int posy);
+	mensaje createInitialScoreMessage(Score* score, int posx, int posy, clientMsj mess);
 	mensaje createPlaneMovementMessageForClient(Client *client);
 	mensaje createInitBackgroundMessage(Escenario *escenario);
 	mensaje createBulletMessage(Object*);

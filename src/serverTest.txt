@@ -1,4 +1,4 @@
-<Servidor>
+	<Servidor>
 	<configuracion>
 		<nivelDeLog>2</nivelDeLog>
 	</configuracion>

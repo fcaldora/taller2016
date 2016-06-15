@@ -425,9 +425,11 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				if((*scoreIt)->hasChanged()){
 					strcpy(msj.action, "score");
 					msj.id = (*scoreIt)->getClientTeamId();
+					msj.actualPhotogram = (*scoreIt)->getId();
 					//msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
 					//msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
 					//msj.photograms = (*scoreIt)->getScore();
+					msj.width = (*scoreIt)->getScore();
 					msj.photograms = processor->gameManager->getScoreTeamForClient((*scoreIt)->getClientTeamId());
 					cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
 					broadcast(msj, clientList);
@@ -598,7 +600,6 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 
 				clientList->addClient(client);
 
-				message = MessageBuilder().createSuccessfullyConnectedMessageForClient(client, colaboration);
 
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, client, clientList, procesor, escenario);
@@ -616,10 +617,14 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 					mensaje corazon = MessageBuilder().createLifeMessage(5000*i + clientPlane->getId(), procesor->getScreenHeight(), procesor->getScreenWidth());
 					drawableList.push_back(corazon);
 				}
+
+				mensaje mensajeScore = MessageBuilder().createInitialScoreMessage(playerScore, playerScore->getScoreXPosition(procesor->getScreenWidth()), playerScore->getScoreYPosition(procesor->getScreenHeight()), message);
+				drawableList.push_back(mensajeScore);
+
+				message = MessageBuilder().createSuccessfullyConnectedMessageForClient(client, colaboration);
+
 				sendMsj(socketConnection, sizeof(message), &(message));
 
-				//mensaje mensajeScore = MessageBuilder().createInitialScoreMessage(playerScore, playerScore->getScoreXPosition(procesor->getScreenWidth()), playerScore->getScoreYPosition(procesor->getScreenHeight()));
-				//drawableList.push_back(mensajeScore);
 				if(!colaboration){
 					menuResponseMessage menuMessage = MessageBuilder().createMenuMessage(teams);
 					sendMenuMessage(socketConnection, sizeof(menuMessage), &menuMessage);

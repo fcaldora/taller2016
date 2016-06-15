@@ -64,13 +64,15 @@ mensaje MessageBuilder::createInitialMessageForClient(Client *client) {
 	return message;
 }
 
-mensaje MessageBuilder::createInitialScoreMessage(Score* playerScore, int posX, int posY){
+mensaje MessageBuilder::createInitialScoreMessage(Score* playerScore, int posX, int posY,clientMsj mess){
 	mensaje message;
 
 	strcpy(message.action, "createScore");
 	message.id = playerScore->getId();
 	message.posX = posX;
 	message.posY = posY;
+	strcpy(message.imagePath, mess.value);
+	message.height = playerScore->getClientTeamId();
 
 	return message;
 }
@@ -251,8 +253,14 @@ mensaje MessageBuilder::createLifeMessage(int id, int height, int width){
 	if(id == 5001 || id == 10001 || id == 15001){
 		message.posX = 0 + (id/5000)*50;
 		message.posY = 25;
-	}else{
-		message.posX = width - (id/5000)*50;
+	}else if(id == 5002 || id == 10002 || id == 15002){
+		message.posX = 170 + (id/5000)*50;
+		message.posY = 25;
+	}else if(id == 5003 || id == 10003 || id == 15003){
+		message.posX = 340 + (id/5000)*50;
+		message.posY = 25;
+	}else if(id == 5004 || id == 10004 || id == 15004){
+		message.posX = 510 + (id/5000)*50;
 		message.posY = 25;
 	}
 	message.activeState = true;
