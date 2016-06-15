@@ -2,29 +2,39 @@
 	<configuracion>
 		<nivelDeLog>2</nivelDeLog>
 	</configuracion>
-    <CantidadMaximaClientes>2</CantidadMaximaClientes>
+    <CantidadDeJugadoresPorEquipo>2</CantidadDeJugadoresPorEquipo>
+    <FirstBulletID>50</FirstBulletID>
     <Puerto>8080</Puerto>
 </Servidor>
-
+<colaboration>true</colaboration>
 <ventana>
 	<ancho>800</ancho>
 	<alto>600</alto>
 </ventana>
 <escenario>
 	<ancho>800</ancho>
-	<alto>10000</alto>
+	<alto>20000</alto>
 	<portaAvionesX>300</portaAvionesX>
-	<portaAvionesY>9000</portaAvionesY>
+	<portaAvionesY>8500</portaAvionesY>
+	<anchoPortaAviones>224</anchoPortaAviones>
+	<practica>on</practica>
 	<fondo>
 		<spriteId>0</spriteId>
 		<ancho>1024</ancho>
 		<alto>1024</alto>
 		<path>fondo.png</path>
 	</fondo>
+	<stagesPositions>
+		<stagePosition>4000</stagePosition>
+		<stagePosition>8000</stagePosition>
+		<stagePosition>12000</stagePosition>
+		<stagePosition>16000</stagePosition>
+		<stagePosition>20000</stagePosition>
+	</stagesPositions>
 	<elementos>
 		<elemento>
 			<path>isla1.png</path>
-			<id>3</id>
+			<id>10</id>
 			<ancho>64</ancho>
 			<alto>63</alto>
 			<x>50</x>
@@ -32,7 +42,7 @@
 		</elemento>
 		<elemento>
 			<path>isla2.png</path>
-			<id>4</id>
+			<id>11</id>
 			<ancho>64</ancho>
 			<alto>63</alto>
 			<x>50</x>
@@ -40,26 +50,58 @@
 		</elemento>
 		<elemento>
 			<path>barco1.png</path>
-			<id>5</id>
+			<id>12</id>
 			<ancho>33</ancho>
 			<alto>98</alto>
 			<x>50</x>
 			<y>1000</y>
 		</elemento>
 		<elemento>
-			<path>pAviones.png</path>
-			<id>6</id>
-			<ancho>256</ancho>
-			<alto>244</alto>
+			<path>portaAviones.png</path>
+			<id>13</id>
+			<ancho>320</ancho>
+			<alto>896</alto>
 			<x>300</x>
-			<y>9000</y>
+			<y>4000</y>
+		</elemento>
+		<elemento>
+			<path>portaAviones.png</path>
+			<id>14</id>
+			<ancho>320</ancho>
+			<alto>896</alto>
+			<x>300</x>
+			<y>8000</y>
+		</elemento>
+		<elemento>
+			<path>portaAviones.png</path>
+			<id>15</id>
+			<ancho>320</ancho>
+			<alto>896</alto>
+			<x>300</x>
+			<y>12000</y>
+		</elemento>
+		<elemento>
+			<path>portaAviones.png</path>
+			<id>7</id>
+			<ancho>320</ancho>
+			<alto>896</alto>
+			<x>300</x>
+			<y>16000</y>
+		</elemento>
+		<elemento>
+			<path>portaAviones.png</path>
+			<id>8</id>
+			<ancho>320</ancho>
+			<alto>896</alto>
+			<x>300</x>
+			<y>20000</y>
 		</elemento>
 	</elementos>
 </escenario>
 <powerUps>
 	<powerUp>
 		<path>x2.png</path>
-		<id>7</id>
+		<id>9</id>
 		<x>300</x>
 		<y>2500</y>
 		<ancho>32</ancho>
@@ -83,7 +125,6 @@
 		<vueltaSpriteId>disparo</vueltaSpriteId>
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
-	
 	<avion>
 		<id>2</id>
 		<path>Avion2.png</path>
@@ -100,7 +141,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>8</id>
+		<id>3</id>
 		<path>Avion3.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -115,7 +156,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>9</id>
+		<id>4</id>
 		<path>Avion4.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -129,22 +170,72 @@
 		<vueltaSpriteId>disparo</vueltaSpriteId>
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
+	<avion>
+		<id>5</id>
+		<path>Avion1.png</path>
+		<ancho>68</ancho>
+		<alto>68</alto>
+		<lifes>3</lifes>
+		<x>450</x>
+		<y>150</y>
+		<cantidad>8</cantidad>
+		<velocidadDesplazamiento>5</velocidadDesplazamiento>
+		<velocidadDisparos>6</velocidadDisparos>
+		<avionSpriteId>avion</avionSpriteId>
+		<vueltaSpriteId>disparo</vueltaSpriteId>
+		<disparosSpriteId>vuelta</disparosSpriteId>
+	</avion>
+	<avion>
+		<id>6</id>
+		<path>Avion2.png</path>
+		<ancho>68</ancho>
+		<alto>68</alto>
+		<lifes>3</lifes>
+		<x>400</x>
+		<y>200</y>
+		<cantidad>8</cantidad>
+		<velocidadDesplazamiento>5</velocidadDesplazamiento>
+		<velocidadDisparos>6</velocidadDisparos>
+		<avionSpriteId>avion</avionSpriteId>
+		<vueltaSpriteId>disparo</vueltaSpriteId>
+		<disparosSpriteId>vuelta</disparosSpriteId>
+	</avion>
 </aviones>
 <formations>
 	<formation>
-		<id>100</id>
+		<id>1</id>
 		<extraPoints>500</extraPoints>
 		<quantity>5</quantity>
 	</formation>
 	<formation>
-		<id>101</id>
+		<id>2</id>
+		<extraPoints>500</extraPoints>
+		<quantity>5</quantity>
+	</formation>
+	<formation>
+		<id>3</id>
+		<extraPoints>500</extraPoints>
+		<quantity>5</quantity>
+	</formation>
+	<formation>
+		<id>4</id>
+		<extraPoints>500</extraPoints>
+		<quantity>5</quantity>
+	</formation>
+	<formation>
+		<id>5</id>
+		<extraPoints>1500</extraPoints>
+		<quantity>10</quantity>
+	</formation>
+	<formation>
+		<id>6</id>
 		<extraPoints>1000</extraPoints>
-		<quantity>1</quantity>
+		<quantity>5</quantity>
 	</formation>
 </formations>
 <enemyPlanes>
 	<enemyPlane>
-		<id>8</id>
+		<id>22</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -155,11 +246,12 @@
 		<path>enemyplane1.png</path>
 		<facingDirection>SOUTH</facingDirection>
 		<crazyMoves>0</crazyMoves>
-		<score>100</score>
-		<formationId>1</formationId>
+		<score>50</score>
+		<lastHitScore>0</lastHitScore>
+		<formationId>-1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>9</id>
+		<id>23</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -170,11 +262,12 @@
 		<path>enemyplane1.png</path>
 		<facingDirection>SOUTH</facingDirection>
 		<crazyMoves>0</crazyMoves>
-		<score>100</score>
+		<score>50</score>
+		<lastHitScore>0</lastHitScore>
 		<formationId>-1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>10</id>
+		<id>24</id>
 		<lifes>1</lifes>
 		<alto>34</alto>
 		<ancho>34</ancho>
@@ -185,29 +278,31 @@
 		<path>enemyplane1.png</path>
 		<facingDirection>SOUTHEAST</facingDirection>
 		<crazyMoves>0</crazyMoves>
-		<score>100</score>
-		<formationId>1</formationId>
+		<score>50</score>
+		<lastHitScore>0</lastHitScore>
+		<formationId>-1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>11</id>
+		<id>25</id>
 		<lifes>5</lifes>
-		<alto>67</alto>
-		<ancho>67</ancho>
+		<alto>46</alto>
+		<ancho>60</ancho>
 		<x>150</x>
 		<y>-400</y>
 		<actualPhotogram>1</actualPhotogram>
 		<photograms>8</photograms>
 		<path>enemyplane3.png</path>
 		<facingDirection>SOUTH</facingDirection>
-		<crazyMoves>0</crazyMoves>
-		<score>500</score>
-		<formationId>2</formationId>
+		<crazyMoves>1</crazyMoves>
+		<score>100</score>
+		<lastHitScore>500</lastHitScore>
+		<formationId>1</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>12</id>
+		<id>26</id>
 		<lifes>5</lifes>
-		<alto>67</alto>
-		<ancho>67</ancho>
+		<alto>46</alto>
+		<ancho>60</ancho>
 		<x>85</x>
 		<y>-350</y>
 		<actualPhotogram>1</actualPhotogram>
@@ -215,14 +310,15 @@
 		<path>enemyplane3.png</path>
 		<facingDirection>SOUTH</facingDirection>
 		<crazyMoves>0</crazyMoves>
-		<score>500</score>
-		<formationId>1</formationId>
+		<score>100</score>
+		<lastHitScore>500</lastHitScore>
+		<formationId>2</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>13</id>
+		<id>27</id>
 		<lifes>5</lifes>
-		<alto>67</alto>
-		<ancho>67</ancho>
+		<alto>46</alto>
+		<ancho>60</ancho>
 		<x>200</x>
 		<y>-350</y>
 		<actualPhotogram>1</actualPhotogram>
@@ -230,14 +326,15 @@
 		<path>enemyplane3.png</path>
 		<facingDirection>SOUTH</facingDirection>
 		<crazyMoves>1</crazyMoves>
-		<score>500</score>
-		<formationId>1</formationId>
+		<score>100</score>
+		<lastHitScore>500</lastHitScore>
+		<formationId>3</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>14</id>
+		<id>28</id>
 		<lifes>5</lifes>
-		<alto>67</alto>
-		<ancho>67</ancho>
+		<alto>46</alto>
+		<ancho>60</ancho>
 		<x>150</x>
 		<y>-200</y>
 		<actualPhotogram>1</actualPhotogram>
@@ -245,22 +342,104 @@
 		<path>enemyplane3.png</path>
 		<facingDirection>SOUTH</facingDirection>
 		<crazyMoves>0</crazyMoves>
-		<score>500</score>
-		<formationId>1</formationId>
+		<score>100</score>
+		<lastHitScore>500</lastHitScore>
+		<formationId>4</formationId>
 	</enemyPlane>
 	<enemyPlane>
-		<id>15</id>
+		<id>29</id>
 		<lifes>10</lifes>
-		<alto>124</alto>
-		<ancho>95</ancho>
-		<x>250</x>
+		<alto>121</alto>
+		<ancho>82</ancho>
+		<x>550</x>
 		<y>500</y>
 		<actualPhotogram>1</actualPhotogram>
 		<photograms>8</photograms>
 		<path>enemyplane4.png</path>
 		<facingDirection>NORTH</facingDirection>
 		<crazyMoves>0</crazyMoves>
-		<score>1000</score>
-		<formationId>2</formationId>
+		<score>100</score>
+		<lastHitScore>1000</lastHitScore>
+		<formationId>5</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>30</id>
+		<lifes>1</lifes>
+		<alto>34</alto>
+		<ancho>34</ancho>
+		<x>400</x>
+		<y>-25</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane2.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>100</score>
+		<lastHitScore>0</lastHitScore>
+		<formationId>6</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>31</id>
+		<lifes>1</lifes>
+		<alto>34</alto>
+		<ancho>34</ancho>
+		<x>400</x>
+		<y>-80</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane2.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>100</score>
+		<lastHitScore>0</lastHitScore>
+		<formationId>6</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>32</id>
+		<lifes>1</lifes>
+		<alto>34</alto>
+		<ancho>34</ancho>
+		<x>400</x>
+		<y>-135</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane2.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>100</score>
+		<lastHitScore>0</lastHitScore>
+		<formationId>6</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>33</id>
+		<lifes>1</lifes>
+		<alto>34</alto>
+		<ancho>34</ancho>
+		<x>400</x>
+		<y>-190</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane2.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>100</score>
+		<lastHitScore>0</lastHitScore>
+		<formationId>6</formationId>
+	</enemyPlane>
+	<enemyPlane>
+		<id>34</id>
+		<lifes>1</lifes>
+		<alto>34</alto>
+		<ancho>34</ancho>
+		<x>400</x>
+		<y>-245</y>
+		<actualPhotogram>1</actualPhotogram>
+		<photograms>8</photograms>
+		<path>enemyplane2.png</path>
+		<facingDirection>SOUTH</facingDirection>
+		<crazyMoves>0</crazyMoves>
+		<score>100</score>
+		<lastHitScore>0</lastHitScore>
+		<formationId>6</formationId>
 	</enemyPlane>
 </enemyPlanes>
