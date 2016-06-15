@@ -94,6 +94,8 @@ int EnemyPlane::collideWithClient(ClientList* clientList){
 	bool xCollision = false;
 	bool yCollision = false;
 	for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
+		xCollision = false;
+		yCollision = false;
 		if((*it)->getConnnectionState() && (*it)->isAlive()){
 
 			int leftPlaneX = (*it)->getPlane()->getPosX();
