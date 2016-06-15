@@ -15,7 +15,7 @@ public:
 	XmlParser(const char* filename);
 	virtual ~XmlParser();
 	int getServerPort();
-	int getMaxNumberOfClients();
+	int getMaxNumberOfClients(bool colaboration);
 	LogLevelType getLogLevel();
 	int getAnchoVentana();
 	int getAltoVentana();
@@ -41,7 +41,7 @@ public:
 	bool startWithPracticeMode();
 	int getMaxNumberOfPlayerPerTeam();
 	int getFirstBulletId();
-
+	bool gameIsColaborationType();
 private:
 	TiXmlDocument doc;
 	string fileName;

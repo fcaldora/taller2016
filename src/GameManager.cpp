@@ -52,7 +52,7 @@ list<Formation*> formations;
 list<Score*> scores;
 ScoreManager* scoreManager;
 bool appShouldTerminate, gameInitiated, userWasConnected;
-bool aterrizaje;
+bool aterrizaje, colaboration;
 LogWriter *logWriter;
 int numberOfCurrentAcceptedClients;
 list<mensaje> drawableList; //lista que guarda todos los mensajes iniciales para levantar el juego :
@@ -392,6 +392,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			if(disparos == 1000){
 				disparos = 0;
 			}
+			processor->gameManager->updateScoresTeam(scores);
 			for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
 				if((*scoreIt)->hasChanged()){
 					strcpy(msj.action, "score");
@@ -399,8 +400,10 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
 					msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
 					msj.photograms = (*scoreIt)->getScore();
+					//msj.photograms = processor->gameManager->getScoreTeamForClient((*scoreIt)->getId());
 					cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
 					broadcast(msj, clientList);
+					(*scoreIt)->updateLastScore();
 				}
 			}
 			if(contador == 29){
@@ -504,7 +507,7 @@ void *clientReader(Client *client, ClientList *clientList, Procesador *procesor,
 	int res = 0;
 	bool clientHasDisconnected = false;
 
-	if (client->isFirstTimeConnected)
+	if (client->isFirstTimeConnected && !colaboration)
 		receiveClientMenuMessage(client, procesor);
 
 	while (!appShouldTerminate && !clientHasDisconnected) {
@@ -559,7 +562,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 
 				clientList->addClient(client);
 
-				message = MessageBuilder().createSuccessfullyConnectedMessageForClient(client);
+				message = MessageBuilder().createSuccessfullyConnectedMessageForClient(client, colaboration);
 
 				clientEntranceMessages[socketConnection] = std::thread(
 						clientReader, client, clientList, procesor, escenario);
@@ -570,6 +573,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				playerScore->setId(client->getPlane()->getId());
 				playerScore->setScore(0);
 				playerScore->setClientSocket(socketConnection);
+				playerScore->setClientTeamId(client->getTeamId());
 				scores.push_back(playerScore);
 				for(int i=1; i<4; i++){
 					mensaje corazon = MessageBuilder().createLifeMessage(5000*i + clientPlane->getId(), procesor->getScreenHeight(), procesor->getScreenWidth());
@@ -579,8 +583,13 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 
 				//mensaje mensajeScore = MessageBuilder().createInitialScoreMessage(playerScore, playerScore->getScoreXPosition(procesor->getScreenWidth()), playerScore->getScoreYPosition(procesor->getScreenHeight()));
 				//drawableList.push_back(mensajeScore);
-				menuResponseMessage menuMessage = MessageBuilder().createMenuMessage(teams);
-				sendMenuMessage(socketConnection, sizeof(menuMessage), &menuMessage);
+				if(!colaboration){
+					menuResponseMessage menuMessage = MessageBuilder().createMenuMessage(teams);
+					sendMenuMessage(socketConnection, sizeof(menuMessage), &menuMessage);
+				}else{
+					procesor->addClientToColaborationTeam(client);
+					client->setTeamId(0);//id del equipo de colaboracion.
+				}
 			}
 		} else {
 			Client* client = clientList->getClientForName(message.value);
@@ -598,7 +607,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				client->setConnected(true);
 				client->isFirstTimeConnected = false;
 
-				message = MessageBuilder().createSuccessfullyReconnectedMessageForClient(client);
+				message = MessageBuilder().createSuccessfullyReconnectedMessageForClient(client, colaboration);
 				escenarioMsj = MessageBuilder().createInitBackgroundMessage(escenario);
 				clientEntranceMessages[socketConnection] = std::thread(clientReader, client, clientList, procesor, escenario);
 				userWasConnected = true;
@@ -641,7 +650,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->menuPresenter = new MenuPresenter(this->appShouldTerminate, this);
 	this->clientList = new ClientList();
-
+	colaboration = false;
 	const char* fileName;
 	logWriter = new LogWriter;
 	this->xmlLoader = new XMLLoader(logWriter);
@@ -659,8 +668,11 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	this->parser = new XmlParser(fileName);
 	logWriter->setLogLevel(this->parser->getLogLevel());
 	this->socketManager = new SocketManager(logWriter, this->parser);
-
-	int maxNumberOfClients = this->parser->getMaxNumberOfClients();
+	if(parser->gameIsColaborationType()){
+		colaboration = true;
+		this->createColaborationTeam("team 1");
+	}
+	int maxNumberOfClients = this->parser->getMaxNumberOfClients(colaboration);
 	int screenHeight = this->parser->getAltoVentana();
 	int screenWidth = this->parser->getAnchoVentana();
 
@@ -742,7 +754,7 @@ void GameManager::restartGame() {
 
 void GameManager::sendInitialGameInfo() {
 	//Se envia la info para levantar el juego recien cuando todos se conectaron.
-	if(numberOfCurrentAcceptedClients == this->parser->getMaxNumberOfClients() && !gameInitiated){
+	if(numberOfCurrentAcceptedClients == this->parser->getMaxNumberOfClients(colaboration) && !gameInitiated){
 		sendGameInfo(this->clientList);
 		gameInitiated = true;
 		scoreManager = new ScoreManager();
@@ -754,6 +766,7 @@ void GameManager::addClientToTeamWithName(Client *client, string teamName) {
 	for (unsigned int i = 0; i < this->teams->size(); i++) {
 		if (strcmp((*this->teams)[i]->teamName.c_str(), teamName.c_str()) == 0) {
 			(*this->teams)[i]->clients.push_back(client);
+			client->setTeamId((*this->teams)[i]->getTeamId());
 		}
 	}
 
@@ -763,10 +776,41 @@ void GameManager::addClientToTeamWithName(Client *client, string teamName) {
 void GameManager::createTeamWithNameForClient(string teamName, Client *client) {
 	int maxNumberOfPlayersPerTeam = this->parser->getMaxNumberOfPlayerPerTeam();
 	Team *newTeam = new Team(this->teams->size(), teamName, maxNumberOfPlayersPerTeam);
+	client->setTeamId(this->teams->size());
 	newTeam->clients.push_back(client);
 	this->teams->push_back(newTeam);
 
 	this->sendInitialGameInfo();
+}
+
+void GameManager::createColaborationTeam(string teamName){
+	int maxNumberOfPlayersPerTeam = this->parser->getMaxNumberOfPlayerPerTeam();
+	Team *newTeam = new Team(this->teams->size(), teamName, maxNumberOfPlayersPerTeam);
+	this->teams->push_back(newTeam);
+
+	//this->sendInitialGameInfo();
+}
+
+void GameManager::updateScoresTeam(list<Score*> scores){
+	list<Score*>::iterator it;
+	for(it = scores.begin(); it != scores.end(); it++){
+		if((*it)->hasChanged()){
+			for (unsigned int i = 0; i < this->teams->size(); i++){
+				if((*this->teams)[i]->isClientOfThisTeam((*it)->getId())){
+					(*this->teams)[i]->addPoints((*it)->getLastScoreDifference());
+				}
+			}
+		}
+	}
+}
+
+int GameManager::getScoreTeamForClient(int planeId){
+	for (unsigned int i = 0; i < this->teams->size(); i++){
+		if((*this->teams)[i]->isClientOfThisTeam(planeId)){
+			return((*this->teams)[i]->getPoints());
+		}
+	}
+	return 0;
 }
 
 void GameManager::createEnemyBullet(EnemyPlane* enemyPlane){

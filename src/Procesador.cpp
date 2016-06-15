@@ -156,6 +156,10 @@ void Procesador::processPracticeOffMessage(){
 	this->gameManager->getScenary()->setPracticeMode(false);
 }
 
+void Procesador::addClientToColaborationTeam(Client* client){
+	this->gameManager->addClientToTeamWithName(client, "team 1");
+}
+
 Procesador::~Procesador() {
 	// TODO Auto-generated destructor stub
 }

@@ -22,8 +22,8 @@ public:
 	MessageBuilder();
 	virtual ~MessageBuilder();
 
-	clientMsj createSuccessfullyConnectedMessageForClient(Client *client);
-	clientMsj createSuccessfullyReconnectedMessageForClient(Client *client);
+	clientMsj createSuccessfullyConnectedMessageForClient(Client *client, bool colaboration);
+	clientMsj createSuccessfullyReconnectedMessageForClient(Client *client, bool colaboration);
 	clientMsj createServerFullMessage();
 	clientMsj createUserNameAlreadyInUseMessage();
 	mensaje createInitialMessageForClient(Client *client);

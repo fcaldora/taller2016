@@ -37,6 +37,9 @@ public:
 
 	void addClientToTeamWithName(Client *client, string teamName);
 	void createTeamWithNameForClient(string teamName, Client *client);
+	void createColaborationTeam(string teamName);
+	void updateScoresTeam(list<Score*> scores);
+	int getScoreTeamForClient(int planeId);
 
 private:
 	bool appShouldTerminate;

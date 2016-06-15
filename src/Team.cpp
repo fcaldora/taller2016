@@ -10,26 +10,39 @@
 Team::Team() {
 	this->maxNumberOfPlayers = 0;
 	this->teamID = 0;
+	points = 0;
 }
 
 Team::Team(int teamID, string teamName, int maxNumberOfPlayers) {
 	this->maxNumberOfPlayers = maxNumberOfPlayers;
 	this->teamID = teamID;
 	this->teamName = teamName;
+	points = 0;
 }
 
 bool Team::isFull() {
 	return (this->maxNumberOfPlayers <= this->clients.size());
 }
 
-int Team::earnedPoints () {
-	int earnedPoints = 0;
-
-	for (Client *client : clients) {
-		//earnedPoints += client->earnedPoints;
+bool Team::isClientOfThisTeam(int planeId){
+	list<Client*>::iterator it;
+	for(it = clients.begin(); it != clients.end(); it++){
+		if((*it)->getPlane()->getId() == planeId)
+			return true;
 	}
+	return false;
+}
 
-	return earnedPoints;
+void Team::addPoints(int points){
+	this->points += points;
+}
+
+int Team::getPoints(){
+	return points;
+}
+
+int Team::getTeamId(){
+	return teamID;
 }
 
 Team::~Team() {

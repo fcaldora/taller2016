@@ -21,8 +21,11 @@ int XmlParser::getServerPort(){
 	}
 }
 
-int XmlParser::getMaxNumberOfClients(){
-	return this->getMaxNumberOfPlayerPerTeam() * 2;
+int XmlParser::getMaxNumberOfClients(bool colaboration){
+	if(!colaboration)//hay 2 equipos
+		return this->getMaxNumberOfPlayerPerTeam() * 2;
+	else //hay 1 solo equipo
+		return this->getMaxNumberOfPlayerPerTeam();
 }
 
 int XmlParser::getMaxNumberOfPlayerPerTeam() {
@@ -510,6 +513,14 @@ bool XmlParser::startWithPracticeMode(){
 	if(strcmp(practiceElem->GetText(), "on") == 0){
 		return true;
 	}
+	return false;
+}
+
+bool XmlParser::gameIsColaborationType(){
+	TiXmlHandle docHandle(&this->doc);
+	TiXmlElement* colaborationElement = docHandle.FirstChild("colaboration").ToElement();
+	if(strcmp(colaborationElement->GetText(),"true") == 0)
+		return true;
 	return false;
 }
 

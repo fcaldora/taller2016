@@ -29,10 +29,25 @@ int Score::getScoreXPosition(int width){
 bool Score::hasChanged(){
 	if (score == lastScore)
 		return false;
-	lastScore = score;
 	return true;
+}
+
+void Score::updateLastScore(){
+	lastScore = score;
+}
+
+int Score::getLastScoreDifference(){
+	return (score - lastScore);
 }
 
 int Score::getScoreYPosition(int height){
 	return height - height/8;
+}
+
+int Score::getClientTeamId(){
+	return clientTeamId;
+}
+
+void Score::setClientTeamId(int teamId){
+	clientTeamId = teamId;
 }

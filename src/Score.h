@@ -38,14 +38,18 @@ public:
 	}
 
 	bool hasChanged();
-
+	void updateLastScore();
+	void setClientTeamId(int teamId);
+	int getClientTeamId();
 	int getScoreXPosition(int width);
 	int getScoreYPosition(int height);
+	int getLastScoreDifference();
 private:
 	int score;
 	int lastScore;
 	int id;
 	int clientSocket;
+	int clientTeamId;
 };
 
 #endif /* SCORE_H_ */

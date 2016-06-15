@@ -10,27 +10,21 @@
 MessageBuilder::MessageBuilder() {
 }
 
-//clientMsj MessageBuilder::createSuccessfullyConnectedMessage(int planeId) {
-//	clientMsj message;
-//	strncpy(message.id, std::to_string(planeId).c_str(), kLongChar);
-//	strncpy(message.type, "connection_ok", kLongChar);
-//	strncpy(message.value, "Client connected", kLongChar);
-//	return message;
-//}
 
-clientMsj MessageBuilder::createSuccessfullyConnectedMessageForClient(Client *client) {
+clientMsj MessageBuilder::createSuccessfullyConnectedMessageForClient(Client *client, bool colaboration) {
 	clientMsj message;
 	string planeID = std::to_string(client->plane->getId());
 	strncpy(message.id, planeID.c_str(), kLongChar);
 	strncpy(message.type, "connection_ok", kLongChar);
-	strncpy(message.value, "Client connected", kLongChar);
+	if(colaboration)
+		strncpy(message.value, "colaboration", kLongChar);
 	message.isFirstTimeLogin = true;
 
 	return message;
 }
 
-clientMsj MessageBuilder::createSuccessfullyReconnectedMessageForClient(Client *client) {
-	clientMsj message = this->createSuccessfullyConnectedMessageForClient(client);
+clientMsj MessageBuilder::createSuccessfullyReconnectedMessageForClient(Client *client, bool colaboration) {
+	clientMsj message = this->createSuccessfullyConnectedMessageForClient(client, colaboration);
 	message.isFirstTimeLogin = false;
 
 	return message;

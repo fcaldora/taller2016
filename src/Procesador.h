@@ -25,7 +25,7 @@ public:
 
 	void processMessage(clientMsj message);
 	void processMenuMessageForClient(menuRequestMessage message, Client *client);
-
+	void addClientToColaborationTeam(Client* client);
 	int getScreenHeight() const {
 		return screenHeight;
 	}

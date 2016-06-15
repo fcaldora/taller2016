@@ -2,11 +2,11 @@
 	<configuracion>
 		<nivelDeLog>2</nivelDeLog>
 	</configuracion>
-    <CantidadDeJugadoresPorEquipo>1</CantidadDeJugadoresPorEquipo>
+    <CantidadDeJugadoresPorEquipo>2</CantidadDeJugadoresPorEquipo>
     <FirstBulletID>50</FirstBulletID>
     <Puerto>8080</Puerto>
 </Servidor>
-
+<colaboration>true</colaboration>
 <ventana>
 	<ancho>800</ancho>
 	<alto>600</alto>
@@ -34,7 +34,7 @@
 	<elementos>
 		<elemento>
 			<path>isla1.png</path>
-			<id>1</id>
+			<id>10</id>
 			<ancho>64</ancho>
 			<alto>63</alto>
 			<x>50</x>
@@ -42,7 +42,7 @@
 		</elemento>
 		<elemento>
 			<path>isla2.png</path>
-			<id>2</id>
+			<id>11</id>
 			<ancho>64</ancho>
 			<alto>63</alto>
 			<x>50</x>
@@ -50,7 +50,7 @@
 		</elemento>
 		<elemento>
 			<path>barco1.png</path>
-			<id>3</id>
+			<id>12</id>
 			<ancho>33</ancho>
 			<alto>98</alto>
 			<x>50</x>
@@ -58,7 +58,7 @@
 		</elemento>
 		<elemento>
 			<path>pAviones224x621.png</path>
-			<id>4</id>
+			<id>13</id>
 			<ancho>224</ancho>
 			<alto>621</alto>
 			<x>300</x>
@@ -66,7 +66,7 @@
 		</elemento>
 		<elemento>
 			<path>pAviones224x621.png</path>
-			<id>5</id>
+			<id>14</id>
 			<ancho>224</ancho>
 			<alto>621</alto>
 			<x>300</x>
@@ -74,7 +74,7 @@
 		</elemento>
 		<elemento>
 			<path>pAviones224x621.png</path>
-			<id>6</id>
+			<id>15</id>
 			<ancho>224</ancho>
 			<alto>621</alto>
 			<x>300</x>
@@ -111,7 +111,7 @@
 </powerUps>
 <aviones>
 	<avion>
-		<id>10</id>
+		<id>1</id>
 		<path>Avion1.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -126,7 +126,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>11</id>
+		<id>2</id>
 		<path>Avion2.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -141,7 +141,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>12</id>
+		<id>3</id>
 		<path>Avion3.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -156,7 +156,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>13</id>
+		<id>4</id>
 		<path>Avion4.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -171,7 +171,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>14</id>
+		<id>5</id>
 		<path>Avion1.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -186,7 +186,7 @@
 		<disparosSpriteId>vuelta</disparosSpriteId>
 	</avion>
 	<avion>
-		<id>15</id>
+		<id>6</id>
 		<path>Avion2.png</path>
 		<ancho>68</ancho>
 		<alto>68</alto>
@@ -351,7 +351,7 @@
 		<lifes>10</lifes>
 		<alto>124</alto>
 		<ancho>95</ancho>
-		<x>350</x>
+		<x>550</x>
 		<y>500</y>
 		<actualPhotogram>1</actualPhotogram>
 		<photograms>8</photograms>
