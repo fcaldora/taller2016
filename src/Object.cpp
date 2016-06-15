@@ -20,7 +20,36 @@ Object::~Object() {
 
 void Object::move(){
 	if(this->isEnemyBullet()){
-		this->posY += step;
+		switch(facingDirection){
+		case 0:
+			this->posY -= step;
+			break;
+		case 1:
+			this->posY -= step;
+			this->posX += step;
+			break;
+		case 2:
+			this->posX += step;
+			break;
+		case 3:
+			this->posX += step;
+			this->posY += step;
+			break;
+		case 4:
+			this->posY += step;
+			break;
+		case 5:
+			this->posY += step;
+			this->posX -= step;
+			break;
+		case 6:
+			this->posX -= step;
+			break;
+		case 7:
+			this->posX -= step;
+			this->posY -= step;
+			break;
+		}
 	}else{
 		this->posY -= step;
 	}
@@ -108,7 +137,6 @@ int Object::crashedWithPlane(list<EnemyPlane*> enemyPlanes){
 		if(this->haveCollision(*it)){
 			(*it)->setLifes((*it)->getLifes() - 1);
 			if((*it)->getFormation() != NULL){
-				(*it)->getFormation()->setQuantity((*it)->getFormation()->getQuantity() - 1);
 				if((*it)->getFormation()->isBonus()){
 					//Primera vez seteo el client id
 					if((*it)->getFormation()->getHitId() == -1) (*it)->getFormation()->setHitId(this->getClientId());
@@ -140,4 +168,24 @@ int Object::crashedWithClient(ClientList* clientList){
 		}
 	}
 	return -1;
+}
+
+void Object::setFacingDirection(string facingDirection){
+	if(strcmp(facingDirection.c_str(), "NORTH") == 0){
+		this->facingDirection = 0;
+	}else if(strcmp(facingDirection.c_str(), "NORTHEAST") == 0){
+		this->facingDirection = 1;
+	}else if(strcmp(facingDirection.c_str(), "EAST") == 0){
+		this->facingDirection = 2;
+	}else if(strcmp(facingDirection.c_str(), "SOUTHEAST") == 0){
+		this->facingDirection = 3;
+	}else if(strcmp(facingDirection.c_str(), "SOUTH") == 0){
+		this->facingDirection = 4;
+	}else if(strcmp(facingDirection.c_str(), "SOUTHWEST") == 0){
+		this->facingDirection = 5;
+	}else if(strcmp(facingDirection.c_str(), "WEST") == 0){
+		this->facingDirection = 6;
+	}else if(strcmp(facingDirection.c_str(), "NORTHWEST") == 0){
+		this->facingDirection = 7;
+	}
 }

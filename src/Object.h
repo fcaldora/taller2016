@@ -102,6 +102,7 @@ public:
 	void setStep(int step){
 		this->step = step;
 	}
+	void setFacingDirection(string f);
 
 	int getClientId()  {
 		return clientId;
@@ -121,6 +122,9 @@ public:
 
 	int crashedWithClient(ClientList* clientList);
 
+	void setFD(int fd){
+		this->facingDirection = fd;
+	}
 private:
 	int id;
 	string imagePath;
@@ -134,7 +138,7 @@ private:
 	bool status;
 	int clientId;
 	bool enemyBullet;
-
+	int facingDirection;
 
 };
 

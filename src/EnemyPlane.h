@@ -94,6 +94,14 @@ public:
 		this->lastHitScore = lastHitScore;
 	}
 
+	bool isBigPlane() const {
+		return bigPlane;
+	}
+
+	void setBigPlane(bool bigPlane) {
+		this->bigPlane = bigPlane;
+	}
+
 private:
 	Formation* formation;
 	int score;
@@ -103,6 +111,7 @@ private:
 	bool crazyMoves;
 	int speedFactor;
 	int lastHitScore;
+	bool bigPlane;
 };
 
 #endif /* ENEMYPLANE_H_ */

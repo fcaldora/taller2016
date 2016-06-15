@@ -34,7 +34,7 @@ public:
 	void reloadGameFromXml();
 	void createEnemyBullet(EnemyPlane* enemyPlane);
 	Escenario* getScenary();
-
+	void createBigPlaneBullet(EnemyPlane* enemyPlane, int i);
 	void addClientToTeamWithName(Client *client, string teamName);
 	void createTeamWithNameForClient(string teamName, Client *client);
 	void createColaborationTeam(string teamName);

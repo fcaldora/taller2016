@@ -119,7 +119,7 @@ void GameManager::reloadGameFromXml(){
 	}
 	for(int i = 0; i < parser->getNumberOfEnemyPlanes(); i++){
 		EnemyPlane* enemyPlane = new EnemyPlane();
-		parser->getEnemyPlane(enemyPlane, i, formations);
+		parser->getEnemyPlane(enemyPlane, i, formations, parser->getAnchoEscenario());
 		enemyPlanes.push_back(enemyPlane);
 		mensaje enemyPlanesMsj = MessageBuilder().createEnemyPlaneCreationMessage(enemyPlane);
 		drawableList.push_back(enemyPlanesMsj);
@@ -392,11 +392,25 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					//Creo una bala si el avion esta visible y el random es 23
 					if((*enemyPlanesIt)->isOnScreen(processor->getScreenWidth(), processor->getScreenHeight())){
 						if(disparos == 1000 && !escenario->getPracticeMode()){
-							mensaje disparo;
-							strcpy(disparo.action, "create");
-							disparo = MessageBuilder().createEnemyBulletCreationMessage((*enemyPlanesIt), objects.getLastId() + 1);
-							broadcast(disparo, clientList);
-							processor->processEnemyBullet((*enemyPlanesIt));
+							int shoot = rand()%4;
+							if(shoot == 0){
+								if((*enemyPlanesIt)->isBigPlane()){
+									for(int i=0; i<5; i++){
+										cout << " CREO 5 BALAS " << endl;
+										mensaje disparo;
+										strcpy(disparo.action, "create");
+										disparo = MessageBuilder().createEnemyBulletCreationMessage((*enemyPlanesIt), objects.getLastId() + 1);
+										broadcast(disparo, clientList);
+										processor->processBigPlaneBullet((*enemyPlanesIt),i);
+									}
+								}else{
+									mensaje disparo;
+									strcpy(disparo.action, "create");
+									disparo = MessageBuilder().createEnemyBulletCreationMessage((*enemyPlanesIt), objects.getLastId() + 1);
+									broadcast(disparo, clientList);
+									processor->processEnemyBullet((*enemyPlanesIt));
+								}
+							}
 						}
 					}
 				}
@@ -740,7 +754,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	}
 	for(int i = 0; i < parser->getNumberOfEnemyPlanes(); i++){
 		EnemyPlane* enemyPlane = new EnemyPlane();
-		parser->getEnemyPlane(enemyPlane, i, formations);
+		parser->getEnemyPlane(enemyPlane, i, formations, parser->getAnchoEscenario());
 		enemyPlanes.push_back(enemyPlane);
 		mensaje enemyPlanesMsj = MessageBuilder().createEnemyPlaneCreationMessage(enemyPlane);
 		drawableList.push_back(enemyPlanesMsj);
@@ -848,6 +862,23 @@ void GameManager::createEnemyBullet(EnemyPlane* enemyPlane){
 	bullet.setPath("enemybullet.png");
 	bullet.setStatus(true);
 	bullet.setStep(1);
+	bullet.setFacingDirection(enemyPlane->getFacingDirection());
+	bullet.setEnemyBullet(true);
+	objects.addElement(bullet);
+}
+
+void GameManager::createBigPlaneBullet(EnemyPlane* enemyPlane, int i){
+	Object bullet;
+	bullet.setId(objects.getLastId() + 1);
+	bullet.setPosX(enemyPlane->getPosX() + enemyPlane->getWidth()/2);
+	bullet.setPosY(enemyPlane->getPosY() + enemyPlane->getWidth());
+	bullet.setWidth(12);
+	bullet.setHeigth(12);
+	bullet.setActualPhotogram(1);
+	bullet.setPath("enemybullet.png");
+	bullet.setStatus(true);
+	bullet.setStep(1);
+	bullet.setFD(i+2);
 	bullet.setEnemyBullet(true);
 	objects.addElement(bullet);
 }

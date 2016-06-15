@@ -35,6 +35,7 @@ void ScoreManager::increaseDestroyScore(int id, EnemyPlane* enemyPlane){
 		if((*it)->getId() == id){
 			(*it)->setScore((*it)->getScore() + enemyPlane->getScore() + enemyPlane->getLastHitScore());
 			if(enemyPlane->getFormation() != NULL){
+				enemyPlane->getFormation()->setQuantity(enemyPlane->getFormation()->getQuantity() - 1);
 				if(enemyPlane->getFormation()->getQuantity() == 0){
 					enemyPlane->getFormation()->setDestroyed(true);
 					if(enemyPlane->getFormation()->isBonus()){

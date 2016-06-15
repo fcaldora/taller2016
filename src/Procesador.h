@@ -33,7 +33,7 @@ public:
 	void setScreenHeight(int screenHeight) {
 		this->screenHeight = screenHeight;
 	}
-
+	void processBigPlaneBullet(EnemyPlane* enemyPlane, int i);
 	int getScreenWidth() const {
 		return screenWidth;
 	}

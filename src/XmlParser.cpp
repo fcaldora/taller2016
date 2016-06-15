@@ -367,7 +367,7 @@ int XmlParser::getNumberOfPowerUp(){
 	return quantity;
 }
 
-void XmlParser::getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Formation*> formations){
+void XmlParser::getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Formation*> formations, int width){
 	list<Formation*>::iterator it;
 	TiXmlHandle docHandle(&this->doc);
 	TiXmlElement* enemyPlanesElement = docHandle.FirstChild(tagEnemyPlanes).ToElement();
@@ -384,7 +384,22 @@ void XmlParser::getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Fo
 	if(lifes <= 0){
 		lifes = 1;
 	}
+
+	TiXmlElement* formationIdElement = enemyPlaneElement->FirstChildElement(tagFormationId);
+	Formation* finalFormation;
+	if(atoi(formationIdElement->GetText()) != -1){
+		for(it = formations.begin(); it != formations.end(); it++){
+			if((*it)->getId() == atoi(formationIdElement->GetText())){
+				finalFormation = (*it);
+			}
+		}
+	}else{
+		finalFormation = NULL;
+	}
+	enemyPlane->setFormation(finalFormation);
 	enemyPlane->setLifes(lifes);
+	TiXmlElement* bigPlaneElement = enemyPlaneElement->FirstChildElement(tagBigPlane);
+	enemyPlane->setBigPlane((atoi(bigPlaneElement->GetText())) == 1);
 	TiXmlElement* idElement = enemyPlaneElement->FirstChildElement(tagId);
 	enemyPlane->setId(atoi(idElement->GetText()));
 	TiXmlElement* altoElement = enemyPlaneElement->FirstChildElement(tagAlto);
@@ -392,7 +407,17 @@ void XmlParser::getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Fo
 	TiXmlElement* anchoElement = enemyPlaneElement->FirstChildElement(tagAncho);
 	enemyPlane->setWidth(atoi(anchoElement->GetText()));
 	TiXmlElement* xElement = enemyPlaneElement->FirstChildElement(tagPosX);
-	enemyPlane->setPosX(atoi(xElement->GetText()));
+	int posX;
+	posX = rand()%(width);
+	if((posX+enemyPlane->getWidth()) > width){
+		posX = posX - enemyPlane->getWidth();
+	}
+	if(finalFormation != NULL){
+		if(finalFormation->getQuantity() > 1){
+			posX = atoi(xElement->GetText());
+		}
+	}
+	enemyPlane->setPosX(posX);
 	TiXmlElement* yElement = enemyPlaneElement->FirstChildElement(tagPosY);
 	enemyPlane->setPosY(atoi(yElement->GetText()));
 	TiXmlElement* actualPhotogramElement = enemyPlaneElement->FirstChildElement(tagActualPhotogram);
@@ -409,18 +434,6 @@ void XmlParser::getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Fo
 	enemyPlane->setScore(atoi(score->GetText()));
 	TiXmlElement* lastHitScore = enemyPlaneElement->FirstChildElement(tagLastHitScore);
 	enemyPlane->setLastHitScore(atoi(lastHitScore->GetText()));
-	TiXmlElement* formationIdElement = enemyPlaneElement->FirstChildElement(tagFormationId);
-	Formation* finalFormation;
-	if(atoi(formationIdElement->GetText()) != -1){
-		for(it = formations.begin(); it != formations.end(); it++){
-			if((*it)->getId() == atoi(formationIdElement->GetText())){
-				finalFormation = (*it);
-			}
-		}
-	}else{
-		finalFormation = NULL;
-	}
-	enemyPlane->setFormation(finalFormation);
 	//Factor para que el avion no se desplace tan rapido
 	enemyPlane->setSpeedFactor(0);
 }

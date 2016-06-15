@@ -26,7 +26,7 @@ public:
 	int getSprite(DrawableObject &object, int numSprite);
 	int getElement(DrawableObject &element, int elementNum);
 	void getPowerUp(PowerUp& powerUp, int powerUpNum);
-	void getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Formation*> formations);
+	void getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Formation*> formations, int width);
 	void getFormation(Formation* formation, int formationNum);
 	int getNumberOfPowerUp();
 	int getNumberOfElements();

@@ -3,6 +3,7 @@
 		<nivelDeLog>2</nivelDeLog>
 	</configuracion>
     <CantidadDeJugadoresPorEquipo>2</CantidadDeJugadoresPorEquipo>
+    <CantidadMaximaClientes>2</CantidadMaximaClientes>
     <FirstBulletID>50</FirstBulletID>
     <Puerto>8080</Puerto>
 </Servidor>
@@ -205,27 +206,27 @@
 	<formation>
 		<id>1</id>
 		<extraPoints>500</extraPoints>
-		<quantity>5</quantity>
+		<quantity>1</quantity>
 	</formation>
 	<formation>
 		<id>2</id>
 		<extraPoints>500</extraPoints>
-		<quantity>5</quantity>
+		<quantity>1</quantity>
 	</formation>
 	<formation>
 		<id>3</id>
 		<extraPoints>500</extraPoints>
-		<quantity>5</quantity>
+		<quantity>1</quantity>
 	</formation>
 	<formation>
 		<id>4</id>
 		<extraPoints>500</extraPoints>
-		<quantity>5</quantity>
+		<quantity>1</quantity>
 	</formation>
 	<formation>
 		<id>5</id>
 		<extraPoints>1500</extraPoints>
-		<quantity>10</quantity>
+		<quantity>1</quantity>
 	</formation>
 	<formation>
 		<id>6</id>
@@ -245,10 +246,11 @@
 		<photograms>8</photograms>
 		<path>enemyplane1.png</path>
 		<facingDirection>SOUTH</facingDirection>
-		<crazyMoves>0</crazyMoves>
+		<crazyMoves>1</crazyMoves>
 		<score>50</score>
 		<lastHitScore>0</lastHitScore>
 		<formationId>-1</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>23</id>
@@ -265,6 +267,7 @@
 		<score>50</score>
 		<lastHitScore>0</lastHitScore>
 		<formationId>-1</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>24</id>
@@ -281,6 +284,7 @@
 		<score>50</score>
 		<lastHitScore>0</lastHitScore>
 		<formationId>-1</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>25</id>
@@ -297,6 +301,7 @@
 		<score>100</score>
 		<lastHitScore>500</lastHitScore>
 		<formationId>1</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>26</id>
@@ -313,6 +318,7 @@
 		<score>100</score>
 		<lastHitScore>500</lastHitScore>
 		<formationId>2</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>27</id>
@@ -329,6 +335,7 @@
 		<score>100</score>
 		<lastHitScore>500</lastHitScore>
 		<formationId>3</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>28</id>
@@ -345,6 +352,7 @@
 		<score>100</score>
 		<lastHitScore>500</lastHitScore>
 		<formationId>4</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>29</id>
@@ -361,6 +369,7 @@
 		<score>100</score>
 		<lastHitScore>1000</lastHitScore>
 		<formationId>5</formationId>
+		<bigPlane>1</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>30</id>
@@ -377,6 +386,7 @@
 		<score>100</score>
 		<lastHitScore>0</lastHitScore>
 		<formationId>6</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>31</id>
@@ -393,6 +403,7 @@
 		<score>100</score>
 		<lastHitScore>0</lastHitScore>
 		<formationId>6</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>32</id>
@@ -409,6 +420,7 @@
 		<score>100</score>
 		<lastHitScore>0</lastHitScore>
 		<formationId>6</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>33</id>
@@ -425,6 +437,7 @@
 		<score>100</score>
 		<lastHitScore>0</lastHitScore>
 		<formationId>6</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 	<enemyPlane>
 		<id>34</id>
@@ -441,5 +454,6 @@
 		<score>100</score>
 		<lastHitScore>0</lastHitScore>
 		<formationId>6</formationId>
+		<bigPlane>0</bigPlane>
 	</enemyPlane>
 </enemyPlanes>

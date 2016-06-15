@@ -152,6 +152,10 @@ void Procesador::processEnemyBullet(EnemyPlane* enemyPlane){
 	this->gameManager->createEnemyBullet(enemyPlane);
 }
 
+void Procesador::processBigPlaneBullet(EnemyPlane* enemyPlane, int i){
+	this->gameManager->createBigPlaneBullet(enemyPlane, i);
+}
+
 void Procesador::processPracticeOffMessage(){
 	this->gameManager->getScenary()->setPracticeMode(false);
 }

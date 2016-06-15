@@ -33,6 +33,7 @@ using namespace std;
 #define tagSprites "sprites"
 #define tagSprite "sprite"
 #define tagId "id"
+#define tagBigPlane "bigPlane"
 #define tagPath "path"
 #define tagCantidad "cantidad"
 #define tagEscenario "escenario"
