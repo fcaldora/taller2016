@@ -67,11 +67,20 @@ public:
 		this->alive = alive;
 	}
 
+	void setTeamId(int teamId){
+		this->teamId = teamId;
+	}
+
+	int getTeamId(){
+		return teamId;
+	}
+
 	Avion* plane;
 	bool isFirstTimeConnected;
 
 private:
 	string name;
+	int teamId;
 	bool connected;
 	bool alive;
 	int socketMessages;
