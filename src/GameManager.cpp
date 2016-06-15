@@ -267,7 +267,7 @@ void broadcast(mensaje msg, ClientList* clientList){
 	}
 }
 
-void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario) {
+void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario, vector<Team *> *teams) {
 	std::list<Client*>::iterator it;
 	std::list<Object>::iterator objectIt;
 	std::list<EnemyPlane*>::iterator enemyPlanesIt;
@@ -278,6 +278,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 	int disparos = 0;
 	int hit = -1;
 	int bulletId = -1;
+	bool alreadyCreatedScores = false;
 	while(!appShouldTerminate){
 		usleep(1000);
 		objects.moveBullets();
@@ -326,6 +327,20 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 		objects.clearBullets();
 		mensaje msj;
 		if(gameInitiated){
+			if(!colaboration && !alreadyCreatedScores){
+				alreadyCreatedScores = true;
+				if(!colaboration){
+					mensaje teamScore;
+					cout << "TEAM SCORE CREATION" << endl;
+					for (unsigned int i = 0; i < teams->size(); i++) {
+						strcpy(teamScore.action, "createTeamScore");
+						teamScore.id = (*teams)[i]->teamID;
+						strcpy(teamScore.imagePath, (*teams)[i]->teamName.c_str());
+						broadcast(teamScore, clientList);
+					}
+				}
+
+			}
 			usleep(1000);
 			escenario->update();
 			aterrizaje = escenario->hayQueAterrizar();
@@ -429,6 +444,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					//msj.posX = (*scoreIt)->getScoreXPosition(processor->getScreenWidth());
 					//msj.posY = (*scoreIt)->getScoreYPosition(processor->getScreenHeight());
 					//msj.photograms = (*scoreIt)->getScore();
+					msj.activeState = colaboration;
 					msj.width = (*scoreIt)->getScore();
 					msj.photograms = processor->gameManager->getScoreTeamForClient((*scoreIt)->getClientTeamId());
 					cout << "SCORE " << (*scoreIt)->getId() << ": " << (*scoreIt)->getScore() << endl;
@@ -629,6 +645,7 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 				if(!colaboration){
 					menuResponseMessage menuMessage = MessageBuilder().createMenuMessage(teams);
 					sendMenuMessage(socketConnection, sizeof(menuMessage), &menuMessage);
+
 				}else{
 					procesor->addClientToColaborationTeam(client);
 					client->setTeamId(0);//id del equipo de colaboracion.
@@ -771,7 +788,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	escenario.setPosPortaAviones(parser->getPosXPortaAviones(),parser->getPosYPortaAviones());
 	escenario.setStagesPositions(parser);
 	objects.setIdOfFirstBullet(this->parser->getFirstBulletId());
-	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario);
+	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario, this->teams);
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario, this->teams);
 	this->menuPresenter->presentMenu();
