@@ -17,8 +17,6 @@ void PowerUp::setPointsToAdd(int points){
 }
 
 bool PowerUp::haveCollision(Avion* plane){
-	bool xCollision = false;
-	bool yCollision = false;
 	int leftPlaneX = plane->getPosX();
 	int rightPlaneX = plane->getPosX() + plane->getWidth();
 	int upPlaneY = plane->getPosY();

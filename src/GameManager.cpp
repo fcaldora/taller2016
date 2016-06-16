@@ -394,9 +394,9 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					explosions.push_back(explosion);
 					strcpy(msj.action, "delete");
 					msj.id = (*enemyPlanesIt)->getId();
-					enemyPlanes.erase(enemyPlanesIt);
+					enemyPlanesIt = enemyPlanes.erase(enemyPlanesIt);
 					enemiesMutex.unlock();
-					enemyPlanesIt--;
+					//enemyPlanesIt--;
 					hit = -1;
 				}else{
 					strcpy(msj.action, "draw");
@@ -475,9 +475,9 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			for(formationIt = formations.begin(); formationIt != formations.end(); formationIt++){
 				if((*formationIt)->isDestroyed()){
 					formationsMutex.lock();
-					formations.erase(formationIt);
+					formationIt = formations.erase(formationIt);
 					formationsMutex.unlock();
-					formationIt--;
+					//formationIt--;
 				}
 			}
 		}

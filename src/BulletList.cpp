@@ -111,12 +111,13 @@ void BulletList::setLastId(int id){
 
 void BulletList::clearBullets(){
 	list<Object>::iterator it;
+	mutex.lock();
 	for(it = begin(); it != end(); it++){
 		if(!(*it).isStatic()){
-			deleteElement((*it).getId());
-			it--;
+			it = objectList.erase(it);
 		}
 	}
+	mutex.unlock();
 }
 
 BulletList::~BulletList() {
