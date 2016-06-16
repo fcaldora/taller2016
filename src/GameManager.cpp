@@ -502,9 +502,11 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			mensaje endStageMsj;
 			strncpy(endStageMsj.action, "endStage", kLongChar);
 			for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
-				endStageMsj.photograms = (*scoreIt)->getScore(); //Envio puntaje
-				endStageMsj.actualPhotogram = escenario->getCurrentStageNumber(); //Envio numero de etapa
-				sendMsjInfo((*scoreIt)->getClientSocket(), sizeof(mensaje), &endStageMsj);
+				if((*scoreIt)->isConnected()){
+					endStageMsj.photograms = (*scoreIt)->getScore(); //Envio puntaje
+					endStageMsj.actualPhotogram = escenario->getCurrentStageNumber(); //Envio numero de etapa
+					sendMsjInfo((*scoreIt)->getClientSocket(), sizeof(mensaje), &endStageMsj);
+				}
 			}
 		}
 		if(escenario->gameFinished()){
@@ -538,6 +540,7 @@ void sendGameInfo(ClientList* clientList){
 void disconnectClientForSocketConnection(unsigned int socketConnection, ClientList *clientList) {
 	Client* clientDisconnect = clientList->getClientForSocket(socketConnection);
 	clientDisconnect -> setConnected(false);
+	list<Score*>::iterator scoreIt;
 	map<unsigned int, thread>::iterator threadItr;
 
 	for(threadItr = clientEntranceMessages.begin(); threadItr != clientEntranceMessages.end(); ++threadItr){
@@ -548,6 +551,11 @@ void disconnectClientForSocketConnection(unsigned int socketConnection, ClientLi
 	for(threadItr = keepAliveThreads.begin(); threadItr != keepAliveThreads.end(); ++threadItr){
 		if(threadItr->first == socketConnection)
 			threadItr->second.detach();
+	}
+	for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
+		if((*scoreIt)->getClientSocket() == socketConnection){
+			(*scoreIt)->setConnected(false);
+		}
 	}
 }
 

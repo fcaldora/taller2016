@@ -45,12 +45,15 @@ public:
 	int getScoreXPosition(int width);
 	int getScoreYPosition(int height);
 	int getLastScoreDifference();
+	bool isConnected();
+	void setConnected(bool isConnected);
 private:
 	int score;
 	int lastScore;
 	int id;
 	int clientSocket;
 	int clientTeamId;
+	bool connected;
 };
 
 #endif /* SCORE_H_ */
