@@ -213,6 +213,12 @@ mensaje MessageBuilder::createExplosionMessage(Explosion* explosion){
 	return message;
 }
 
+mensaje MessageBuilder::createExplosionSoundMessage(){
+	mensaje message;
+	strcpy(message.action,"explosionSound");
+	return message;
+}
+
 mensaje MessageBuilder::createEnemyPlaneCreationMessage(EnemyPlane* enemyPlane){
 	mensaje message;
 	message.id = enemyPlane->getId();
