@@ -390,9 +390,9 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					Explosion* explosion = new Explosion((*enemyPlanesIt)->getPosX(), (*enemyPlanesIt)->getPosY(), false,  objects.getLastId() + 1);
 					objects.setLastId(objects.getLastId() + 1);
 					msj = MessageBuilder().createExplosionMessage(explosion);
-					msj = MessageBuilder().createExplosionSoundMessage();
+					msjExplosionSound = MessageBuilder().createExplosionSoundMessage();
 					broadcast(msj, clientList);
-					broadcast(msj, clientList);
+					broadcast(msjExplosionSound, clientList);
 					if((*enemyPlanesIt)->isBigPlane() && (*enemyPlanesIt)->getLifes() <= 0){
 						PowerUp bonusPowerUp;
 						bonusPowerUp.setPath((*enemyPlanesIt)->getPwUpPath());
