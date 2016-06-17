@@ -390,13 +390,28 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					objects.setLastId(objects.getLastId() + 1);
 					msj = MessageBuilder().createExplosionMessage(explosion);
 					broadcast(msj, clientList);
+					if((*enemyPlanesIt)->isBigPlane() && (*enemyPlanesIt)->getLifes() <= 0){
+						PowerUp bonusPowerUp;
+						bonusPowerUp.setPath((*enemyPlanesIt)->getPwUpPath());
+						bonusPowerUp.setHeigth((*enemyPlanesIt)->getPwUpHeiht());
+						bonusPowerUp.setWidth((*enemyPlanesIt)->getPwUpWidth());
+						bonusPowerUp.setPointsToAdd((*enemyPlanesIt)->getPwUpPoints());
+						bonusPowerUp.setId(objects.getLastId()+1);
+						objects.setLastId(objects.getLastId()+1);
+						bonusPowerUp.setPosX((*enemyPlanesIt)->getPosX());
+						bonusPowerUp.setPosY((*enemyPlanesIt)->getPosY());
+						bonusPowerUp.setType(3);//Tipo 3: suma puntos.
+						mensaje pwUpCreation = MessageBuilder().createBackgroundElementCreationMessageForElement(&bonusPowerUp);
+						broadcast(pwUpCreation, clientList);
+						escenario->addPowerUp(&bonusPowerUp);
+					}
 					enemiesMutex.lock();
 					explosions.push_back(explosion);
 					strcpy(msj.action, "delete");
 					msj.id = (*enemyPlanesIt)->getId();
-					enemyPlanes.erase(enemyPlanesIt);
+					enemyPlanesIt = enemyPlanes.erase(enemyPlanesIt);
 					enemiesMutex.unlock();
-					enemyPlanesIt--;
+					//enemyPlanesIt--;
 					hit = -1;
 				}else{
 					strcpy(msj.action, "draw");
@@ -475,9 +490,9 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			for(formationIt = formations.begin(); formationIt != formations.end(); formationIt++){
 				if((*formationIt)->isDestroyed()){
 					formationsMutex.lock();
-					formations.erase(formationIt);
+					formationIt = formations.erase(formationIt);
 					formationsMutex.unlock();
-					formationIt--;
+					//formationIt--;
 				}
 			}
 		}
@@ -502,9 +517,11 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			mensaje endStageMsj;
 			strncpy(endStageMsj.action, "endStage", kLongChar);
 			for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
-				endStageMsj.photograms = (*scoreIt)->getScore(); //Envio puntaje
-				endStageMsj.actualPhotogram = escenario->getCurrentStageNumber(); //Envio numero de etapa
-				sendMsjInfo((*scoreIt)->getClientSocket(), sizeof(mensaje), &endStageMsj);
+				if((*scoreIt)->isConnected()){
+					endStageMsj.photograms = (*scoreIt)->getScore(); //Envio puntaje
+					endStageMsj.actualPhotogram = escenario->getCurrentStageNumber(); //Envio numero de etapa
+					sendMsjInfo((*scoreIt)->getClientSocket(), sizeof(mensaje), &endStageMsj);
+				}
 			}
 		}
 		if(escenario->gameFinished()){
@@ -538,6 +555,7 @@ void sendGameInfo(ClientList* clientList){
 void disconnectClientForSocketConnection(unsigned int socketConnection, ClientList *clientList) {
 	Client* clientDisconnect = clientList->getClientForSocket(socketConnection);
 	clientDisconnect -> setConnected(false);
+	list<Score*>::iterator scoreIt;
 	map<unsigned int, thread>::iterator threadItr;
 
 	for(threadItr = clientEntranceMessages.begin(); threadItr != clientEntranceMessages.end(); ++threadItr){
@@ -548,6 +566,11 @@ void disconnectClientForSocketConnection(unsigned int socketConnection, ClientLi
 	for(threadItr = keepAliveThreads.begin(); threadItr != keepAliveThreads.end(); ++threadItr){
 		if(threadItr->first == socketConnection)
 			threadItr->second.detach();
+	}
+	for(scoreIt = scores.begin(); scoreIt != scores.end(); scoreIt++){
+		if((*scoreIt)->getClientSocket() == socketConnection){
+			(*scoreIt)->setConnected(false);
+		}
 	}
 }
 

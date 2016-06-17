@@ -8,8 +8,10 @@
 #include "EnemyPlane.h"
 
 EnemyPlane::EnemyPlane() {
-	// TODO Auto-generated constructor stub
-
+	pwUpPoints = 0;
+	pwUpWidth = 0;
+	pwUpHeight = 0;
+	pwUpPath = "";
 }
 
 EnemyPlane::~EnemyPlane() {

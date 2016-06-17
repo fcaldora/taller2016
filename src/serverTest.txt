@@ -370,6 +370,10 @@
 		<lastHitScore>1000</lastHitScore>
 		<formationId>5</formationId>
 		<bigPlane>1</bigPlane>
+		<pwUpPath>x2.png</pwUpPath>
+		<pwUpAlto>32</pwUpAlto>
+		<pwUpAncho>32</pwUpAncho>
+		<pwUpPoints>1500</pwUpPoints>
 	</enemyPlane>
 	<enemyPlane>
 		<id>30</id>

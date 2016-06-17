@@ -12,6 +12,9 @@ Score::Score() {
 	score = 0;
 	lastScore = 0;
 	id = 0;
+	connected = true;
+	clientTeamId = 0;
+	clientSocket = 0;
 }
 
 Score::~Score() {
@@ -51,4 +54,12 @@ int Score::getClientTeamId(){
 
 void Score::setClientTeamId(int teamId){
 	clientTeamId = teamId;
+}
+
+bool Score::isConnected(){
+	return connected;
+}
+
+void Score::setConnected(bool isConnected){
+	connected = isConnected;
 }

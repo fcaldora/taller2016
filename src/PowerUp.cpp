@@ -10,6 +10,8 @@
 PowerUp::PowerUp() {
 	this->type = 0;
 	this->pointsToAdd = 0;
+	actualPhotogram = 1;
+	this->numberOfPhotograms = 1;
 }
 
 void PowerUp::setPointsToAdd(int points){
@@ -17,8 +19,6 @@ void PowerUp::setPointsToAdd(int points){
 }
 
 bool PowerUp::haveCollision(Avion* plane){
-	bool xCollision = false;
-	bool yCollision = false;
 	int leftPlaneX = plane->getPosX();
 	int rightPlaneX = plane->getPosX() + plane->getWidth();
 	int upPlaneY = plane->getPosY();
@@ -66,7 +66,7 @@ void PowerUp::applyPowerUp(Avion* avion, ScoreManager* score, list<EnemyPlane*> 
 		}
 		break;
 	case 3:
-		cout<<"Sumar  "<<this->pointsToAdd<<" puntos"<<endl;
+		cout<<"Sumar  "<<this->pointsToAdd<<" puntos gracias a powerUp"<<endl;
 		score->increaseScoreForPowerUp(avion->getId(), pointsToAdd);
 		break;
 	}

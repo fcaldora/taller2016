@@ -60,8 +60,6 @@ bool Object::notVisible(int width, int height){
 }
 
 bool Object::haveCollision(EnemyPlane* plane){
-	bool xCollision = false;
-	bool yCollision = false;
 	int leftPlaneX = plane->getPosX();
 	int rightPlaneX = plane->getPosX() + plane->getWidth();
 	int downPlaneY = plane->getPosY() + plane->getHeigth();
@@ -70,19 +68,7 @@ bool Object::haveCollision(EnemyPlane* plane){
 	int rightBulletX= posX + width;
 	int upBulletY = posY;
 	int downBulletY = posY + heigth;
-	/*if(leftBulletX >= leftPlaneX && rightBulletX <= rightPlaneX)
-		xCollision = true;
-	else if(leftBulletX <= rightPlaneX && rightBulletX >= rightPlaneX)
-		xCollision = true;
-	else if(rightBulletX >= leftPlaneX && leftBulletX <= leftPlaneX)
-		xCollision = true;
 
-	if(upBulletY <= downPlaneY)
-		yCollision = true;
-
-	if(yCollision && xCollision)
-		return true;
-	return false;*/
 	if(downBulletY < upPlaneY)
 		return false;
 	if(upBulletY > downPlaneY)
@@ -96,8 +82,6 @@ bool Object::haveCollision(EnemyPlane* plane){
 }
 
 bool Object::haveCollision2(Client* client){
-	bool xCollision = false;
-	bool yCollision = false;
 	int leftPlaneX = client->getPlane()->getPosX();
 	int rightPlaneX = client->getPlane()->getPosX() + client->getPlane()->getWidth();
 	int upPlaneY = client->getPlane()->getPosY();
@@ -106,19 +90,7 @@ bool Object::haveCollision2(Client* client){
 	int rightBulletX= posX + width;
 	int downBulletY = posY + heigth;
 	int upBulletY = posY;
-	/*if(leftBulletX >= leftPlaneX && rightBulletX <= rightPlaneX)
-		xCollision = true;
-	else if(leftBulletX <= rightPlaneX && rightBulletX >= rightPlaneX)
-		xCollision = true;
-	else if(rightBulletX >= leftPlaneX && leftBulletX <= leftPlaneX)
-		xCollision = true;
 
-	if(downBulletY >= upPlaneY && upBulletY <= downPlaneY)
-		yCollision = true;
-
-	if(yCollision && xCollision)
-		return true;
-	return false;*/
 	if(downPlaneY < upBulletY)
 		return false;
 	if(upPlaneY > downBulletY)
