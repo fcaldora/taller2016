@@ -76,3 +76,15 @@ void ScoreManager::resetScores(){
 		(*it)->setScore(0);
 	}
 }
+
+int ScoreManager::bestScore(){
+	list<Score*>::iterator it;
+	int id;
+	int bestScore = 0;
+	for(it = scores.begin(); it != scores.end(); it++){
+		if((*it)->getScore()>bestScore){
+			id = (*it)->getId();
+		}
+	}
+	return id;
+}

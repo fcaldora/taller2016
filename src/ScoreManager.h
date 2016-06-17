@@ -23,6 +23,7 @@ public:
 	void increaseScoreForHit(int id, EnemyPlane* enemyPlane);
 	void increaseScoreForPowerUp(int id, int powerUpBonus);
 	void resetScores();
+	int bestScore();
 private:
 	list<Score*> scores;
 };
