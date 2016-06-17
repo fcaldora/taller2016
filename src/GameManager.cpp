@@ -390,6 +390,21 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					objects.setLastId(objects.getLastId() + 1);
 					msj = MessageBuilder().createExplosionMessage(explosion);
 					broadcast(msj, clientList);
+					if((*enemyPlanesIt)->isBigPlane() && (*enemyPlanesIt)->getLifes() <= 0){
+						PowerUp bonusPowerUp;
+						bonusPowerUp.setPath((*enemyPlanesIt)->getPwUpPath());
+						bonusPowerUp.setHeigth((*enemyPlanesIt)->getPwUpHeiht());
+						bonusPowerUp.setWidth((*enemyPlanesIt)->getPwUpWidth());
+						bonusPowerUp.setPointsToAdd((*enemyPlanesIt)->getPwUpPoints());
+						bonusPowerUp.setId(objects.getLastId()+1);
+						objects.setLastId(objects.getLastId()+1);
+						bonusPowerUp.setPosX((*enemyPlanesIt)->getPosX());
+						bonusPowerUp.setPosY((*enemyPlanesIt)->getPosY());
+						bonusPowerUp.setType(3);//Tipo 3: suma puntos.
+						mensaje pwUpCreation = MessageBuilder().createBackgroundElementCreationMessageForElement(&bonusPowerUp);
+						broadcast(pwUpCreation, clientList);
+						escenario->addPowerUp(&bonusPowerUp);
+					}
 					enemiesMutex.lock();
 					explosions.push_back(explosion);
 					strcpy(msj.action, "delete");

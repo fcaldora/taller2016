@@ -436,6 +436,20 @@ void XmlParser::getEnemyPlane(EnemyPlane* enemyPlane, int enemyPlaneNum, list<Fo
 	enemyPlane->setLastHitScore(atoi(lastHitScore->GetText()));
 	//Factor para que el avion no se desplace tan rapido
 	enemyPlane->setSpeedFactor(0);
+	//Recupero PowerUp si es que existe.
+	TiXmlElement* pwUpPath = enemyPlaneElement->FirstChildElement("pwUpPath");
+	if(pwUpPath != NULL){
+		enemyPlane->setPwUpPath(pwUpPath->GetText());
+		TiXmlElement* pwUpHeight = enemyPlaneElement->FirstChildElement("pwUpAlto");
+		if(pwUpHeight != NULL)
+			enemyPlane->setPwUpHeight(atoi(pwUpHeight->GetText()));
+		TiXmlElement* pwUpWidth = enemyPlaneElement->FirstChildElement("pwUpAncho");
+		if(pwUpWidth != NULL)
+			enemyPlane->setPwUpWidth(atoi(pwUpWidth->GetText()));
+		TiXmlElement* pwUpPoints = enemyPlaneElement->FirstChildElement("pwUpPoints");
+		if(pwUpPoints != NULL)
+			enemyPlane->setPwUpPoints(atoi(pwUpPoints->GetText()));
+	}
 }
 
 

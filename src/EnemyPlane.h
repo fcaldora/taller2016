@@ -14,6 +14,7 @@
 #include "time.h"
 #include "ClientList.h"
 
+
 class EnemyPlane: public DrawableObject {
 public:
 	EnemyPlane();
@@ -102,6 +103,38 @@ public:
 		this->bigPlane = bigPlane;
 	}
 
+	void setPwUpPath(string path){
+		pwUpPath = path;
+	}
+
+	string getPwUpPath(){
+		return pwUpPath;
+	}
+
+	void setPwUpHeight(int height){
+		pwUpHeight = height;
+	}
+
+	int getPwUpHeiht(){
+		return pwUpHeight;
+	}
+
+	void setPwUpWidth(int width){
+		pwUpWidth = width;
+	}
+
+	int getPwUpWidth(){
+		return pwUpWidth;
+	}
+
+	void setPwUpPoints(int points){
+		pwUpPoints = points;
+	}
+
+	int getPwUpPoints(){
+		return pwUpPoints;
+	}
+
 private:
 	Formation* formation;
 	int score;
@@ -112,6 +145,10 @@ private:
 	int speedFactor;
 	int lastHitScore;
 	bool bigPlane;
+	string pwUpPath;
+	int pwUpWidth;
+	int pwUpHeight;
+	int pwUpPoints;
 };
 
 #endif /* ENEMYPLANE_H_ */
