@@ -14,6 +14,8 @@ Avion::Avion() :DrawableObject() {
 	velDesplazamiento = 0;
 	this->isLooping = false;
 	this->hasDoubleShooting = false;
+	lastRollPhotogram = 8; //CARGAR DESDE XML?
+	landingCounter = 0;
 }
 
 void Avion::setVelDesplazamiento(int velDesplazamiento){
@@ -70,28 +72,47 @@ void Avion::setPhotogram(){
 }
 
 void Avion::aterrizar(int finishX){
-	if(this->posX - finishX > 0){
+	if(this->posX - finishX >= 0){
 		this->moveOneStepLeft();
-	}else if(this->posX - finishX < 0){
+	}else if(this->posX - finishX <= 0){
 		this->moveOneStepRight();
+	}
+	if(landingCounter == 0){
+		actualPhotogram = lastRollPhotogram + 1;
+		landingCounter++;
+		return;
+	}
+
+	landingCounter++;
+
+	if(actualPhotogram < numberOfPhotograms && landingCounter == 100){
+		actualPhotogram++;
+		landingCounter = 1;
+	}else if(actualPhotogram == numberOfPhotograms){
+		actualPhotogram = 1;
+		landingCounter = 0;
 	}
 }
 
-bool Avion::updatePhotogram(){
+bool Avion::updatePhotogram(bool aterrizaje){
 	if(this->actualPhotogram == 1) {
 		this->isLooping = false;
 		return false;
 	}
 
-	if(this->actualPhotogram < this->numberOfPhotograms){
+	if(this->actualPhotogram < this->lastRollPhotogram){
 		this->actualPhotogram++;
 		this->isLooping = true;
 		return true;
 	}
-	if(this->actualPhotogram == this->numberOfPhotograms){
+	if(this->actualPhotogram == this->lastRollPhotogram){
 		this->actualPhotogram = 1;
 		this->isLooping = false;
 		return true;
+	}
+	if(!aterrizaje & (actualPhotogram > lastRollPhotogram || actualPhotogram >= numberOfPhotograms)){
+		actualPhotogram = 1;
+		landingCounter = 0;
 	}
 	return false;
 }

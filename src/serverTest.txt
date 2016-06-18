@@ -119,7 +119,7 @@
 		<lifes>3</lifes>
 		<x>100</x>
 		<y>350</y>
-		<cantidad>8</cantidad>
+		<cantidad>17</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -134,7 +134,7 @@
 		<lifes>3</lifes>
 		<x>200</x>
 		<y>350</y>
-		<cantidad>8</cantidad>
+		<cantidad>17</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -149,7 +149,7 @@
 		<lifes>3</lifes>
 		<x>300</x>
 		<y>100</y>
-		<cantidad>8</cantidad>
+		<cantidad>17</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -164,7 +164,7 @@
 		<lifes>3</lifes>
 		<x>400</x>
 		<y>100</y>
-		<cantidad>8</cantidad>
+		<cantidad>17</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>

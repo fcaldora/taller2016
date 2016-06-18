@@ -528,7 +528,7 @@ void XmlParser::getStagesPositions(list<int> &stagesPositions){
 	TiXmlElement* stagesPos = escenarioElem->FirstChildElement("stagesPositions");
 	TiXmlElement* stagePos = stagesPos->FirstChildElement("stagePosition");
 	while (stagePos != NULL){
-		stagesPositions.push_back(atoi(stagePos->GetText()));
+		stagesPositions.push_back(atoi(stagePos->GetText()) - 3*this->getAltoVentana()/2);
 		stagePos = stagePos->NextSiblingElement("stagePosition");
 	}
 }

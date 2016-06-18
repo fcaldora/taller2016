@@ -29,7 +29,7 @@ public:
 	void moveOneStepLeft();
 	void moveOneStepUp();
 	void moveOneStepDown();
-	bool updatePhotogram();
+	bool updatePhotogram(bool aterrizaje);
 	bool doubleShooting();
 	void setDoubleShooting(bool);
 	void aterrizar(int finishX);
@@ -48,6 +48,8 @@ private:
 	int velDisparo;
 	bool hasDoubleShooting;
 	int lifes;
+	int lastRollPhotogram;
+	int landingCounter;
 };
 
 #endif /* AVION_H_ */
