@@ -136,6 +136,17 @@ struct menuResponseMessage {
 	bool secondTeamIsAvailableToJoin;
 };
 
+struct StatsTypeMessage {
+	int id;
+	char statType[kLongChar]; //teams || collaboration
+};
+
+struct CollaborationStatsMessage {
+	int id;
+	char bestPlayerName[kLongChar];
+	int bestPlayerScore;
+};
+
 enum LogLevelType {
 	LogLevelTypeOnlyErrors = 1,
 	LogLevelTypeEverything = 2

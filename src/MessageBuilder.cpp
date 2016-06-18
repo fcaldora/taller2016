@@ -297,6 +297,34 @@ menuResponseMessage MessageBuilder::createMenuMessage(vector<Team *> *teams) {
 	return message;
 }
 
+StatsTypeMessage MessageBuilder::createStatsTypeMessageCollaborationType(bool isCollaborative) {
+	StatsTypeMessage message;
+	message.id = 0;
+	if (isCollaborative) {
+		strncpy(message.statType , "collaboration", kLongChar);
+	} else {
+		strncpy(message.statType , "teams", kLongChar);
+	}
+	return message;
+}
+
+CollaborationStatsMessage MessageBuilder::createCollaborationStatsMessage(ScoreManager *scoreManager, ClientList *clientList) {
+	CollaborationStatsMessage message;
+	message.id = 0;
+	Score *bestScore = scoreManager->getBestScore();
+	Client *clientWithBestScore;
+	for (Client *client : clientList->clients) {
+		if (bestScore->getClientSocket() == client->getSocketMessages()) {
+			clientWithBestScore = client;
+		}
+	}
+
+	strncpy(message.bestPlayerName , clientWithBestScore->getName().c_str(), kLongChar);
+	message.bestPlayerScore = bestScore->getScore();
+
+	return message;
+}
+
 MessageBuilder::~MessageBuilder() {
 }
 

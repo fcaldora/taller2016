@@ -46,6 +46,8 @@ public:
 	mensaje createLifeMessage(int id, int height, int width);
 	mensaje createExplosionSoundMessage();
 	menuResponseMessage createMenuMessage(vector<Team *> *teams);
+	StatsTypeMessage createStatsTypeMessageCollaborationType(bool isCollaborative);
+	CollaborationStatsMessage createCollaborationStatsMessage(ScoreManager *scoreManager, ClientList *clientList);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

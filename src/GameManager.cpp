@@ -223,6 +223,42 @@ int sendMsjInfo(int socket, int bytesAEnviar, mensaje* mensaje) {
 	return enviados;
 }
 
+int sendStatsTypeMessage(int socket, int bytesToSend, StatsTypeMessage *message) {
+	int sentBytes = 0;
+	int res = 0;
+
+	while (sentBytes < bytesToSend) {
+		res = send(socket, &(message)[sentBytes], bytesToSend - sentBytes,
+		MSG_WAITALL);
+		if (res == 0) { //Se cerró la conexion. Escribir en log de errores de conexion.
+			return 0;
+		} else if (res < 0) { //Error en el envio del mensaje. Escribir en el log.
+			return -1;
+		} else {
+			sentBytes += res;
+		}
+	}
+	return sentBytes;
+}
+
+int sendCollaborationStatsMessage(int socket, int bytesToSend, CollaborationStatsMessage *message) {
+	int sentBytes = 0;
+	int res = 0;
+
+	while (sentBytes < bytesToSend) {
+		res = send(socket, &(message)[sentBytes], bytesToSend - sentBytes,
+				MSG_WAITALL);
+		if (res == 0) { //Se cerró la conexion. Escribir en log de errores de conexion.
+			return 0;
+		} else if (res < 0) { //Error en el envio del mensaje. Escribir en el log.
+			return -1;
+		} else {
+			sentBytes += res;
+		}
+	}
+	return sentBytes;
+}
+
 int readMsj(int socket, int bytesARecibir, clientMsj* mensaje) {
 	int recibidos = 0;
 	int totalBytesRecibidos = 0;
@@ -267,7 +303,24 @@ void broadcast(mensaje msg, ClientList* clientList){
 	}
 }
 
-void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario, vector<Team *> *teams) {
+void broadcastStatsTypeMessage(StatsTypeMessage message, ClientList *clientList) {
+	std::list<Client*>::iterator it;
+	for (it = clientList->clients.begin(); it != clientList->clients.end(); ++it) {
+		if((*it)->getConnnectionState()){
+			sendStatsTypeMessage((*it)->getSocketMessages(), sizeof(message), &message);
+		}
+	}
+}
+
+void broadcastCollaborationStatsMessage(CollaborationStatsMessage message, ClientList *clientList) {
+	for (Client *client : clientList->clients) {
+		if(client->getConnnectionState()){
+			sendCollaborationStatsMessage(client->getSocketMessages(), sizeof(message), &message);
+		}
+	}
+}
+
+void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario, vector<Team *> *teams, XmlParser *parser) {
 	std::list<Client*>::iterator it;
 	std::list<Object>::iterator objectIt;
 	std::list<EnemyPlane*>::iterator enemyPlanesIt;
@@ -531,6 +584,15 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			mensaje finishMsj;
 			strncpy(finishMsj.action,"close",kLongChar);
 			broadcast(finishMsj,clientList);
+			bool gameIsCollaborative = parser->gameIsColaborationType();
+			StatsTypeMessage statsTypeMessage = MessageBuilder().createStatsTypeMessageCollaborationType(gameIsCollaborative);
+			broadcastStatsTypeMessage(statsTypeMessage, clientList);
+			if (gameIsCollaborative) {
+				CollaborationStatsMessage collaborationStatsMessage = MessageBuilder().createCollaborationStatsMessage(scoreManager, clientList);
+				broadcastCollaborationStatsMessage(collaborationStatsMessage, clientList);
+			} else {
+
+			}
 			appShouldTerminate = true;
 		}
 	}
@@ -814,7 +876,7 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	escenario.setPosPortaAviones(parser->getPosXPortaAviones(),parser->getPosYPortaAviones());
 	escenario.setStagesPositions(parser);
 	objects.setIdOfFirstBullet(this->parser->getFirstBulletId());
-	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario, this->teams);
+	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario, this->teams, this->parser);
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario, this->teams);
 	this->menuPresenter->presentMenu();

@@ -7,9 +7,7 @@
 
 #include "ClientList.h"
 
-ClientList::ClientList() {
-	// TODO Auto-generated constructor stub
-}
+ClientList::ClientList() {}
 
 void ClientList::addClient(Client *client) {
 	this->clients.push_back(client);
@@ -58,11 +56,9 @@ Client* ClientList::getClientForPlaneId(int id) {
 	return response;
 }
 
-
 ClientList::~ClientList() {
 	for (Client *client : this->clients) {
 		delete client;
 	}
-	// TODO Auto-generated destructor stub
 }
 
