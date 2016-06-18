@@ -94,10 +94,12 @@ void EnemyPlane::move(){
 	}else{
 		this->speedFactor += 1;
 	}
+	if(isBigPlane())
+		cout<<"posY: "<<posY<<endl;
 }
 
 bool EnemyPlane::notVisible(int width, int height){
-	return(this->posX > (width + 50) || this->posY > (height+50));
+	return(this->posX > (width + 50) || (this->posY > (height+50) && !this->isBigPlane()));
 }
 
 int EnemyPlane::collideWithClient(ClientList* clientList){

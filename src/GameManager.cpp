@@ -811,8 +811,8 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	escenario.setPracticeMode(parser->startWithPracticeMode());
 	escenario.transformPositions();
 	aterrizaje = false;
-	escenario.setPosPortaAviones(parser->getPosXPortaAviones(),parser->getPosYPortaAviones());
 	escenario.setStagesPositions(parser);
+	escenario.setPosPortaAviones(parser->getPosXPortaAviones(), escenario.getPortaAvionesY());
 	objects.setIdOfFirstBullet(this->parser->getFirstBulletId());
 	std::thread broadcastThread(broadcastMsj,clientList, this->procesor, this->escenario, this->teams);
 	std::thread clientConnectionWaiter(waitForClientConnection,

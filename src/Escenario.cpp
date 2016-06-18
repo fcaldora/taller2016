@@ -41,6 +41,7 @@ void Escenario::update(){
 		//scrollingOffset = 0;
 	//}else{
 		scrollingOffset += scrollingStep;
+		//cout<<"offset del escenario: "<<scrollingOffset<<endl;
 	//}
 		if(stagesPositions.size() > 0){
 			if(this->scrollingOffset >= this->stagesPositions.front()){
@@ -172,6 +173,7 @@ void Escenario::deletePowerUps(){
 void Escenario::setStagesPositions(XmlParser* parser){
 	stagesPositions.clear();
 	parser->getStagesPositions(stagesPositions);
+	this->portaAvionesY = stagesPositions.front();
 }
 
 bool Escenario::gameFinished(){
