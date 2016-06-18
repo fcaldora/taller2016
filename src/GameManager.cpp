@@ -259,6 +259,24 @@ int sendCollaborationStatsMessage(int socket, int bytesToSend, CollaborationStat
 	return sentBytes;
 }
 
+int sendTeamStatsMessage(int socket, int bytesToSend, TeamsStatsMessage *message) {
+	int sentBytes = 0;
+	int res = 0;
+
+	while (sentBytes < bytesToSend) {
+		res = send(socket, &(message)[sentBytes], bytesToSend - sentBytes,
+				MSG_WAITALL);
+		if (res == 0) { //Se cerró la conexion. Escribir en log de errores de conexion.
+			return 0;
+		} else if (res < 0) { //Error en el envio del mensaje. Escribir en el log.
+			return -1;
+		} else {
+			sentBytes += res;
+		}
+	}
+	return sentBytes;
+}
+
 int readMsj(int socket, int bytesARecibir, clientMsj* mensaje) {
 	int recibidos = 0;
 	int totalBytesRecibidos = 0;
@@ -316,6 +334,14 @@ void broadcastCollaborationStatsMessage(CollaborationStatsMessage message, Clien
 	for (Client *client : clientList->clients) {
 		if(client->getConnnectionState()){
 			sendCollaborationStatsMessage(client->getSocketMessages(), sizeof(message), &message);
+		}
+	}
+}
+
+void broadcastTeamStatsMessage(TeamsStatsMessage message, ClientList *clientList) {
+	for (Client *client : clientList->clients) {
+		if(client->getConnnectionState()){
+			sendTeamStatsMessage(client->getSocketMessages(), sizeof(message), &message);
 		}
 	}
 }
@@ -591,7 +617,8 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				CollaborationStatsMessage collaborationStatsMessage = MessageBuilder().createCollaborationStatsMessage(scoreManager, clientList);
 				broadcastCollaborationStatsMessage(collaborationStatsMessage, clientList);
 			} else {
-
+				TeamsStatsMessage teamsStatsMessage = MessageBuilder().createTeamsStatsMessage(scoreManager, teams);
+				broadcastTeamStatsMessage(teamsStatsMessage, clientList);
 			}
 			appShouldTerminate = true;
 		}

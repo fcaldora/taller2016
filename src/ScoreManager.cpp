@@ -99,3 +99,12 @@ int ScoreManager::bestScore(){
 	}
 	return id;
 }
+
+Score* ScoreManager::getScoreForClientId(int clientID) {
+	for (Score *score : this->scores) {
+		if (score->getClientSocket() == clientID) {
+			return score;
+		}
+	}
+	return NULL;
+}

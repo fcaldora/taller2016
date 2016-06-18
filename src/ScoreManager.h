@@ -25,6 +25,7 @@ public:
 	void resetScores();
 	int bestScore();
 	Score* getBestScore();
+	Score* getScoreForClientId(int clientID);
 
 private:
 	list<Score*> scores;

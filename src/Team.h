@@ -25,7 +25,7 @@ public:
 	string teamName;
 
 	unsigned int maxNumberOfPlayers;
-	list<Client *> clients;
+	vector<Client *> clients;
 private:
 	int points;
 };

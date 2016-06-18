@@ -76,6 +76,8 @@ using namespace std;
 #define KILLENEMIES 2
 #define ADDINGPOINTS 3
 
+#define kNoTeamPlaceholder ":No_Team:"
+
 struct sprite{
 	char id[LONG_ID];
 	char path[LONG_PATH];
@@ -145,6 +147,26 @@ struct CollaborationStatsMessage {
 	int id;
 	char bestPlayerName[kLongChar];
 	int bestPlayerScore;
+};
+
+struct TeamsStatsMessage {
+	int id;
+	char winnerTeamName[kLongChar];
+	int winnerTeamScore;
+	char firstPlayerNameOfWinnerTeam[kLongChar];
+	int firstPlayerScoreOfWinnerTeam;
+	char secondPlayerNameOfWinnerTeam[kLongChar];
+	int secondPlayerScoreOfWinnerTeam;
+	char thirdPlayerNameOfWinnerTeam[kLongChar];
+	int thirdPlayerScoreOfWinnerTeam;
+	char losserTeamName[kLongChar];
+	int losserTeamScore;
+	char firstPlayerNameOfLosserTeam[kLongChar];
+	int firstPlayerScoreOfLosserTeam;
+	char secondPlayerNameOfLosserTeam[kLongChar];
+	int secondPlayerScoreOfLosserTeam;
+	char thirdPlayerNameOfLosserTeam[kLongChar];
+	int thirdPlayerScoreOfLosserTeam;
 };
 
 enum LogLevelType {
