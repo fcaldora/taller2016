@@ -503,7 +503,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 		if (contador == 30){
 			contador = 0;
 			for(it = clientList->clients.begin(); it != clientList->clients.end(); it++){
-				if((*it)->plane->updatePhotogram(aterrizaje)){
+				if((*it)->plane->updatePhotogram(aterrizaje, gameInitiated)){
 					mensaje photogramMsg = MessageBuilder().createUpdatePhotogramMessageForPlane((*it)->plane);
 					broadcast(photogramMsg, clientList);
 				}

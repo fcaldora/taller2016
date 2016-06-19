@@ -9,13 +9,15 @@
 
 Avion::Avion() :DrawableObject() {
 	this->numberOfPhotograms = 1;
-	this->actualPhotogram = 1;
+	this->actualPhotogram = 12;//Inicia con el photograma mas chico y va aumentando.
 	velDisparo = 0;
 	velDesplazamiento = 0;
 	this->isLooping = false;
 	this->hasDoubleShooting = false;
 	lastRollPhotogram = 8; //CARGAR DESDE XML?
 	landingCounter = 0;
+	isStarting = true;
+	startingCounter = 0;
 }
 
 void Avion::setVelDesplazamiento(int velDesplazamiento){
@@ -94,7 +96,7 @@ void Avion::aterrizar(int finishX){
 	}
 }
 
-bool Avion::updatePhotogram(bool aterrizaje){
+bool Avion::updatePhotogram(bool aterrizaje, bool gameInitiated){
 	if(this->actualPhotogram == 1) {
 		this->isLooping = false;
 		return false;
@@ -110,10 +112,20 @@ bool Avion::updatePhotogram(bool aterrizaje){
 		this->isLooping = false;
 		return true;
 	}
-	if(!aterrizaje & (actualPhotogram > lastRollPhotogram || actualPhotogram >= numberOfPhotograms)){
+	if(!aterrizaje &&!isStarting && (actualPhotogram > lastRollPhotogram || actualPhotogram >= numberOfPhotograms)){
 		actualPhotogram = 1;
 		landingCounter = 0;
 	}
+	if(isStarting && gameInitiated){
+		if(startingCounter == 3){
+			actualPhotogram++;
+			startingCounter = 0;
+			return true;
+		}else
+			startingCounter++;
+	}
+	if(actualPhotogram == numberOfPhotograms)
+		isStarting = false;
 	return false;
 }
 
