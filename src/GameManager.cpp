@@ -346,6 +346,19 @@ void broadcastTeamStatsMessage(TeamsStatsMessage message, ClientList *clientList
 	}
 }
 
+void deleteClientLifes(Client *client, ClientList *clientList) {
+	for (int i = 1 ; i <= 3 ; i++) {
+		mensaje clientHit;
+		strcpy(clientHit.action, "path");
+		client->getPlane()->setLifes(0);
+		clientHit.id = client->getPlane()->getId() + (5000 * i);
+		strcpy(clientHit.imagePath, "nheart.png");
+		clientHit.width = 39;
+		clientHit.height = 42;
+		broadcast(clientHit, clientList);
+	}
+}
+
 void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* escenario, vector<Team *> *teams, XmlParser *parser) {
 	std::list<Client*>::iterator it;
 	std::list<Object>::iterator objectIt;
@@ -456,11 +469,15 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					//Explosion* explosion = new Explosion(client->getPlane()->getPosX(), client->getPlane()->getPosY(), true, 15000 + explosions.size());
 					//msj = MessageBuilder().createExplosionMessage(explosion);
 					//broadcast(msj, clientList);
-					client->setAlive(false);
 					strcpy(msj.action, "delete");
 					msj.id = clientId;
 					broadcast(msj, clientList);
+					deleteClientLifes(client, clientList);
+
 					(*enemyPlanesIt)->setLifes(0);
+
+					client->setAlive(false);
+
 				}
 				if((*enemyPlanesIt)->notVisible(processor->getScreenWidth(), processor->getScreenHeight())
 						|| (*enemyPlanesIt)->getLifes() <= 0){
