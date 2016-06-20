@@ -77,6 +77,17 @@ void ScoreManager::resetScores(){
 	}
 }
 
+Score* ScoreManager::getBestScore() {
+	Score *bestScore = new Score();
+	bestScore->setScore(0);
+	for (Score *score : this->scores) {
+		if (bestScore->getScore() <= score->getScore()) {
+			bestScore = score;
+		}
+	}
+	return bestScore;
+}
+
 int ScoreManager::bestScore(){
 	list<Score*>::iterator it;
 	int id;
@@ -87,4 +98,13 @@ int ScoreManager::bestScore(){
 		}
 	}
 	return id;
+}
+
+Score* ScoreManager::getScoreForClientId(int clientID) {
+	for (Score *score : this->scores) {
+		if (score->getClientSocket() == clientID) {
+			return score;
+		}
+	}
+	return NULL;
 }

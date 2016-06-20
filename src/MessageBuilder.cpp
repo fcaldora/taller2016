@@ -297,6 +297,86 @@ menuResponseMessage MessageBuilder::createMenuMessage(vector<Team *> *teams) {
 	return message;
 }
 
+StatsTypeMessage MessageBuilder::createStatsTypeMessageCollaborationType(bool isCollaborative) {
+	StatsTypeMessage message;
+	message.id = 0;
+	if (isCollaborative) {
+		strncpy(message.statType , "collaboration", kLongChar);
+	} else {
+		strncpy(message.statType , "teams", kLongChar);
+	}
+	return message;
+}
+
+CollaborationStatsMessage MessageBuilder::createCollaborationStatsMessage(ScoreManager *scoreManager, ClientList *clientList) {
+	CollaborationStatsMessage message;
+	message.id = 0;
+	Score *bestScore = scoreManager->getBestScore();
+	Client *clientWithBestScore;
+	for (Client *client : clientList->clients) {
+		if (bestScore->getClientSocket() == client->getSocketMessages()) {
+			clientWithBestScore = client;
+		}
+	}
+
+	strncpy(message.bestPlayerName , clientWithBestScore->getName().c_str(), kLongChar);
+	message.bestPlayerScore = bestScore->getScore();
+
+	return message;
+}
+
+TeamsStatsMessage MessageBuilder::createTeamsStatsMessage(ScoreManager *scoreManager, vector<Team *> *teams) {
+	TeamsStatsMessage message;
+	message.id = 0;
+	Team *winnerTeam;
+	Team *losserTeam;
+	if (teams->at(0)->getPoints() <= teams->at(1)->getPoints()) {
+		winnerTeam = teams->at(1);
+		losserTeam = teams->at(0);
+	} else {
+		winnerTeam = teams->at(0);
+		losserTeam = teams->at(1);
+	}
+
+	strncpy(message.winnerTeamName , winnerTeam->teamName.c_str(), kLongChar);
+	message.winnerTeamScore = winnerTeam->getPoints();
+	strncpy(message.firstPlayerNameOfWinnerTeam , winnerTeam->clients[0]->getName().c_str(), kLongChar);
+	message.firstPlayerScoreOfWinnerTeam = scoreManager->getScoreForClientId(((Client *)winnerTeam->clients[0])->getSocketMessages())->getScore();
+	if (winnerTeam->clients.size() >= 2) {
+		strncpy(message.secondPlayerNameOfWinnerTeam , ((Client *)winnerTeam->clients[1])->getName().c_str(), kLongChar);
+		message.secondPlayerScoreOfWinnerTeam = scoreManager->getScoreForClientId(((Client *)winnerTeam->clients[1])->getSocketMessages())->getScore();
+		if (winnerTeam->clients.size() == 3) {
+			strncpy(message.thirdPlayerNameOfWinnerTeam , ((Client *)winnerTeam->clients[2])->getName().c_str(), kLongChar);
+			message.thirdPlayerScoreOfWinnerTeam = scoreManager->getScoreForClientId(((Client *)winnerTeam->clients[2])->getSocketMessages())->getScore();
+		} else {
+			strncpy(message.thirdPlayerNameOfWinnerTeam , kNoTeamPlaceholder, kLongChar);
+		}
+	} else {
+		strncpy(message.secondPlayerNameOfWinnerTeam , kNoTeamPlaceholder, kLongChar);
+		strncpy(message.thirdPlayerNameOfWinnerTeam , kNoTeamPlaceholder, kLongChar);
+	}
+
+	strncpy(message.losserTeamName , losserTeam->teamName.c_str(), kLongChar);
+	message.losserTeamScore = losserTeam->getPoints();
+	strncpy(message.firstPlayerNameOfLosserTeam , ((Client *)losserTeam->clients[0])->getName().c_str(), kLongChar);
+	message.firstPlayerScoreOfLosserTeam = scoreManager->getScoreForClientId(((Client *)losserTeam->clients[0])->getSocketMessages())->getScore();
+	if (losserTeam->clients.size() >= 2) {
+		strncpy(message.secondPlayerNameOfLosserTeam , ((Client *)losserTeam->clients[1])->getName().c_str(), kLongChar);
+		message.secondPlayerScoreOfLosserTeam = scoreManager->getScoreForClientId(((Client *)losserTeam->clients[1])->getSocketMessages())->getScore();
+		if (losserTeam->clients.size() == 3) {
+			strncpy(message.thirdPlayerNameOfLosserTeam , ((Client *)losserTeam->clients[2])->getName().c_str(), kLongChar);
+			message.thirdPlayerScoreOfLosserTeam = scoreManager->getScoreForClientId(((Client *)losserTeam->clients[2])->getSocketMessages())->getScore();
+		} else {
+			strncpy(message.thirdPlayerNameOfLosserTeam , kNoTeamPlaceholder, kLongChar);
+		}
+	} else {
+		strncpy(message.secondPlayerNameOfLosserTeam , kNoTeamPlaceholder, kLongChar);
+		strncpy(message.thirdPlayerNameOfLosserTeam , kNoTeamPlaceholder, kLongChar);
+	}
+
+	return message;
+}
+
 MessageBuilder::~MessageBuilder() {
 }
 
