@@ -9,11 +9,15 @@
 
 Avion::Avion() :DrawableObject() {
 	this->numberOfPhotograms = 1;
-	this->actualPhotogram = 1;
+	this->actualPhotogram = 12;//Inicia con el photograma mas chico y va aumentando.
 	velDisparo = 0;
 	velDesplazamiento = 0;
 	this->isLooping = false;
 	this->hasDoubleShooting = false;
+	lastRollPhotogram = 8; //CARGAR DESDE XML?
+	landingCounter = 0;
+	isStarting = true;
+	startingCounter = 0;
 }
 
 void Avion::setVelDesplazamiento(int velDesplazamiento){
@@ -70,29 +74,58 @@ void Avion::setPhotogram(){
 }
 
 void Avion::aterrizar(int finishX){
-	if(this->posX - finishX > 0){
+	if(this->posX - finishX >= 0){
 		this->moveOneStepLeft();
-	}else if(this->posX - finishX < 0){
+	}else if(this->posX - finishX <= 0){
 		this->moveOneStepRight();
+	}
+	if(landingCounter == 0){
+		actualPhotogram = lastRollPhotogram + 1;
+		landingCounter++;
+		return;
+	}
+
+	landingCounter++;
+
+	if(actualPhotogram < numberOfPhotograms && landingCounter == 100){
+		actualPhotogram++;
+		landingCounter = 1;
+	}else if(actualPhotogram == numberOfPhotograms){
+		actualPhotogram = 1;
+		landingCounter = 0;
 	}
 }
 
-bool Avion::updatePhotogram(){
+bool Avion::updatePhotogram(bool aterrizaje, bool gameInitiated){
 	if(this->actualPhotogram == 1) {
 		this->isLooping = false;
 		return false;
 	}
 
-	if(this->actualPhotogram < this->numberOfPhotograms){
+	if(this->actualPhotogram < this->lastRollPhotogram){
 		this->actualPhotogram++;
 		this->isLooping = true;
 		return true;
 	}
-	if(this->actualPhotogram == this->numberOfPhotograms){
+	if(this->actualPhotogram == this->lastRollPhotogram){
 		this->actualPhotogram = 1;
 		this->isLooping = false;
 		return true;
 	}
+	if(!aterrizaje &&!isStarting && (actualPhotogram > lastRollPhotogram || actualPhotogram >= numberOfPhotograms)){
+		actualPhotogram = 1;
+		landingCounter = 0;
+	}
+	if(isStarting && gameInitiated){
+		if(startingCounter == 3){
+			actualPhotogram++;
+			startingCounter = 0;
+			return true;
+		}else
+			startingCounter++;
+	}
+	if(actualPhotogram == numberOfPhotograms)
+		isStarting = false;
 	return false;
 }
 
