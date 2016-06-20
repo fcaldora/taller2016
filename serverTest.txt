@@ -1,13 +1,13 @@
-<Servidor>
+	<Servidor>
 	<configuracion>
 		<nivelDeLog>2</nivelDeLog>
 	</configuracion>
-    <CantidadDeJugadoresPorEquipo>1</CantidadDeJugadoresPorEquipo>
+    <CantidadDeJugadoresPorEquipo>2</CantidadDeJugadoresPorEquipo>
     <CantidadMaximaClientes>2</CantidadMaximaClientes>
     <FirstBulletID>50</FirstBulletID>
     <Puerto>8080</Puerto>
 </Servidor>
-<colaboration>false</colaboration>
+<colaboration>true</colaboration>
 <ventana>
 	<ancho>800</ancho>
 	<alto>600</alto>
@@ -16,7 +16,7 @@
 	<ancho>800</ancho>
 	<alto>20000</alto>
 	<portaAvionesX>300</portaAvionesX>
-	<portaAvionesY>8500</portaAvionesY>
+	<portaAvionesY>0</portaAvionesY>
 	<anchoPortaAviones>224</anchoPortaAviones>
 	<practica>on</practica>
 	<fondo>
@@ -97,6 +97,14 @@
 			<x>300</x>
 			<y>20000</y>
 		</elemento>
+		<elemento>
+			<path>portaAviones.png</path>
+			<id>16</id>
+			<ancho>320</ancho>
+			<alto>896</alto>
+			<x>300</x>
+			<y>896</y>
+		</elemento>
 	</elementos>
 </escenario>
 <powerUps>
@@ -117,9 +125,9 @@
 		<ancho>68</ancho>
 		<alto>68</alto>
 		<lifes>3</lifes>
-		<x>100</x>
+		<x>470</x>
 		<y>350</y>
-		<cantidad>8</cantidad>
+		<cantidad>17</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -132,9 +140,9 @@
 		<ancho>68</ancho>
 		<alto>68</alto>
 		<lifes>3</lifes>
-		<x>200</x>
-		<y>350</y>
-		<cantidad>8</cantidad>
+		<x>470</x>
+		<y>400</y>
+		<cantidad>17</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -149,7 +157,7 @@
 		<lifes>3</lifes>
 		<x>300</x>
 		<y>100</y>
-		<cantidad>8</cantidad>
+		<cantidad>17</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -164,7 +172,7 @@
 		<lifes>3</lifes>
 		<x>400</x>
 		<y>100</y>
-		<cantidad>8</cantidad>
+		<cantidad>17</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -179,7 +187,7 @@
 		<lifes>3</lifes>
 		<x>450</x>
 		<y>150</y>
-		<cantidad>8</cantidad>
+		<cantidad>17</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -194,7 +202,7 @@
 		<lifes>3</lifes>
 		<x>400</x>
 		<y>200</y>
-		<cantidad>8</cantidad>
+		<cantidad>17</cantidad>
 		<velocidadDesplazamiento>5</velocidadDesplazamiento>
 		<velocidadDisparos>6</velocidadDisparos>
 		<avionSpriteId>avion</avionSpriteId>
@@ -359,8 +367,8 @@
 		<lifes>10</lifes>
 		<alto>121</alto>
 		<ancho>82</ancho>
-		<x>550</x>
-		<y>500</y>
+		<x>85</x>
+		<y>1000</y>
 		<actualPhotogram>1</actualPhotogram>
 		<photograms>8</photograms>
 		<path>enemyplane4.png</path>
