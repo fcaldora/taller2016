@@ -97,7 +97,7 @@ void EnemyPlane::move(){
 }
 
 bool EnemyPlane::notVisible(int width, int height){
-	return(this->posX > (width + 50) || (this->posY > (height+50) && !this->isBigPlane()));
+	return(this->posX > (width + 15000) || this->posY > (height+15000));
 }
 
 int EnemyPlane::collideWithClient(ClientList* clientList){
@@ -109,19 +109,21 @@ int EnemyPlane::collideWithClient(ClientList* clientList){
 		yCollision = false;
 		if((*it)->getConnnectionState() && (*it)->isAlive()){
 
-			int leftPlaneX = (*it)->getPlane()->getPosX();
-			int rightPlaneX = (*it)->getPlane()->getPosX() + (*it)->getPlane()->getWidth();
-			int upPlaneY = (*it)->getPlane()->getPosY();
-			int downPlaneY = (*it)->getPlane()->getPosY() + (*it)->getPlane()->getHeigth();
-			int leftClientX = posX;
-			int rightClientX = posX + width;
-			int upClientY = posY;
-			int downClientY = posY + heigth;
+			int leftClientX = (*it)->getPlane()->getPosX();
+			int rightClientX = (*it)->getPlane()->getPosX() + (*it)->getPlane()->getWidth();
+			int upClientY = (*it)->getPlane()->getPosY();
+			int downClientY = (*it)->getPlane()->getPosY() + (*it)->getPlane()->getHeigth();
+			int leftPlaneX = posX;
+			int rightPlaneX = posX + width;
+			int upPlaneY = posY;
+			int downPlaneY = posY + heigth;
 			if(leftPlaneX >= leftClientX && leftPlaneX <= rightClientX)
 				xCollision = true;
 			else if(rightPlaneX >= leftClientX && rightPlaneX <= rightClientX)
 				xCollision = true;
 			else if(leftPlaneX >= leftClientX && rightPlaneX <= rightClientX)
+				xCollision = true;
+			else if(leftClientX >= leftPlaneX && rightClientX <= rightPlaneX)
 				xCollision = true;
 
 			if(upPlaneY >= upClientY && upPlaneY <= downClientY)
@@ -129,6 +131,8 @@ int EnemyPlane::collideWithClient(ClientList* clientList){
 			else if(downPlaneY >= upClientY && downPlaneY <= downClientY)
 				yCollision = true;
 			else if(downPlaneY <= downClientY && upPlaneY >= upClientY)
+				yCollision = true;
+			else if(downClientY <= downPlaneY && upClientY >= upPlaneY)
 				yCollision = true;
 
 			if(yCollision && xCollision){
