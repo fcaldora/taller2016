@@ -42,7 +42,6 @@ public:
 	int getScoreTeamForClient(int planeId);
 	void setTeamIdScores(int teamId, int planeId);
 private:
-	bool appShouldTerminate;
 	MenuPresenter *menuPresenter;
 	XmlParser *parser;
 	XMLLoader *xmlLoader;
