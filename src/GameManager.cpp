@@ -623,21 +623,24 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				}
 			}
 		}
-		if(escenario->gameFinished()){
-			mensaje finishMsj;
-			strncpy(finishMsj.action,"close",kLongChar);
-			broadcast(finishMsj,clientList);
-			bool gameIsCollaborative = parser->gameIsColaborationType();
-			StatsTypeMessage statsTypeMessage = MessageBuilder().createStatsTypeMessageCollaborationType(gameIsCollaborative);
-			broadcastStatsTypeMessage(statsTypeMessage, clientList);
-			if (gameIsCollaborative) {
-				CollaborationStatsMessage collaborationStatsMessage = MessageBuilder().createCollaborationStatsMessage(scoreManager, clientList);
-				broadcastCollaborationStatsMessage(collaborationStatsMessage, clientList);
-			} else {
-				TeamsStatsMessage teamsStatsMessage = MessageBuilder().createTeamsStatsMessage(scoreManager, teams);
-				broadcastTeamStatsMessage(teamsStatsMessage, clientList);
+		if(gameInitiated){
+			if(escenario->gameFinished(clientList)){
+				sleep(2);//Para que se vea un poco el avion estacionado al final.
+				mensaje finishMsj;
+				strncpy(finishMsj.action,"close",kLongChar);
+				broadcast(finishMsj,clientList);
+				bool gameIsCollaborative = parser->gameIsColaborationType();
+				StatsTypeMessage statsTypeMessage = MessageBuilder().createStatsTypeMessageCollaborationType(gameIsCollaborative);
+				broadcastStatsTypeMessage(statsTypeMessage, clientList);
+				if (gameIsCollaborative) {
+					CollaborationStatsMessage collaborationStatsMessage = MessageBuilder().createCollaborationStatsMessage(scoreManager, clientList);
+					broadcastCollaborationStatsMessage(collaborationStatsMessage, clientList);
+				} else {
+					TeamsStatsMessage teamsStatsMessage = MessageBuilder().createTeamsStatsMessage(scoreManager, teams);
+					broadcastTeamStatsMessage(teamsStatsMessage, clientList);
+				}
+				appShouldTerminate = true;
 			}
-			appShouldTerminate = true;
 		}
 	}
 }

@@ -176,7 +176,15 @@ void Escenario::setStagesPositions(XmlParser* parser){
 	this->portaAvionesY = stagesPositions.front();
 }
 
-bool Escenario::gameFinished(){
+bool Escenario::gameFinished(ClientList* clients){
+	if(stagesPositions.size() == 1){//Si queda una sola etapa (la última)
+		list<Client*>::iterator it;
+		for(it = clients->clients.begin(); it != clients->clients.end(); it++){
+			if((*it)->getPlane()->getActualPhotogram() == 16){//Si esta en el fotograma más chico (aterrizado)
+				return true;
+			}
+		}
+	}
 	if(scrollingOffset >= this->heigth)
 		return true;
 	return false;
