@@ -60,7 +60,6 @@ list<mensaje> drawableList; //lista que guarda todos los mensajes iniciales para
 
 
 GameManager::GameManager() {
-	this->appShouldTerminate = false;
 	this->menuPresenter = NULL;
 	this->parser = NULL;
 	this->socketManager = NULL;
@@ -356,6 +355,15 @@ void deleteClientLifes(Client *client, ClientList *clientList) {
 		clientHit.width = 39;
 		clientHit.height = 42;
 		broadcast(clientHit, clientList);
+	}
+}
+
+void joinAllClientThreads(){
+	map<unsigned int, thread>::iterator threadItr;
+
+	for (threadItr = clientEntranceMessages.begin();
+			threadItr != clientEntranceMessages.end(); ++threadItr) {
+		threadItr->second.join();
 	}
 }
 
@@ -840,11 +848,13 @@ void* waitForClientConnection(int maxNumberOfClients, int socketHandle, XmlParse
 			sendMsjInfo(socketConnection, sizeof(mensaje), &sortPlaneMsg);
 		}
 	}
+	joinAllClientThreads();
 	pthread_exit(NULL);
 }
 
 int GameManager::initGameWithArguments(int argc, char* argv[]) {
-	this->menuPresenter = new MenuPresenter(this->appShouldTerminate, this);
+	appShouldTerminate = false;
+	this->menuPresenter = new MenuPresenter(appShouldTerminate, this);
 	this->clientList = new ClientList();
 	colaboration = false;
 	const char* fileName;
@@ -927,16 +937,15 @@ int GameManager::initGameWithArguments(int argc, char* argv[]) {
 	std::thread clientConnectionWaiter(waitForClientConnection,
 			maxNumberOfClients, this->socketManager->socketHandle, this->parser, this->clientList, this->procesor, this->escenario, this->teams);
 	this->menuPresenter->presentMenu();
-
-	clientConnectionWaiter.detach();
+	appShouldTerminate = true;
+	shutdown(this->socketManager->socketHandle, SHUT_RDWR);
+	clientConnectionWaiter.join();
 	broadcastThread.detach();
-	//enemyPlanesThread.detach();
 	return EXIT_SUCCESS;
 }
 
 void GameManager::userDidChooseExitoption() {
 	logWriter->writeUserDidFinishTheApp();
-	this->appShouldTerminate = true;
 	appShouldTerminate = true;
 }
 
@@ -1075,14 +1084,17 @@ void GameManager::detachClientMessagesThreads() {
 }
 
 GameManager::~GameManager() {
-	delete this->procesor;
-	delete this->clientList;
-	detachClientMessagesThreads();
-	delete this->menuPresenter;
-	delete this->parser;
-	delete this->xmlLoader;
-	delete this->socketManager;
-	delete this->escenario;
-	delete logWriter;
+	if(procesor != NULL)
+		delete this->procesor;
+	if(clientList != NULL)
+		delete this->clientList;
+	if(menuPresenter != NULL)
+		delete this->menuPresenter;
+	if(xmlLoader != NULL)
+		delete this->xmlLoader;
+	if(socketManager != NULL)
+		delete this->socketManager;
+	if(logWriter != NULL)
+		delete logWriter;
 }
 
