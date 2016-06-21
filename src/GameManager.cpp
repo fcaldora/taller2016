@@ -463,6 +463,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 							deletePowerUp.id = escenario->getPowerUp(i)->getId();
 							escenario->deletePowerUp(escenario->getPowerUp(i)->getId());
 							broadcast(deletePowerUp, clientList);
+							break;
 						}
 					}
 				}
