@@ -176,7 +176,7 @@ void Escenario::setStagesPositions(XmlParser* parser){
 	this->portaAvionesY = stagesPositions.front();
 }
 
-bool Escenario::gameFinished(ClientList* clients){
+bool Escenario::gameFinished(ClientList* clients, bool colaboration){
 	if(stagesPositions.size() == 1){//Si queda una sola etapa (la última)
 		list<Client*>::iterator it;
 		for(it = clients->clients.begin(); it != clients->clients.end(); it++){
@@ -184,6 +184,21 @@ bool Escenario::gameFinished(ClientList* clients){
 				return true;
 			}
 		}
+	}
+	if(!colaboration){
+		int firstTeamId = -1;
+		int secondTeamId = -1;
+		list<Client*>::iterator it;
+			for(it = clients->clients.begin() ; it != clients->clients.end(); it++){
+				if((*it)->isAlive()){
+					if(firstTeamId == -1)
+						firstTeamId = (*it)->getTeamId();
+					else if(secondTeamId == -1 && (*it)->getTeamId() != firstTeamId)
+						secondTeamId = (*it)->getTeamId();
+				}
+			}
+		if(firstTeamId == -1 || secondTeamId == -1) //No encontro vivo a al menos un jugador de algun equipo.
+			return true;
 	}
 	if(scrollingOffset >= this->heigth)
 		return true;

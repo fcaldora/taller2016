@@ -41,7 +41,7 @@ public:
 	void restart();
 	void deleteElements();
 	void setStagesPositions(XmlParser* parser);
-	bool gameFinished(ClientList* clients);
+	bool gameFinished(ClientList* clients, bool colaboration);
 	bool stageHasChanged();
 	int getCurrentStageNumber();
 	void setPracticeMode(bool);

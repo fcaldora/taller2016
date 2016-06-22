@@ -56,6 +56,18 @@ Client* ClientList::getClientForPlaneId(int id) {
 	return response;
 }
 
+bool ClientList::teamIsAlive(int teamId){
+	bool isAlive = false;
+	list<Client*>::iterator it;
+	for(it = clients.begin(); it != clients.end(); it++){
+		if((*it)->getTeamId() == teamId && (*it)->isAlive())
+			isAlive = true;
+	}
+
+	return isAlive;
+}
+
+
 ClientList::~ClientList() {
 	for (Client *client : this->clients) {
 		delete client;

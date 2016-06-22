@@ -48,7 +48,7 @@ public:
 	menuResponseMessage createMenuMessage(vector<Team *> *teams);
 	StatsTypeMessage createStatsTypeMessageCollaborationType(bool isCollaborative);
 	CollaborationStatsMessage createCollaborationStatsMessage(ScoreManager *scoreManager, ClientList *clientList);
-	TeamsStatsMessage createTeamsStatsMessage(ScoreManager *scoreManager, vector<Team *> *teams);
+	TeamsStatsMessage createTeamsStatsMessage(ScoreManager *scoreManager, vector<Team *> *teams,ClientList* clients);
 
 private:
 	mensaje createBackgroundElementBaseMessageForElement(DrawableObject *element);

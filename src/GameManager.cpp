@@ -638,7 +638,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 			}
 		}
 		if(gameInitiated){
-			if(escenario->gameFinished(clientList)){
+			if(escenario->gameFinished(clientList, colaboration)){
 				sleep(2);//Para que se vea un poco el avion estacionado al final.
 				mensaje finishMsj;
 				strncpy(finishMsj.action,"close",kLongChar);
@@ -650,7 +650,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 					CollaborationStatsMessage collaborationStatsMessage = MessageBuilder().createCollaborationStatsMessage(scoreManager, clientList);
 					broadcastCollaborationStatsMessage(collaborationStatsMessage, clientList);
 				} else {
-					TeamsStatsMessage teamsStatsMessage = MessageBuilder().createTeamsStatsMessage(scoreManager, teams);
+					TeamsStatsMessage teamsStatsMessage = MessageBuilder().createTeamsStatsMessage(scoreManager, teams, clientList);
 					broadcastTeamStatsMessage(teamsStatsMessage, clientList);
 				}
 				appShouldTerminate = true;

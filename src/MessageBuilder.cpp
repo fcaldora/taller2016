@@ -325,12 +325,13 @@ CollaborationStatsMessage MessageBuilder::createCollaborationStatsMessage(ScoreM
 	return message;
 }
 
-TeamsStatsMessage MessageBuilder::createTeamsStatsMessage(ScoreManager *scoreManager, vector<Team *> *teams) {
+TeamsStatsMessage MessageBuilder::createTeamsStatsMessage(ScoreManager *scoreManager, vector<Team *> *teams, ClientList* clients) {
 	TeamsStatsMessage message;
 	message.id = 0;
 	Team *winnerTeam;
 	Team *losserTeam;
-	if (teams->at(0)->getPoints() <= teams->at(1)->getPoints()) {
+	//Agrego el teamIsAlive para saber si el equipo 1, aparte de tener mas puntos, tiene aunque sea 1 jugador vivo.
+	if (teams->at(0)->getPoints() <= teams->at(1)->getPoints() && clients->teamIsAlive(1)) {
 		winnerTeam = teams->at(1);
 		losserTeam = teams->at(0);
 	} else {

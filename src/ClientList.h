@@ -23,6 +23,7 @@ public:
 	Client* getClientForName(char name[]);
 	Client* getClientForSocket(int socket);
 	Client* getClientForPlaneId(int id);
+	bool teamIsAlive(int teamId);
 
 };
 
