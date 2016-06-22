@@ -34,11 +34,11 @@ public:
 	void setDoubleShooting(bool);
 	void aterrizar(int finishX);
 	bool isLooping;
-
+	void setIfIsStarting(bool starting);
 	int getLifes() const {
 		return lifes;
 	}
-
+	void resetLandingCounter();
 	void setLifes(int lifes) {
 		this->lifes = lifes;
 	}

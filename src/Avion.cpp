@@ -124,9 +124,21 @@ bool Avion::updatePhotogram(bool aterrizaje, bool gameInitiated){
 		}else
 			startingCounter++;
 	}
-	if(actualPhotogram == numberOfPhotograms)
+	if(actualPhotogram == numberOfPhotograms){
 		isStarting = false;
+	}
+
 	return false;
+}
+
+void Avion::setIfIsStarting(bool starting){
+	isStarting = starting;
+	if(starting == true)
+		startingCounter = 0;
+}
+
+void Avion::resetLandingCounter(){
+	landingCounter = 0;
 }
 
 Avion::~Avion() {

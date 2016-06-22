@@ -26,7 +26,7 @@ public:
 	int getLastId();
 	int getFirstId();
 	void moveBullets();
-	int bulletMessage(int bulletNumber, mensaje &msg, int ScreenWidth, int ScreenHeight, list<EnemyPlane*> enemyPlanes, ClientList* clientList);
+	int bulletMessage(int bulletNumber, mensaje &msg, int ScreenWidth, int ScreenHeight, list<EnemyPlane*> enemyPlanes, ClientList* clientList, bool aterrizaje);
 	void clearBullets();
 	list<Object>::iterator begin();
 	list<Object>::iterator end();

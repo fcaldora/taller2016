@@ -72,11 +72,14 @@ void BulletList::moveBullets(){
 	}
 }
 
-int BulletList::bulletMessage(int bulletNumber, mensaje &msg, int width, int height, list<EnemyPlane*> enemyPlanes, ClientList* clientList){
+int BulletList::bulletMessage(int bulletNumber, mensaje &msg, int width, int height, list<EnemyPlane*> enemyPlanes, ClientList* clientList, bool aterrizaje){
 	Object* object = this->getObject(bulletNumber);
 	int id;
 	if(object->isEnemyBullet()){
-		id = object->crashedWithClient(clientList);
+		if(!aterrizaje)
+			id = object->crashedWithClient(clientList);
+		else
+			id = -1;
 	}else{
 		id = object->crashedWithPlane(enemyPlanes);
 	}

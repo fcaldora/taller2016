@@ -84,6 +84,7 @@ void GameManager::reloadGameFromXml(){
 	escenario->deletePowerUps();
 	escenario->resetScrollingOffset();
 	escenario->setStagesPositions(parser);
+	escenario->setPracticeMode(parser->startWithPracticeMode());
 	mensaje ventanaMsj, escenarioMsj;
 	memset(&ventanaMsj, 0, sizeof(mensaje));
 	memset(&escenarioMsj, 0, sizeof(mensaje));
@@ -142,6 +143,10 @@ void GameManager::reloadGameFromXml(){
 		(*it)->plane = parser->getAvion(i);
 		(*it)->setAlive(true);
 		(*it)->plane->setLifes(3);
+		(*it)->plane->setActualPhotogram(12);//fotograma mas pequeño. Arranca despegando.
+		(*it)->plane->setDoubleShooting(false);
+		(*it)->plane->setIfIsStarting(true);
+		(*it)->plane->resetLandingCounter();
 		avionMsj = MessageBuilder().createInitialMessageForClient((*it));
 		this->broadcastMessage(avionMsj);
 		for(int i=1; i<4; i++){
@@ -384,7 +389,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 		objects.moveBullets();
 		for(int i = 0; i < objects.bulletQuantity(); i++){
 			mensaje msg;
-			hit = objects.bulletMessage(i, msg, processor->getScreenWidth(), processor->getScreenHeight(), enemyPlanes, clientList);
+			hit = objects.bulletMessage(i, msg, processor->getScreenWidth(), processor->getScreenHeight(), enemyPlanes, clientList, aterrizaje);
 			if(hit != -1){
 				if(hit > clientList->clients.size()){
 					bulletId = objects.getObject(i)->getClientId();
@@ -472,7 +477,7 @@ void broadcastMsj( ClientList *clientList, Procesador* processor, Escenario* esc
 				mensaje msj;
 				(*enemyPlanesIt)->move();
 				int clientId = (*enemyPlanesIt)->collideWithClient(clientList);
-				if(clientId != -1){
+				if(clientId != -1 && !aterrizaje){
 					//Aviso a los clientes que borren al avion-
 					Client* client = clientList->getClientForPlaneId(clientId);
 					//Explosion* explosion = new Explosion(client->getPlane()->getPosX(), client->getPlane()->getPosY(), true, 15000 + explosions.size());
