@@ -74,9 +74,9 @@ void Avion::setPhotogram(){
 }
 
 void Avion::aterrizar(int finishX){
-	if(this->posX - finishX >= 0){
+	if(this->posX - finishX > 20){
 		this->moveOneStepLeft();
-	}else if(this->posX - finishX <= 0){
+	}else if(this->posX - finishX < -20){
 		this->moveOneStepRight();
 	}
 	if(landingCounter == 0){
